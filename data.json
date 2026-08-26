@@ -6,6 +6,13 @@
       "color": "#ff3366",
       "feedUrl": "",
       "lastSync": null
+    },
+    {
+      "id": "cal_1787764123477",
+      "name": "Travail perso",
+      "color": "#f97316",
+      "feedUrl": "",
+      "lastSync": null
     }
   ],
   "events": [
