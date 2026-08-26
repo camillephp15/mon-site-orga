@@ -10910,6 +10910,14 @@
   ],
   "dailyTodos": [
     {
+      "id": "td_1787766409317",
+      "text": "ajouter des transitio",
+      "completed": false,
+      "priority": "normal",
+      "tag": "Maison",
+      "createdAt": "2026-08-26T17:46:49.317Z"
+    },
+    {
       "id": "td_1787766368498",
       "text": "changer modif calendrier",
       "completed": false,
