@@ -11332,15 +11332,7 @@
             "id": "sub-ss2",
             "name": "Skills stage A2",
             "coef": 1,
-            "evaluations": [
-              {
-                "id": "ev-st1",
-                "name": "Rapport de stage & Bilan compétences",
-                "grade": 15,
-                "coef": 1,
-                "bonus": 0
-              }
-            ]
+            "evaluations": []
           },
           {
             "id": "sub-ss3",
