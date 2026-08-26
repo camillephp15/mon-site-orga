@@ -11250,15 +11250,7 @@
             "id": "sub-i2",
             "name": "Structures de données",
             "coef": 1,
-            "evaluations": [
-              {
-                "id": "ev-sd1",
-                "name": "TP Arbres & Graphes",
-                "grade": 16.5,
-                "coef": 1,
-                "bonus": 0
-              }
-            ]
+            "evaluations": []
           },
           {
             "id": "sub-i3",
