@@ -11126,13 +11126,6 @@
                 "grade": 14.5,
                 "coef": 2,
                 "bonus": 0
-              },
-              {
-                "id": "ev-s2",
-                "name": "Interrogation de cours",
-                "grade": 13,
-                "coef": 1,
-                "bonus": 0
               }
             ]
           },
