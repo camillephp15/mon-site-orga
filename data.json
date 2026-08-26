@@ -11229,22 +11229,7 @@
             "id": "sub-i1",
             "name": "Algorithmique et POO",
             "coef": 3,
-            "evaluations": [
-              {
-                "id": "ev-p1",
-                "name": "Projet POO Java / Python",
-                "grade": 16,
-                "coef": 2,
-                "bonus": 0
-              },
-              {
-                "id": "ev-p2",
-                "name": "DS Écrit Algorithmique",
-                "grade": 14.5,
-                "coef": 2,
-                "bonus": 0
-              }
-            ]
+            "evaluations": []
           },
           {
             "id": "sub-i2",
