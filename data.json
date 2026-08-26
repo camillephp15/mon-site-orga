@@ -10863,6 +10863,17 @@
       "room": "Kyndril Montpellier 881 Rue de la Vieille Poste - 34000 Montpellier",
       "type": "tp",
       "completed": false
+    },
+    {
+      "calendarId": "cal_1787764123477",
+      "title": "Travailler CS50",
+      "date": "2026-08-27",
+      "day": "thu",
+      "startTime": "09:00",
+      "duration": 60,
+      "room": "",
+      "completed": false,
+      "id": "ev_1787764199145"
     }
   ],
   "importantDates": [
