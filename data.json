@@ -11346,15 +11346,7 @@
             "id": "sub-ss3",
             "name": "Design Thinking et Créativité",
             "coef": 1,
-            "evaluations": [
-              {
-                "id": "ev-dt1",
-                "name": "Atelier idéation & Prototype",
-                "grade": 14.5,
-                "coef": 1,
-                "bonus": 0
-              }
-            ]
+            "evaluations": []
           }
         ]
       }
