@@ -10858,7 +10858,14 @@
       "completed": false
     }
   ],
-  "importantDates": [],
+  "importantDates": [
+    {
+      "title": "EXAM : Séries, Algèbre, POO, BD",
+      "date": "2026-10-03",
+      "color": "#f97316",
+      "id": "imp_1787763961363"
+    }
+  ],
   "dailyTodos": [
     {
       "id": "td_1787761482490",
