@@ -82,7 +82,7 @@
 
   <!-- Top Navigation Bar - Navigation parfaitement centrée et sans StudyFlow -->
   <header class="sticky top-0 z-40 bg-creme-100/90 dark:bg-ink-darkbg/90 backdrop-blur-md border-b border-creme-300 dark:border-ink-border transition-colors">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="relative flex items-center justify-between h-16">
         
         <!-- Left spacer to balance right buttons and keep center perfectly centered -->
@@ -150,11 +150,11 @@
     </div>
   </header>
 
-  <!-- Main Content Area -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7 pb-24 md:pb-10">
+  <!-- Main Content Area (Immersif et Plein Écran) -->
+  <main class="flex-1 max-w-[1800px] w-full mx-auto px-3 sm:px-5 lg:px-6 py-4 sm:py-5 pb-24 md:pb-8 flex flex-col">
     
     <!-- View 1: Accueil / Dashboard -->
-    <section id="view-dashboard" class="page-view active animate-fade-in"></section>
+    <section id="view-dashboard" class="page-view active animate-fade-in flex-1 flex flex-col"></section>
 
     <!-- View 2: Matières -->
     <section id="view-subjects" class="page-view hidden animate-fade-in"></section>
@@ -193,6 +193,9 @@
       <span>Notes</span>
     </button>
   </nav>
+
+  <!-- Global Drawers (Tiroirs Coulissants) Container -->
+  <div id="drawers-root"></div>
 
   <!-- Global Modals Container -->
   <div id="modals-root"></div>
