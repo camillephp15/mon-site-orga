@@ -11002,24 +11002,9 @@
       "id": "cat-1",
       "name": "Projets & PIX",
       "color": "coral"
-    },
-    {
-      "id": "cat-4",
-      "name": "Personnel & Sport",
-      "color": "purple"
     }
   ],
-  "longtermTodos": [
-    {
-      "id": "lt-4",
-      "title": "Programme Sport : 3 séances par semaine régulières",
-      "categoryId": "cat-4",
-      "deadline": "2026-12-31",
-      "priority": "normal",
-      "status": "in_progress",
-      "notes": "Cardio le mardi, renforcement le jeudi et samedi."
-    }
-  ],
+  "longtermTodos": [],
   "flashcards": [],
   "gradesData": {
     "blocks": [
