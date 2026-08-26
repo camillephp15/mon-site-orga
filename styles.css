@@ -1,0 +1,364 @@
+/* ==========================================================================
+   StudyFlow - Design Pop & Solaire (Studio Créatif Épuré)
+   Typographie nette & lisible, contrastes forts, navigation centrée
+   ========================================================================== */
+
+:root {
+  --bg-creme: #fcfaf6;
+  --card-light: #ffffff;
+  --border-light: #eee7da;
+  --border-crisp: #ded4c1;
+  --text-ink: #0f0f12;
+  --text-muted: #57534e;
+  
+  --coral-pop: #ff3366;
+  --orange-solar: #f97316;
+  --sun-gold: #f59e0b;
+  
+  --hour-height: 54px;
+}
+
+.dark {
+  --bg-dark: #0a0a0d;
+  --card-dark: #16161b;
+  --border-dark: #272730;
+  --text-light: #fdfdfd;
+  --text-dark-muted: #a1a1aa;
+  
+  --coral-pop: #ff4d79;
+  --orange-solar: #fb923c;
+}
+
+/* Base Body Styles - Typographie ultra nette */
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.01em;
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Daisy Sticker Animation & Glow */
+.daisy-sticker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 2px 5px rgba(255, 51, 102, 0.3));
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.daisy-sticker:hover {
+  transform: scale(1.15) rotate(15deg);
+}
+
+/* --------------------------------------------------------------------------
+   Boutons de Navigation
+   -------------------------------------------------------------------------- */
+.nav-btn {
+  color: #57534e;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+.dark .nav-btn {
+  color: #a1a1aa;
+}
+.nav-btn:hover {
+  color: #0f0f12;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.dark .nav-btn:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+.nav-btn.active {
+  color: #ffffff;
+  background-color: #0f0f12;
+  border-color: #0f0f12;
+  box-shadow: 0 2px 6px rgba(15, 15, 18, 0.2);
+}
+.dark .nav-btn.active {
+  color: #0f0f12;
+  background-color: #ffffff;
+  border-color: #ffffff;
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.15);
+}
+
+.mobile-nav-btn {
+  color: #71717a;
+  transition: all 0.15s ease;
+}
+.dark .mobile-nav-btn {
+  color: #a1a1aa;
+}
+.mobile-nav-btn.active {
+  color: #ff3366;
+  font-weight: 800;
+}
+.dark .mobile-nav-btn.active {
+  color: #ff4d79;
+}
+
+/* --------------------------------------------------------------------------
+   Emploi du Temps (Timetable)
+   -------------------------------------------------------------------------- */
+.timetable-grid {
+  position: relative;
+  background-size: 100% var(--hour-height);
+  background-image: linear-gradient(to bottom, rgba(238, 231, 218, 0.8) 1px, transparent 1px);
+}
+
+.dark .timetable-grid {
+  background-image: linear-gradient(to bottom, rgba(39, 39, 48, 0.9) 1px, transparent 1px);
+}
+
+/* Ligne de l'heure courante */
+.current-time-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  background-color: #ff3366;
+  z-index: 25;
+  pointer-events: none;
+}
+
+.current-time-line::before {
+  content: '✿';
+  position: absolute;
+  left: -8px;
+  top: -10px;
+  font-size: 13px;
+  line-height: 1;
+  color: #ff3366;
+  filter: drop-shadow(0 0 3px rgba(255, 51, 102, 0.7));
+}
+
+/* Carte d'événement dans l'EDT */
+.timetable-event {
+  position: absolute;
+  border-radius: 10px;
+  padding: 5px 7px;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease;
+  overflow: hidden;
+  box-sizing: border-box;
+  z-index: 10;
+  cursor: pointer;
+  border-left-width: 4.5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.timetable-event:hover {
+  z-index: 30 !important;
+  transform: translateY(-2px) scale(1.015);
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.18);
+}
+
+.timetable-event.completed {
+  opacity: 0.45;
+  filter: grayscale(0.4);
+}
+
+.timetable-event.completed .event-title {
+  text-decoration: line-through;
+}
+
+/* Rond de validation du cours */
+.event-checkbox {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: 1.8px solid currentColor;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.event-checkbox:hover {
+  transform: scale(1.25);
+}
+
+.event-checkbox.checked {
+  background-color: currentColor;
+}
+
+.event-checkbox.checked::after {
+  content: '✓';
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 900;
+  display: block;
+  line-height: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Mini-Calendrier Mensuel
+   -------------------------------------------------------------------------- */
+.mini-cal-day {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mini-cal-day:hover {
+  background-color: rgba(255, 51, 102, 0.1);
+  color: #ff3366;
+}
+
+.mini-cal-day.today {
+  font-weight: 900;
+  border: 2px solid #ff3366;
+  color: #ff3366;
+}
+.dark .mini-cal-day.today {
+  border-color: #ff4d79;
+  color: #ff4d79;
+}
+
+.mini-cal-day .event-dot {
+  position: absolute;
+  bottom: 2.5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+/* --------------------------------------------------------------------------
+   Accordéons & Matières
+   -------------------------------------------------------------------------- */
+.accordion-header {
+  cursor: pointer;
+  user-select: none;
+}
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0, 1, 0, 1), opacity 0.2s ease;
+  opacity: 0;
+}
+
+.accordion-content.open {
+  max-height: 3000px;
+  transition: max-height 0.35s ease-in-out, opacity 0.25s ease;
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Flashcards (3D Flip Card)
+   -------------------------------------------------------------------------- */
+.flashcard-scene {
+  perspective: 1000px;
+  width: 100%;
+  min-height: 300px;
+}
+
+.flashcard-card {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  position: relative;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+  cursor: pointer;
+}
+
+.flashcard-card.flipped {
+  transform: rotateY(180deg);
+}
+
+.flashcard-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.75rem;
+}
+
+.flashcard-face-back {
+  transform: rotateY(180deg);
+}
+
+/* --------------------------------------------------------------------------
+   Tableur de Notes (Grades)
+   -------------------------------------------------------------------------- */
+.grade-table input[type="number"] {
+  -moz-appearance: textfield;
+}
+.grade-table input::-webkit-outer-spin-button,
+.grade-table input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Scrollbars stylisées */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(120, 113, 108, 0.35);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 113, 108, 0.65);
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(82, 82, 91, 0.5);
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(82, 82, 91, 0.8);
+}
+
+/* Support KaTeX */
+.katex-display {
+  margin: 0.5em 0 !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 0;
+}
+
+/* Modale backdrop */
+.modal-backdrop {
+  background-color: rgba(15, 15, 18, 0.7);
+  backdrop-filter: blur(8px);
+}
