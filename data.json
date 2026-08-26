@@ -11298,15 +11298,7 @@
             "id": "sub-pr2",
             "name": "Coopération en équipe",
             "coef": 1,
-            "evaluations": [
-              {
-                "id": "ev-cp1",
-                "name": "Évaluation par les pairs & Soutenance",
-                "grade": 16,
-                "coef": 1,
-                "bonus": 0
-              }
-            ]
+            "evaluations": []
           }
         ]
       },
