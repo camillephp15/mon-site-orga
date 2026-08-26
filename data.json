@@ -10926,7 +10926,7 @@
       {
         "id": "maths-ch1",
         "title": "Algèbre linéaire & Réduction",
-        "exosTodo": "• Exercices 3, 5 et 8 de la feuille TD 2\n• DM 2 : Matrices circulantes et diagonalisation",
+        "exosTodo": "",
         "exosHard": "• Endomorphismes cycliques et lemme des noyaux\n• Réduction de Dunford (décomposition N+D)",
         "methods": "• Pour diagonaliser A : calculer P_A(X) = det(A - X I_n), chercher le spectre, vérifier dim ker(A - lambda I_n) = mult(lambda).\n• Théorème de Cayley-Hamilton : chi_u(u) = 0."
       },
