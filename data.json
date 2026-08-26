@@ -11119,15 +11119,7 @@
             "id": "sub-m1",
             "name": "Intro aux statistiques",
             "coef": 2,
-            "evaluations": [
-              {
-                "id": "ev-s1",
-                "name": "DS 1 (Statistiques descriptives)",
-                "grade": 14.5,
-                "coef": 2,
-                "bonus": 0
-              }
-            ]
+            "evaluations": []
           },
           {
             "id": "sub-m2",
