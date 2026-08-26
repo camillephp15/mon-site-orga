@@ -11140,15 +11140,7 @@
             "id": "sub-m2",
             "name": "Algèbre linéaire",
             "coef": 4,
-            "evaluations": [
-              {
-                "id": "ev-a1",
-                "name": "DS 1 (Espaces vectoriels & Matrices)",
-                "grade": 13,
-                "coef": 3,
-                "bonus": 0
-              }
-            ]
+            "evaluations": []
           },
           {
             "id": "sub-m3",
