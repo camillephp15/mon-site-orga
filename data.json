@@ -11021,15 +11021,6 @@
   ],
   "longtermTodos": [
     {
-      "id": "lt-1",
-      "title": "Projet PIX : Finaliser le prototype et la documentation",
-      "categoryId": "cat-1",
-      "deadline": "2026-10-15",
-      "priority": "urgent",
-      "status": "in_progress",
-      "notes": "Préparer la grille d'évaluation et la démo en équipe."
-    },
-    {
       "id": "lt-2",
       "title": "Ficher toutes les formules d'Algèbre linéaire & Séries",
       "categoryId": "cat-2",
