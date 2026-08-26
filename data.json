@@ -11004,26 +11004,12 @@
       "color": "coral"
     },
     {
-      "id": "cat-3",
-      "name": "Objectifs Semestre",
-      "color": "emerald"
-    },
-    {
       "id": "cat-4",
       "name": "Personnel & Sport",
       "color": "purple"
     }
   ],
   "longtermTodos": [
-    {
-      "id": "lt-3",
-      "title": "Objectif Semestre : Valider les 5 blocs avec moyenne > 13.5",
-      "categoryId": "cat-3",
-      "deadline": "2027-01-20",
-      "priority": "normal",
-      "status": "in_progress",
-      "notes": "Maintenir la régularité sur les devoirs surveillés et colles."
-    },
     {
       "id": "lt-4",
       "title": "Programme Sport : 3 séances par semaine régulières",
