@@ -10984,7 +10984,7 @@
       {
         "id": "maths_ch_1787766631685",
         "title": "améliorations site",
-        "exosTodo": "- ajouter des transitions aux changements de pages et partout ou c possible \n\n- edt sur toute la page \n\n- dans les menus pop up que les selections de date et d'heures ou tout ce qui se défile soit plus esthétique \n\n- agrandir to do list \n\n- sur calendrier : si on clique dessus a 8h ca propose de rajouter un cours a 8h et on peut étirer pour rajouter un cours de 8h a 10h \n\n- demander a gemini si je peux fairenmieux que des fenetres pop up ",
+        "exosTodo": "- ajouter des transitions aux changements de pages et partout ou c possible \n\n- edt sur toute la page \n\n- dans les menus pop up que les selections de date et d'heures ou tout ce qui se défile soit plus esthétique \n\n- agrandir to do list \n\n- sur calendrier : si on clique dessus a 8h ca propose de rajouter un cours a 8h et on peut étirer pour rajouter un cours de 8h a 10h \n\n- demander a gemini si je peux fairenmieux que des fenetres pop up \n\n- cliquer sur la date de l'edt pour afficher un calendrier mensuel puis quand je clique sur un jour ca m'affiche l'edt de cette semaine (aussi pareil lier le calendrier mensuel a coté) \n\n- dans mes notes modifier le bouton 'ajouter une épreuve' en 'ajouter une note' \n\n- essayer de mettre une vue semaine sur tel (pincer pour zoomer et passer en vue 6-5-4-3-2-1  jour )",
         "exosHard": "",
         "methods": ""
       }
