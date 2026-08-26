@@ -76,7 +76,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-creme-100 dark:bg-ink-darkbg text-ink dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-colors duration-200 antialiased selection:bg-solaire-500 selection:text-white">
 
@@ -88,7 +88,7 @@
         <!-- Left spacer to balance right buttons and keep center perfectly centered -->
         <div class="w-24 hidden md:block flex-shrink-0"></div>
 
-        <!-- Centered Navigation: Accueil, Matières, To-do List, Colles, Notes -->
+        <!-- Centered Navigation: Accueil, Matières, To-do List, Colles, Notes + Marguerite Sticker -->
         <nav class="hidden md:flex items-center justify-center gap-1.5 bg-creme-200/90 dark:bg-ink-darkcard p-1.5 rounded-2xl border border-creme-300 dark:border-ink-border mx-auto shadow-xs" id="desktop-nav">
           <button data-page="dashboard" class="nav-btn active flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition-all">
             <i data-lucide="calendar" class="w-4 h-4"></i>
@@ -110,6 +110,23 @@
             <i data-lucide="calculator" class="w-4 h-4"></i>
             <span>Notes</span>
           </button>
+
+          <!-- Sticker Marguerite Rose Pop & Solaire à l'extrémité droite du menu -->
+          <div class="daisy-sticker flex-shrink-0 px-2 py-0.5 select-none cursor-pointer" title="🌸 Marguerite Pop & Solaire">
+            <svg width="26" height="26" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g fill="#ff3366">
+                <ellipse cx="18" cy="5.5" rx="3.3" ry="5.5" />
+                <ellipse cx="18" cy="30.5" rx="3.3" ry="5.5" />
+                <ellipse cx="5.5" cy="18" rx="5.5" ry="3.3" />
+                <ellipse cx="30.5" cy="18" rx="5.5" ry="3.3" />
+                <ellipse cx="9.2" cy="9.2" rx="3.3" ry="5.5" transform="rotate(-45 9.2 9.2)" fill="#ff4d79" />
+                <ellipse cx="26.8" cy="26.8" rx="3.3" ry="5.5" transform="rotate(-45 26.8 26.8)" fill="#ff4d79" />
+                <ellipse cx="26.8" cy="9.2" rx="3.3" ry="5.5" transform="rotate(45 26.8 9.2)" fill="#ff4d79" />
+                <ellipse cx="9.2" cy="26.8" rx="3.3" ry="5.5" transform="rotate(45 9.2 26.8)" fill="#ff4d79" />
+              </g>
+              <circle cx="18" cy="18" r="5.5" fill="#f59e0b" stroke="#fbbf24" stroke-width="1.5" />
+            </svg>
+          </div>
         </nav>
 
         <!-- Right actions: Dark/Light toggle + Data Backup JSON -->
@@ -121,10 +138,11 @@
             <i data-lucide="sun" class="w-4 h-4 block dark:hidden text-orangePop-500"></i>
           </button>
 
-          <!-- Local Data Backup Pill -->
-          <button id="backup-menu-btn" title="Sauvegarde locale & transfert (JSON)" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-extrabold bg-creme-200 hover:bg-creme-300 dark:bg-ink-darkcard dark:hover:bg-zinc-800 text-ink dark:text-zinc-200 border border-creme-300 dark:border-ink-border transition-all shadow-xs">
-            <i data-lucide="database" class="w-3.5 h-3.5 text-solaire-500"></i>
-            <span class="hidden sm:inline">Données JSON</span>
+          <!-- GitHub Cloud Sync Button & Status Indicator -->
+          <button id="github-sync-btn" title="Synchronisation GitHub (data.json)" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-extrabold bg-creme-200 hover:bg-creme-300 dark:bg-ink-darkcard dark:hover:bg-zinc-800 text-ink dark:text-zinc-200 border border-creme-300 dark:border-ink-border transition-all shadow-xs">
+            <span id="github-sync-indicator" class="w-2 h-2 rounded-full bg-zinc-400 inline-block transition-colors"></span>
+            <i data-lucide="github" class="w-3.5 h-3.5 text-ink dark:text-white"></i>
+            <span id="github-sync-label" class="hidden sm:inline">GitHub Sync</span>
           </button>
 
         </div>
@@ -186,6 +204,6 @@
   <input type="file" id="global-json-import-input" accept=".json,application/json" class="hidden">
 
   <!-- Standalone Application Script -->
-  <script src="js/app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
