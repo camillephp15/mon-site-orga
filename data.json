@@ -10897,6 +10897,14 @@
   ],
   "dailyTodos": [
     {
+      "id": "td_1787761465834",
+      "text": "Travailler CS50",
+      "completed": false,
+      "priority": "normal",
+      "tag": "Maison",
+      "createdAt": "2026-08-26T16:24:25.834Z"
+    },
+    {
       "id": "td_1787761446289",
       "text": "Faire une séance de sport",
       "completed": true,
