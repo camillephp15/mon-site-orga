@@ -10997,13 +10997,7 @@
       }
     ]
   },
-  "longtermCategories": [
-    {
-      "id": "cat-1",
-      "name": "Projets & PIX",
-      "color": "coral"
-    }
-  ],
+  "longtermCategories": [],
   "longtermTodos": [],
   "flashcards": [],
   "gradesData": {
