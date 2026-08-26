@@ -10897,6 +10897,14 @@
   ],
   "dailyTodos": [
     {
+      "id": "td_1787761482490",
+      "text": "Terminer site web",
+      "completed": false,
+      "priority": "normal",
+      "tag": "Autres cours",
+      "createdAt": "2026-08-26T16:24:42.490Z"
+    },
+    {
       "id": "td_1787761465834",
       "text": "Travailler CS50",
       "completed": true,
