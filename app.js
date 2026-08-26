@@ -4297,27 +4297,23 @@
       this._bindGitHubSync();
       this._bindGlobalShortcuts();
 
-      this.navigateTo('dashboard');
-
-      // Synchronisation GitHub silencieuse en arrière-plan
+      // 1. Tenter de charger les données de GitHub EN PRIORITÉ avant d'afficher la vue
       if (GitHubSync.isConfigured()) {
         try {
           const remote = await GitHubSync.fetchRemoteData();
           if (remote && remote.data) {
             store.applyRemoteData(remote.data);
-            this.navigateTo(this.currentPage);
-            // Sync silencieuse — aucun toast
           } else if (remote && remote.notFound) {
-            // Créer data.json silencieusement
-            GitHubSync.commitRemoteData(store.data, 'Initial commit: StudyFlow data.json').catch(e => {
-              console.warn('[GitHubSync] Init data.json:', e.message);
-            });
+            // Créer data.json silencieusement s'il n'existe pas
+            await GitHubSync.commitRemoteData(store.data, 'Initial commit: StudyFlow data.json').catch(() => {});
           }
         } catch (err) {
-          // Mode local silencieux — pas de message d'erreur rouge
           console.warn('[GitHubSync] Mode local (réseau indisponible):', err.message);
         }
       }
+
+      // 2. Afficher la page une fois que les données sont prêtes (locales ou distantes)
+      this.navigateTo('dashboard');
     }
 
 
