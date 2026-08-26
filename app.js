@@ -1,4 +1,4 @@
-﻿/**
+/**
  * StudyFlow - Application Web d'Organisation (Prépa / Ingénieur)
  * 
  * NOUVEAUX AJUSTEMENTS :
@@ -271,7 +271,8 @@
       const rect = wrapper.getBoundingClientRect();
       const spaceBelow = window.innerHeight - rect.bottom;
       const spaceAbove = rect.top;
-      const listHeight = Math.min(options.length * 44, 300);
+      const optionCount = list ? list.querySelectorAll('.custom-dropdown-option').length : 5;
+      const listHeight = Math.min(optionCount * 44, 300);
 
       if (spaceBelow < listHeight && spaceAbove > listHeight) {
         list.classList.add('dropup');
@@ -754,26 +755,11 @@
     },
 
     _updateStatus(status, label = '') {
+      // Sync 100% silencieuse — aucun élément visuel dans l'UI
       this.status = status;
-      const indicator = document.getElementById('github-sync-indicator');
-      const labelEl = document.getElementById('github-sync-label');
-
-      if (indicator) {
-        indicator.className = 'w-2 h-2 rounded-full inline-block transition-all';
-        if (status === 'synced') indicator.classList.add('bg-emerald-500', 'shadow-xs', 'shadow-emerald-500');
-        else if (status === 'syncing') indicator.classList.add('bg-amber-400', 'animate-pulse');
-        else if (status === 'error') indicator.classList.add('bg-rose-500');
-        else indicator.classList.add('bg-zinc-400');
-      }
-
-      if (labelEl) {
-        if (label) labelEl.textContent = label;
-        else if (status === 'synced') labelEl.textContent = 'GitHub Sync';
-        else if (status === 'syncing') labelEl.textContent = 'Sync...';
-        else if (status === 'error') labelEl.textContent = 'GitHub Erreur';
-        else labelEl.textContent = 'GitHub Sync';
-      }
+      if (status === 'error') console.warn('[GitHubSync] Erreur:', label || '');
     },
+
 
     _getHeaders(token) {
       return {
@@ -907,7 +893,6 @@
 
     triggerAutoSync(data) {
       if (!this.isConfigured()) return;
-      this._updateStatus('syncing');
 
       if (this._debounceTimer) clearTimeout(this._debounceTimer);
 
@@ -915,10 +900,12 @@
         try {
           await this.commitRemoteData(data);
         } catch (err) {
-          Toast.error(`Échec synchronisation GitHub : ${err.message}`);
+          // Basculement silencieux en mode local — pas de toast agressif
+          console.warn('[GitHubSync] Sync en arrière-plan échouée:', err.message);
         }
       }, 1200);
     }
+
   };
 
   // ==========================================================================
@@ -1605,7 +1592,9 @@
   const DashboardView = {
     activeMonday: getMondayOfDate(new Date()),
     activeDayMobileIndex: 0,
+    mobileViewDays: 1,
     miniCalDate: new Date(),
+
     todoFilter: 'all',
     selectedTagForNewTodo: 'Maths',
     _autoSynced: false,
@@ -1703,21 +1692,45 @@
                 </div>
               </div>
 
-              <!-- Onglets jours sur mobile -->
-              <div class="lg:hidden bg-white dark:bg-ink-darkcard p-2 rounded-2xl border border-creme-300 dark:border-ink-border shadow-sm flex items-center justify-between gap-1 overflow-x-auto">
-                ${weekDays.map((d, idx) => `
-                  <button data-day-index="${idx}" class="mobile-day-tab flex-1 py-1.5 px-2 rounded-xl text-xs font-bold text-center transition-all ${this.activeDayMobileIndex === idx ? 'bg-solaire-500 text-white font-black shadow-md shadow-solaire-500/20' : 'text-zinc-600 dark:text-zinc-400 hover:bg-creme-200 dark:hover:bg-zinc-800'}">
-                    <div>${d.short}</div>
-                    <div class="text-[10px] opacity-80">${d.dayNum}</div>
-                  </button>
-                `).join('')}
+              <!-- Sélecteur de vue mobile (1j / 2j / 3j / 5j / 7j) + navigation -->
+              <div class="lg:hidden space-y-2">
+                <!-- Barre de contrôle : sélection vue + navigation -->
+                <div class="bg-white dark:bg-ink-darkcard p-2 rounded-2xl border border-creme-300 dark:border-ink-border shadow-sm flex items-center gap-1">
+                  <span class="text-[9px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest px-1 flex-shrink-0">Vue</span>
+                  ${[1, 2, 3, 5, 7].map(n => `
+                    <button data-view-days="${n}" class="mobile-view-btn flex-1 py-1.5 rounded-xl text-xs font-black text-center transition-all ${this.mobileViewDays === n ? 'bg-ink dark:bg-white text-white dark:text-ink shadow-sm' : 'text-zinc-500 dark:text-zinc-400 hover:bg-creme-200 dark:hover:bg-zinc-800'}">
+                      ${n}j
+                    </button>
+                  `).join('')}
+                  <div class="flex items-center gap-0.5 ml-1 pl-1.5 border-l border-creme-200 dark:border-zinc-700 flex-shrink-0">
+                    <button id="mobile-prev-btn" class="p-1.5 rounded-xl hover:bg-creme-200 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 transition-all">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    </button>
+                    <button id="mobile-today-btn" class="px-2 py-1 rounded-xl text-[10px] font-black text-solaire-600 dark:text-solaire-400 hover:bg-creme-200 dark:hover:bg-zinc-800 transition-all">Auj.</button>
+                    <button id="mobile-next-btn" class="p-1.5 rounded-xl hover:bg-creme-200 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 transition-all">
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- En-têtes des jours visibles dans la vue mobile -->
+                <div class="bg-white dark:bg-ink-darkcard px-2 py-1.5 rounded-2xl border border-creme-300 dark:border-ink-border shadow-sm grid" style="grid-template-columns: repeat(${Math.min(this.mobileViewDays, weekDays.slice(this.activeDayMobileIndex).length)}, 1fr)">
+                  ${weekDays.slice(this.activeDayMobileIndex, this.activeDayMobileIndex + this.mobileViewDays).map(d => {
+                    const isToday = d.dateStr === todayStr;
+                    return `<div class="text-center py-1 rounded-xl text-xs font-black ${isToday ? 'text-solaire-600 dark:text-solaire-400 bg-solaire-500/10' : 'text-ink dark:text-zinc-300'}">
+                      <div>${d.short}</div>
+                      <div class="text-[10px] font-mono opacity-70">${d.dayNum}</div>
+                    </div>`;
+                  }).join('')}
+                </div>
               </div>
 
               <!-- Grille de l'Emploi du Temps -->
               <div class="bg-white dark:bg-ink-darkcard rounded-3xl border border-creme-300 dark:border-ink-border shadow-sm overflow-hidden flex flex-col min-h-[580px]">
                 
                 <!-- En-têtes des colonnes -->
-                <div class="grid grid-cols-[54px_repeat(7,1fr)] max-lg:grid-cols-[48px_1fr] border-b border-creme-200 dark:border-ink-border bg-creme-100/70 dark:bg-ink-darkbg/70 text-xs font-extrabold text-ink dark:text-zinc-300 select-none flex-shrink-0">
+                <div class="hidden lg:grid border-b border-creme-200 dark:border-ink-border bg-creme-100/70 dark:bg-ink-darkbg/70 text-xs font-extrabold text-ink dark:text-zinc-300 select-none flex-shrink-0"
+                     style="grid-template-columns: 54px repeat(7, 1fr);">
                   <div class="py-2.5 text-center text-zinc-400 text-[11px] border-r border-creme-200 dark:border-ink-border font-mono">Heure</div>
                   
                   ${weekDays.map(d => {
@@ -1729,17 +1742,12 @@
                       </div>
                     `;
                   }).join('')}
-
-                  <!-- Colonne active sur mobile -->
-                  <div class="lg:hidden flex flex-col items-center justify-center py-2 text-center bg-solaire-500/10 text-solaire-600 dark:text-solaire-400 font-black">
-                    <span>${weekDays[this.activeDayMobileIndex].label}</span>
-                    <span class="text-[10px] font-mono">${weekDays[this.activeDayMobileIndex].dayNum} ${weekDays[this.activeDayMobileIndex].date.toLocaleDateString('fr-FR', { month: 'short' })}</span>
-                  </div>
                 </div>
 
                 <!-- Grille horaire 5h00 - 00h00 -->
                 <div class="relative overflow-y-auto flex-1 timetable-grid" id="timetable-scroll-area" style="min-height: 520px;">
-                  <div class="grid grid-cols-[54px_repeat(7,1fr)] max-lg:grid-cols-[48px_1fr] relative" style="height: calc(19 * var(--hour-height));">
+                  <!-- Desktop : 7 colonnes fixes -->
+                  <div class="hidden lg:grid relative" style="grid-template-columns: 54px repeat(7, 1fr); height: calc(19 * var(--hour-height));">
                     
                     <div class="relative border-r border-creme-200 dark:border-ink-border select-none text-[11px] text-zinc-400 font-mono text-center">
                       ${Array.from({ length: 19 }, (_, i) => i + 5).map(hour => `
@@ -1750,15 +1758,31 @@
                     </div>
 
                     ${weekDays.map(d => `
-                      <div data-col-datestr="${d.dateStr}" class="timetable-column hidden lg:block relative border-r border-creme-200/60 dark:border-ink-border/60 last:border-r-0 ${d.dateStr === todayStr ? 'bg-solaire-500/[0.03]' : ''}"></div>
+                      <div data-col-datestr="${d.dateStr}" class="timetable-column relative border-r border-creme-200/60 dark:border-ink-border/60 last:border-r-0 ${d.dateStr === todayStr ? 'bg-solaire-500/[0.03]' : ''}"></div>
                     `).join('')}
-
-                    <!-- Mobile Active Column -->
-                    <div data-col-datestr="${weekDays[this.activeDayMobileIndex].dateStr}" class="timetable-column lg:hidden relative border-r border-creme-200/60 dark:border-ink-border/60 last:border-r-0"></div>
 
                     <div id="current-time-indicator" class="current-time-line hidden"></div>
                   </div>
+
+                  <!-- Mobile : N colonnes selon mobileViewDays -->
+                  <div class="lg:hidden relative" id="mobile-timetable-grid" style="grid-template-columns: 48px repeat(${this.mobileViewDays}, 1fr); height: calc(19 * var(--hour-height)); display: grid;">
+                    
+                    <div class="relative border-r border-creme-200 dark:border-ink-border select-none text-[11px] text-zinc-400 font-mono text-center">
+                      ${Array.from({ length: 19 }, (_, i) => i + 5).map(hour => `
+                        <div class="absolute left-0 right-0 flex items-center justify-center -translate-y-2.5" style="top: ${(hour - 5) * 56}px;">
+                          ${String(hour).padStart(2, '0')}h
+                        </div>
+                      `).join('')}
+                    </div>
+
+                    ${weekDays.slice(this.activeDayMobileIndex, this.activeDayMobileIndex + this.mobileViewDays).map(d => `
+                      <div data-col-datestr="${d.dateStr}" class="timetable-column relative border-r border-creme-200/60 dark:border-ink-border/60 last:border-r-0 ${d.dateStr === todayStr ? 'bg-solaire-500/[0.03]' : ''}"></div>
+                    `).join('')}
+
+                    <div id="current-time-indicator-mobile" class="current-time-line hidden"></div>
+                  </div>
                 </div>
+
 
               </div>
 
@@ -1932,12 +1956,70 @@
         this.render(container);
       });
 
-      container.querySelectorAll('.mobile-day-tab').forEach(btn => {
+      // Sélecteur de vue mobile (1j / 2j / 3j / 5j / 7j)
+      container.querySelectorAll('.mobile-view-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          this.activeDayMobileIndex = parseInt(btn.dataset.dayIndex, 10);
+          this.mobileViewDays = parseInt(btn.dataset.viewDays, 10);
+          // Recadrer l'index pour ne pas dépasser la fin de la semaine
+          const weekDays = this._getWeekDates(this.activeMonday);
+          this.activeDayMobileIndex = Math.min(this.activeDayMobileIndex, Math.max(0, weekDays.length - this.mobileViewDays));
           this.render(container);
         });
       });
+
+      // Navigation mobile : prev / today / next (avance/recule de mobileViewDays jours)
+      const mobilePrevBtn = container.querySelector('#mobile-prev-btn');
+      const mobileNextBtn = container.querySelector('#mobile-next-btn');
+      const mobileTodayBtn = container.querySelector('#mobile-today-btn');
+
+      if (mobilePrevBtn) {
+        mobilePrevBtn.addEventListener('click', () => {
+          const weekDays = this._getWeekDates(this.activeMonday);
+          const step = this.mobileViewDays;
+          const newIdx = this.activeDayMobileIndex - step;
+          if (newIdx >= 0) {
+            this.activeDayMobileIndex = newIdx;
+            this.render(container);
+          } else {
+            // Reculer d'une semaine
+            const d = new Date(this.activeMonday);
+            d.setDate(d.getDate() - 7);
+            this.activeMonday = d;
+            this.activeDayMobileIndex = Math.max(0, 7 - step);
+            this.render(container);
+          }
+        });
+      }
+
+      if (mobileNextBtn) {
+        mobileNextBtn.addEventListener('click', () => {
+          const weekDays = this._getWeekDates(this.activeMonday);
+          const step = this.mobileViewDays;
+          const newIdx = this.activeDayMobileIndex + step;
+          if (newIdx + this.mobileViewDays <= weekDays.length) {
+            this.activeDayMobileIndex = newIdx;
+            this.render(container);
+          } else {
+            // Avancer d'une semaine
+            const d = new Date(this.activeMonday);
+            d.setDate(d.getDate() + 7);
+            this.activeMonday = d;
+            this.activeDayMobileIndex = 0;
+            this.render(container);
+          }
+        });
+      }
+
+      if (mobileTodayBtn) {
+        mobileTodayBtn.addEventListener('click', () => {
+          this.activeMonday = getMondayOfDate(new Date());
+          const todayStr = new Date().toISOString().split('T')[0];
+          const weekDays = this._getWeekDates(this.activeMonday);
+          const idx = weekDays.findIndex(w => w.dateStr === todayStr);
+          this.activeDayMobileIndex = idx !== -1 ? idx : 0;
+          this.render(container);
+        });
+      }
 
       container.querySelector('#add-event-btn').addEventListener('click', () => this._openCourseDrawer());
       container.querySelector('#manage-calendars-btn').addEventListener('click', () => this._openManageCalendarsDrawer(container));
@@ -2124,10 +2206,10 @@
           touchStartPos = { x: touch.clientX, y: touch.clientY };
           isLongPressed = false;
 
-          // Démarre le décompte de 2 secondes (1800ms pour réactivité optimale)
+          // Démarre le décompte de 2 secondes (2000ms)
           touchTimer = setTimeout(() => {
             isLongPressed = true;
-            if (navigator.vibrate) navigator.vibrate(50); // Retour haptique si supporté
+            if (navigator.vibrate) navigator.vibrate(60); // Retour haptique si supporté
 
             const startY = getYFromEvent(e);
             touchStartMin = yToMinutes(startY);
@@ -2140,7 +2222,7 @@
             col.appendChild(touchSelectionEl);
 
             Toast.info('Glissez pour ajuster la durée du cours', 2000);
-          }, 1800);
+          }, 2000);
         }, { passive: true });
 
         col.addEventListener('touchmove', (e) => {
@@ -4217,26 +4299,27 @@
 
       this.navigateTo('dashboard');
 
-      // Synchronisation GitHub automatique immédiate
+      // Synchronisation GitHub silencieuse en arrière-plan
       if (GitHubSync.isConfigured()) {
         try {
           const remote = await GitHubSync.fetchRemoteData();
           if (remote && remote.data) {
             store.applyRemoteData(remote.data);
             this.navigateTo(this.currentPage);
-            Toast.success('Synchronisé avec GitHub (mon-site-orga) !');
+            // Sync silencieuse — aucun toast
           } else if (remote && remote.notFound) {
-            await GitHubSync.commitRemoteData(store.data, 'Initial commit: StudyFlow data.json');
-            Toast.info('Fichier data.json initialisé sur votre dépôt GitHub !');
+            // Créer data.json silencieusement
+            GitHubSync.commitRemoteData(store.data, 'Initial commit: StudyFlow data.json').catch(e => {
+              console.warn('[GitHubSync] Init data.json:', e.message);
+            });
           }
         } catch (err) {
-          console.warn('Sync GitHub au démarrage:', err);
-          Toast.warning(`GitHub : connexion en arrière-plan (${err.message})`);
+          // Mode local silencieux — pas de message d'erreur rouge
+          console.warn('[GitHubSync] Mode local (réseau indisponible):', err.message);
         }
-      } else {
-        GitHubSync._updateStatus('unconfigured');
       }
     }
+
 
     _initTheme() {
       const savedTheme = localStorage.getItem('studyflow_theme') || 'dark';
