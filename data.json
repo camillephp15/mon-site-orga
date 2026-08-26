@@ -10858,15 +10858,7 @@
       "completed": false
     }
   ],
-  "importantDates": [
-    {
-      "id": "imp-4",
-      "title": "Soutenance Projet PIX",
-      "date": "2026-11-23",
-      "color": "#dc2626",
-      "type": "partiel"
-    }
-  ],
+  "importantDates": [],
   "dailyTodos": [
     {
       "id": "td_1787761482490",
