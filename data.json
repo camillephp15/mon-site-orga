@@ -11147,13 +11147,6 @@
                 "grade": 13,
                 "coef": 3,
                 "bonus": 0
-              },
-              {
-                "id": "ev-a2",
-                "name": "Colle de Maths S1",
-                "grade": 15,
-                "coef": 1,
-                "bonus": 0
               }
             ]
           },
