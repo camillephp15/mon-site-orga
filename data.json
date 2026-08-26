@@ -11264,15 +11264,7 @@
             "id": "sub-i3",
             "name": "Conception base de données",
             "coef": 2,
-            "evaluations": [
-              {
-                "id": "ev-b1",
-                "name": "DS SQL & Modélisation relationnelle",
-                "grade": 14,
-                "coef": 2,
-                "bonus": 0
-              }
-            ]
+            "evaluations": []
           }
         ]
       },
