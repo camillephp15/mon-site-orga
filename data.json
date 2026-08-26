@@ -1,1 +1,722 @@
-{}
+{
+  "calendars": [
+    {
+      "id": "cal-default",
+      "name": "Emploi du temps Principal",
+      "color": "#ff3366",
+      "feedUrl": "",
+      "lastSync": null,
+      "isDefault": true
+    }
+  ],
+  "events": [
+    {
+      "id": "ev-1",
+      "calendarId": "cal-default",
+      "title": "Maths - Algèbre linéaire (Cours)",
+      "date": "2026-08-23",
+      "day": "mon",
+      "startTime": "08:00",
+      "duration": 120,
+      "room": "Amphi Poincaré",
+      "teacher": "M. Dupont",
+      "type": "course",
+      "completed": false
+    },
+    {
+      "id": "ev-2",
+      "calendarId": "cal-default",
+      "title": "Maths - TD Algèbre linéaire",
+      "date": "2026-08-23",
+      "day": "mon",
+      "startTime": "10:15",
+      "duration": 105,
+      "room": "Salle 204",
+      "teacher": "M. Dupont",
+      "type": "td",
+      "completed": false
+    },
+    {
+      "id": "ev-3",
+      "calendarId": "cal-default",
+      "title": "Physique - Mécanique des fluides",
+      "date": "2026-08-23",
+      "day": "mon",
+      "startTime": "14:00",
+      "duration": 120,
+      "room": "Salle 108",
+      "teacher": "Mme Curie",
+      "type": "td",
+      "completed": false
+    },
+    {
+      "id": "ev-4",
+      "calendarId": "cal-default",
+      "title": "Colle de Maths - Groupe 4",
+      "date": "2026-08-23",
+      "day": "mon",
+      "startTime": "17:00",
+      "duration": 60,
+      "room": "Bureau 312",
+      "teacher": "M. Bertrand",
+      "type": "colle",
+      "completed": false
+    },
+    {
+      "id": "ev-5",
+      "calendarId": "cal-default",
+      "title": "Informatique - Algorithmique et POO",
+      "date": "2026-08-24",
+      "day": "tue",
+      "startTime": "08:30",
+      "duration": 120,
+      "room": "Labo Info 2",
+      "teacher": "M. Turing",
+      "type": "tp",
+      "completed": false
+    },
+    {
+      "id": "ev-6",
+      "calendarId": "cal-default",
+      "title": "Physique - Résistance des matériaux",
+      "date": "2026-08-24",
+      "day": "tue",
+      "startTime": "10:45",
+      "duration": 120,
+      "room": "Amphi Carnot",
+      "teacher": "Mme Curie",
+      "type": "course",
+      "completed": false
+    },
+    {
+      "id": "ev-7",
+      "calendarId": "cal-default",
+      "title": "Soft Skills - Green IT",
+      "date": "2026-08-24",
+      "day": "tue",
+      "startTime": "14:00",
+      "duration": 120,
+      "room": "Salle 301",
+      "teacher": "Intervenant",
+      "type": "course",
+      "completed": false
+    },
+    {
+      "id": "ev-8",
+      "calendarId": "cal-default",
+      "title": "Maths - Séries Numériques",
+      "date": "2026-08-25",
+      "day": "wed",
+      "startTime": "08:00",
+      "duration": 120,
+      "room": "Salle 202",
+      "teacher": "M. Dupont",
+      "type": "course",
+      "completed": false
+    },
+    {
+      "id": "ev-9",
+      "calendarId": "cal-default",
+      "title": "TP Systèmes Électroniques",
+      "date": "2026-08-25",
+      "day": "wed",
+      "startTime": "10:15",
+      "duration": 180,
+      "room": "Labo Elec 1",
+      "teacher": "Mme Curie",
+      "type": "tp",
+      "completed": false
+    },
+    {
+      "id": "ev-10",
+      "calendarId": "cal-default",
+      "title": "Séance Projet PIX",
+      "date": "2026-08-25",
+      "day": "wed",
+      "startTime": "14:30",
+      "duration": 150,
+      "room": "FabLab",
+      "teacher": "Tuteurs PIX",
+      "type": "tp",
+      "completed": false
+    },
+    {
+      "id": "ev-11",
+      "calendarId": "cal-default",
+      "title": "Intro aux statistiques - Cours",
+      "date": "2026-08-26",
+      "day": "thu",
+      "startTime": "08:00",
+      "duration": 120,
+      "room": "Amphi Poincaré",
+      "teacher": "M. Gauss",
+      "type": "course",
+      "completed": false
+    },
+    {
+      "id": "ev-12",
+      "calendarId": "cal-default",
+      "title": "Colle de Maths - Salle 114",
+      "date": "2026-08-26",
+      "day": "thu",
+      "startTime": "17:30",
+      "duration": 60,
+      "room": "Salle 114",
+      "teacher": "M. Bertrand",
+      "type": "colle",
+      "completed": false
+    },
+    {
+      "id": "ev-13",
+      "calendarId": "cal-default",
+      "title": "TP Conception base de données",
+      "date": "2026-08-27",
+      "day": "fri",
+      "startTime": "09:00",
+      "duration": 120,
+      "room": "Labo Info 1",
+      "teacher": "M. Turing",
+      "type": "tp",
+      "completed": false
+    },
+    {
+      "id": "ev-14",
+      "calendarId": "cal-default",
+      "title": "Design Thinking et Créativité",
+      "date": "2026-08-27",
+      "day": "fri",
+      "startTime": "13:30",
+      "duration": 120,
+      "room": "Salle Innovation",
+      "teacher": "Coach Design",
+      "type": "td",
+      "completed": false
+    },
+    {
+      "id": "ev-15",
+      "calendarId": "cal-default",
+      "title": "DS du Samedi Matin (4h)",
+      "date": "2026-08-28",
+      "day": "sat",
+      "startTime": "08:00",
+      "duration": 240,
+      "room": "Grand Amphi",
+      "teacher": "Surveillance",
+      "type": "ds",
+      "completed": false
+    },
+    {
+      "calendarId": "cal-default",
+      "title": "test",
+      "date": "2026-08-29",
+      "day": "sat",
+      "startTime": "08:00",
+      "duration": 120,
+      "room": "",
+      "completed": false,
+      "id": "ev_1787759707110"
+    }
+  ],
+  "importantDates": [
+    {
+      "id": "imp-1",
+      "title": "DS 1 Maths - Algèbre",
+      "date": "2026-09-12",
+      "color": "#ff3366",
+      "type": "ds"
+    },
+    {
+      "id": "imp-2",
+      "title": "DS 2 Physique - RDM",
+      "date": "2026-09-26",
+      "color": "#f97316",
+      "type": "ds"
+    },
+    {
+      "id": "imp-3",
+      "title": "DS 3 Info - Algo & POO",
+      "date": "2026-10-10",
+      "color": "#8b5cf6",
+      "type": "ds"
+    },
+    {
+      "id": "imp-4",
+      "title": "Soutenance Projet PIX",
+      "date": "2026-11-23",
+      "color": "#dc2626",
+      "type": "partiel"
+    },
+    {
+      "id": "imp-5",
+      "title": "Colle Maths Semaine 4",
+      "date": "2026-09-15",
+      "color": "#0284c7",
+      "type": "colle"
+    }
+  ],
+  "dailyTodos": [
+    {
+      "id": "td-1",
+      "text": "Refaire les exercices d'Algèbre linéaire (diagonalisation)",
+      "completed": false,
+      "priority": "high",
+      "tag": "Maths"
+    },
+    {
+      "id": "td-2",
+      "text": "Finir le compte-rendu de RDM (Résistance des matériaux)",
+      "completed": true,
+      "priority": "high",
+      "tag": "Physique"
+    },
+    {
+      "id": "td-3",
+      "text": "Programmer la classe Arbre Binaire en Python / Java",
+      "completed": false,
+      "priority": "normal",
+      "tag": "Info"
+    },
+    {
+      "id": "td-4",
+      "text": "Séance de sport (Cardio / Muscu)",
+      "completed": false,
+      "priority": "normal",
+      "tag": "Sport"
+    },
+    {
+      "id": "td-5",
+      "text": "Ranger le bureau & courses de la semaine",
+      "completed": false,
+      "priority": "low",
+      "tag": "Maison"
+    }
+  ],
+  "subjectsData": {
+    "maths": [
+      {
+        "id": "maths-ch1",
+        "title": "Algèbre linéaire & Réduction",
+        "exosTodo": "• Exercices 3, 5 et 8 de la feuille TD 2\n• DM 2 : Matrices circulantes et diagonalisation",
+        "exosHard": "• Endomorphismes cycliques et lemme des noyaux\n• Réduction de Dunford (décomposition N+D)",
+        "methods": "• Pour diagonaliser A : calculer P_A(X) = det(A - X I_n), chercher le spectre, vérifier dim ker(A - lambda I_n) = mult(lambda).\n• Théorème de Cayley-Hamilton : chi_u(u) = 0."
+      },
+      {
+        "id": "maths-ch2",
+        "title": "Séries numériques & Séries entières",
+        "exosTodo": "• Étudier la convergence de sum (-1)^n ln(n)/sqrt(n)\n• Rayon de convergence de sum (n!/n^n) x^n",
+        "exosHard": "• Formule de Stirling via intégrales de Wallis\n• Théorème d'Abel angulaire",
+        "methods": "• Règle de d'Alembert : si lim |u_{n+1}/u_n| = l < 1, la série converge.\n• CSSA : si (|u_n|) décroît vers 0 avec signe alterné, |R_n| <= |u_{n+1}|."
+      },
+      {
+        "id": "maths-ch3",
+        "title": "Intro aux statistiques",
+        "exosTodo": "• Calcul des estimateurs sans biais de la moyenne et variance\n• Tests d'hypothèse (Student et Chi-2)",
+        "exosHard": "• Loi forte des grands nombres et TCL\n• Intervalle de confiance asymptotique",
+        "methods": "• Espérance E(X), Variance V(X) = E(X^2) - E(X)^2.\n• Théorème Central Limite : moyenne centrée réduite converge vers N(0,1)."
+      }
+    ],
+    "physique": [
+      {
+        "id": "phy-ch1",
+        "title": "Résistance des matériaux (RDM)",
+        "exosTodo": "• Diagramme des moments fléchissants et efforts tranchants\n• Calcul de la flèche d'une poutre encastrée",
+        "methods": "• Équation de Navier-Bernoulli : sigma = M_f * y / I_Gz.\n• Flèche : E I_Gz v''(x) = - M_f(x)."
+      },
+      {
+        "id": "phy-ch2",
+        "title": "Mécanique des fluides",
+        "exosTodo": "• Écoulement de Poiseuille en conduite cylindrique\n• Théorème de Bernoulli avec pertes de charge",
+        "methods": "• Équation de Navier-Stokes pour fluide newtonien incompressible.\n• Nombre de Reynolds : Re = rho * v * D / mu."
+      },
+      {
+        "id": "phy-ch3",
+        "title": "Systèmes électroniques",
+        "exosTodo": "• Filtres actifs d'ordre 2 (Sallen-Key, Rauch)\n• Diagramme de Bode (gain et phase)",
+        "methods": "• Fonction de transfert H(jw) = S / E.\n• Fréquence de coupure à -3dB : |H(w_c)| = H_max / sqrt(2)."
+      }
+    ],
+    "info": [
+      {
+        "id": "info-ch1",
+        "title": "Algorithmique et POO",
+        "exosTodo": "• Héritage, polymorphisme et interfaces\n• Implémentation des patrons de conception (Singleton, Factory)",
+        "methods": "• Principes SOLID.\n• Encapsulation : attributs privés + getters/setters."
+      },
+      {
+        "id": "info-ch2",
+        "title": "Structures de données",
+        "exosTodo": "• Arbres binaires de recherche (ABR) et arbres AVL\n• Tas binaires et files de priorité",
+        "methods": "• Recherche dans un ABR équilibré : O(log n).\n• Parcours : infixe (trié), préfixe, postfixe."
+      },
+      {
+        "id": "info-ch3",
+        "title": "Conception base de données",
+        "exosTodo": "• Modèle Entité-Association vers Modèle Relationnel\n• Formes normales (1NF, 2NF, 3NF, BCNF)",
+        "methods": "• Règle de passage 1:N : la clé primaire devient clé étrangère côté N."
+      }
+    ]
+  },
+  "longtermCategories": [
+    {
+      "id": "cat-1",
+      "name": "Projets & PIX",
+      "color": "coral"
+    },
+    {
+      "id": "cat-2",
+      "name": "Révisions Concours/Examens",
+      "color": "orange"
+    },
+    {
+      "id": "cat-3",
+      "name": "Objectifs Semestre",
+      "color": "emerald"
+    },
+    {
+      "id": "cat-4",
+      "name": "Personnel & Sport",
+      "color": "purple"
+    }
+  ],
+  "longtermTodos": [
+    {
+      "id": "lt-1",
+      "title": "Projet PIX : Finaliser le prototype et la documentation",
+      "categoryId": "cat-1",
+      "deadline": "2026-10-15",
+      "priority": "urgent",
+      "status": "in_progress",
+      "notes": "Préparer la grille d'évaluation et la démo en équipe."
+    },
+    {
+      "id": "lt-2",
+      "title": "Ficher toutes les formules d'Algèbre linéaire & Séries",
+      "categoryId": "cat-2",
+      "deadline": "2026-11-01",
+      "priority": "important",
+      "status": "in_progress",
+      "notes": "Théorème de Cayley-Hamilton, critères de Cauchy et d'Abel."
+    },
+    {
+      "id": "lt-3",
+      "title": "Objectif Semestre : Valider les 5 blocs avec moyenne > 13.5",
+      "categoryId": "cat-3",
+      "deadline": "2027-01-20",
+      "priority": "normal",
+      "status": "in_progress",
+      "notes": "Maintenir la régularité sur les devoirs surveillés et colles."
+    },
+    {
+      "id": "lt-4",
+      "title": "Programme Sport : 3 séances par semaine régulières",
+      "categoryId": "cat-4",
+      "deadline": "2026-12-31",
+      "priority": "normal",
+      "status": "in_progress",
+      "notes": "Cardio le mardi, renforcement le jeudi et samedi."
+    }
+  ],
+  "flashcards": [
+    {
+      "id": "fc-deck-1",
+      "subject": "Maths",
+      "deckName": "Formules Algèbre & Réduction",
+      "cards": [
+        {
+          "id": "c1",
+          "front": "Quelle est la définition d'une valeur propre $\\lambda$ et d'un vecteur propre $x$ ?",
+          "back": "$\\lambda \\in \\mathbb{K}$ est valeur propre de $u$ s'il existe $x \\neq 0$ tel que :\n$$u(x) = \\lambda x$$\n$E_\\lambda(u) = \\ker(u - \\lambda \\mathrm{id}_E) \\neq \\{0\\}$.",
+          "status": "learning"
+        },
+        {
+          "id": "c2",
+          "front": "Énoncer le Théorème de Cayley-Hamilton.",
+          "back": "Pour toute matrice $A \\in \\mathcal{M}_n(\\mathbb{K})$ :\n$$\\chi_A(A) = 0_{\\mathcal{M}_n}$$",
+          "status": "learning"
+        },
+        {
+          "id": "c3",
+          "front": "CNS de diagonalisabilité via polynôme annulateur ?",
+          "back": "$A$ est diagonalisable ssi elle admet un **polynôme annulateur scindé à racines simples**.",
+          "status": "learning"
+        },
+        {
+          "id": "c4",
+          "front": "Formule de l'intégrale de Gauss $\\int_{-\\infty}^{+\\infty} e^{-x^2} dx$ ?",
+          "back": "$$\\int_{-\\infty}^{+\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$",
+          "status": "learning"
+        }
+      ]
+    },
+    {
+      "id": "fc-deck-2",
+      "subject": "Maths",
+      "deckName": "Séries Numériques & Entières",
+      "cards": [
+        {
+          "id": "c5",
+          "front": "Règle de d'Alembert pour une série à termes positifs $\\sum u_n$ ?",
+          "back": "Si $\\lim \\frac{u_{n+1}}{u_n} = l$ :\n• Si $l < 1$, la série **converge**.\n• Si $l > 1$, la série **diverge** grossièrement.\n• Si $l = 1$, on ne peut pas conclure.",
+          "status": "learning"
+        },
+        {
+          "id": "c6",
+          "front": "Critère Spécial des Séries Alternées (CSSA) ?",
+          "back": "Si $u_n = (-1)^n a_n$ avec $a_n \\ge 0$, $(a_n)$ décroissante vers $0$ :\n• La série $\\sum u_n$ converge.\n• Le reste $|R_n| \\le a_{n+1}$.",
+          "status": "learning"
+        }
+      ]
+    }
+  ],
+  "gradesData": {
+    "blocks": [
+      {
+        "id": "blk-maths",
+        "name": "MATHS",
+        "subjects": [
+          {
+            "id": "sub-m1",
+            "name": "Intro aux statistiques",
+            "coef": 2,
+            "evaluations": [
+              {
+                "id": "ev-s1",
+                "name": "DS 1 (Statistiques descriptives)",
+                "grade": 14.5,
+                "coef": 2,
+                "bonus": 0
+              },
+              {
+                "id": "ev-s2",
+                "name": "Interrogation de cours",
+                "grade": 13,
+                "coef": 1,
+                "bonus": 0
+              }
+            ]
+          },
+          {
+            "id": "sub-m2",
+            "name": "Algèbre linéaire",
+            "coef": 4,
+            "evaluations": [
+              {
+                "id": "ev-a1",
+                "name": "DS 1 (Espaces vectoriels & Matrices)",
+                "grade": 13,
+                "coef": 3,
+                "bonus": 0
+              },
+              {
+                "id": "ev-a2",
+                "name": "Colle de Maths S1",
+                "grade": 15,
+                "coef": 1,
+                "bonus": 0
+              }
+            ]
+          },
+          {
+            "id": "sub-m3",
+            "name": "Série",
+            "coef": 3,
+            "evaluations": [
+              {
+                "id": "ev-se1",
+                "name": "DS Séries numériques & entières",
+                "grade": 12.5,
+                "coef": 3,
+                "bonus": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "blk-physique",
+        "name": "PHYSIQUE",
+        "subjects": [
+          {
+            "id": "sub-p1",
+            "name": "Résistance des matériaux",
+            "coef": 3,
+            "evaluations": [
+              {
+                "id": "ev-r1",
+                "name": "DS 1 (Moments et contraintes)",
+                "grade": 13.5,
+                "coef": 3,
+                "bonus": 0
+              }
+            ]
+          },
+          {
+            "id": "sub-p2",
+            "name": "Mécanique des fluides",
+            "coef": 2,
+            "evaluations": [
+              {
+                "id": "ev-mf1",
+                "name": "DS 1 (Hydrostatique & Écoulements)",
+                "grade": 11.5,
+                "coef": 2,
+                "bonus": 0
+              }
+            ]
+          },
+          {
+            "id": "sub-p3",
+            "name": "Systèmes électroniques",
+            "coef": 2,
+            "evaluations": [
+              {
+                "id": "ev-e1",
+                "name": "TP Noté (Filtres & Bode)",
+                "grade": 15,
+                "coef": 2,
+                "bonus": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "blk-info",
+        "name": "INFORMATIQUE",
+        "subjects": [
+          {
+            "id": "sub-i1",
+            "name": "Algorithmique et POO",
+            "coef": 3,
+            "evaluations": [
+              {
+                "id": "ev-p1",
+                "name": "Projet POO Java / Python",
+                "grade": 16,
+                "coef": 2,
+                "bonus": 0
+              },
+              {
+                "id": "ev-p2",
+                "name": "DS Écrit Algorithmique",
+                "grade": 14.5,
+                "coef": 2,
+                "bonus": 0
+              }
+            ]
+          },
+          {
+            "id": "sub-i2",
+            "name": "Structures de données",
+            "coef": 1,
+            "evaluations": [
+              {
+                "id": "ev-sd1",
+                "name": "TP Arbres & Graphes",
+                "grade": 16.5,
+                "coef": 1,
+                "bonus": 0
+              }
+            ]
+          },
+          {
+            "id": "sub-i3",
+            "name": "Conception base de données",
+            "coef": 2,
+            "evaluations": [
+              {
+                "id": "ev-b1",
+                "name": "DS SQL & Modélisation relationnelle",
+                "grade": 14,
+                "coef": 2,
+                "bonus": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "blk-projet",
+        "name": "PROJET",
+        "subjects": [
+          {
+            "id": "sub-pr1",
+            "name": "Projet PIX",
+            "coef": 2,
+            "evaluations": [
+              {
+                "id": "ev-px1",
+                "name": "Rapport intermédiaire & Démo",
+                "grade": 15.5,
+                "coef": 2,
+                "bonus": 0
+              }
+            ]
+          },
+          {
+            "id": "sub-pr2",
+            "name": "Coopération en équipe",
+            "coef": 1,
+            "evaluations": [
+              {
+                "id": "ev-cp1",
+                "name": "Évaluation par les pairs & Soutenance",
+                "grade": 16,
+                "coef": 1,
+                "bonus": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "blk-soft",
+        "name": "SOFT SKILLS",
+        "subjects": [
+          {
+            "id": "sub-ss1",
+            "name": "Green IT",
+            "coef": 1,
+            "evaluations": [
+              {
+                "id": "ev-g1",
+                "name": "Étude de cas & Présentation",
+                "grade": 13.5,
+                "coef": 1,
+                "bonus": 0
+              }
+            ]
+          },
+          {
+            "id": "sub-ss2",
+            "name": "Skills stage A2",
+            "coef": 1,
+            "evaluations": [
+              {
+                "id": "ev-st1",
+                "name": "Rapport de stage & Bilan compétences",
+                "grade": 15,
+                "coef": 1,
+                "bonus": 0
+              }
+            ]
+          },
+          {
+            "id": "sub-ss3",
+            "name": "Design Thinking et Créativité",
+            "coef": 1,
+            "evaluations": [
+              {
+                "id": "ev-dt1",
+                "name": "Atelier idéation & Prototype",
+                "grade": 14.5,
+                "coef": 1,
+                "bonus": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
