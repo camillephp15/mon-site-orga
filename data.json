@@ -10895,7 +10895,16 @@
       "type": "colle"
     }
   ],
-  "dailyTodos": [],
+  "dailyTodos": [
+    {
+      "id": "td_1787761446289",
+      "text": "Faire une séance de sport",
+      "completed": false,
+      "priority": "normal",
+      "tag": "Sport",
+      "createdAt": "2026-08-26T16:24:06.289Z"
+    }
+  ],
   "subjectsData": {
     "maths": [
       {
