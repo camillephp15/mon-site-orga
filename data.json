@@ -10897,13 +10897,6 @@
   ],
   "dailyTodos": [
     {
-      "id": "td-1",
-      "text": "Refaire les exercices d'Algèbre linéaire (diagonalisation)",
-      "completed": false,
-      "priority": "high",
-      "tag": "Maths"
-    },
-    {
       "id": "td-2",
       "text": "Finir le compte-rendu de RDM (Résistance des matériaux)",
       "completed": true,
