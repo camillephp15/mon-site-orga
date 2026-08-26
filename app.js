@@ -1,4 +1,4 @@
-/**
+﻿/**
  * StudyFlow - Application Web d'Organisation (Prépa / Ingénieur)
  * 
  * NOUVEAUX AJUSTEMENTS :
@@ -113,7 +113,501 @@
   };
 
   // ==========================================================================
-  // 4. TIROIRS COULISSANTS (DRAWERS)
+  // 4. MENUS DÉROULANTS CUSTOM (CustomDropdown) — 100% HTML/CSS/JS, zéro natif
+  // ==========================================================================
+  /**
+   * CustomDropdown : remplace complètement les <select> natifs par un composant
+   * entièrement stylisé avec la DA Pop & Solaire.
+   * 
+   * Usage : CustomDropdown.create({ options, value, onChange, placeholder, className })
+   * Retourne un élément DOM prêt à être inséré.
+   */
+  const CustomDropdown = {
+    _openInstance: null,
+
+    /**
+     * Crée un dropdown custom et retourne l'élément wrapper (div).
+     * @param {Object} opts
+     * @param {Array<{value: string, label: string, color?: string}>} opts.options
+     * @param {string} [opts.value] - valeur sélectionnée par défaut
+     * @param {function} [opts.onChange] - appelé avec (newValue, newLabel) à chaque sélection
+     * @param {string} [opts.placeholder] - texte affiché si aucune valeur
+     * @param {string} [opts.className] - classes supplémentaires sur le wrapper
+     * @param {string} [opts.name] - nom du champ (pour récupérer la valeur via .dataset.value)
+     */
+    create({ options = [], value = null, onChange = null, placeholder = 'Sélectionner...', className = '', name = '' }) {
+      const selectedOption = options.find(o => o.value === value) || options[0] || null;
+      const currentValue = selectedOption ? selectedOption.value : '';
+      const currentLabel = selectedOption ? selectedOption.label : placeholder;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = `custom-dropdown-wrapper ${className}`;
+      wrapper.dataset.value = currentValue;
+      wrapper.dataset.name = name;
+      wrapper.setAttribute('role', 'combobox');
+      wrapper.setAttribute('aria-haspopup', 'listbox');
+      wrapper.setAttribute('aria-expanded', 'false');
+      wrapper.tabIndex = 0;
+
+      wrapper.innerHTML = `
+        <div class="custom-dropdown-trigger">
+          <span class="custom-dropdown-label">${this._renderLabel(selectedOption, placeholder)}</span>
+          <svg class="custom-dropdown-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+        <div class="custom-dropdown-list" role="listbox">
+          ${options.map(opt => `
+            <div class="custom-dropdown-option ${opt.value === currentValue ? 'selected' : ''}" 
+                 role="option" 
+                 aria-selected="${opt.value === currentValue}" 
+                 data-val="${opt.value}">
+              ${opt.color ? `<span class="custom-dropdown-opt-dot" style="background-color:${opt.color}"></span>` : ''}
+              <span>${opt.label}</span>
+              ${opt.value === currentValue ? `<svg class="custom-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      `;
+
+      const trigger = wrapper.querySelector('.custom-dropdown-trigger');
+      const list = wrapper.querySelector('.custom-dropdown-list');
+
+      const openDropdown = (e) => {
+        e.stopPropagation();
+
+        // Fermer tout autre dropdown ouvert
+        if (CustomDropdown._openInstance && CustomDropdown._openInstance !== wrapper) {
+          CustomDropdown._closeDropdown(CustomDropdown._openInstance);
+        }
+
+        const isOpen = wrapper.classList.contains('open');
+
+        if (isOpen) {
+          CustomDropdown._closeDropdown(wrapper);
+        } else {
+          CustomDropdown._openDropdown(wrapper);
+        }
+      };
+
+      trigger.addEventListener('click', openDropdown);
+      trigger.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDropdown(e); }
+        if (e.key === 'Escape') CustomDropdown._closeDropdown(wrapper);
+      });
+
+      list.querySelectorAll('.custom-dropdown-option').forEach(optEl => {
+        optEl.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const newVal = optEl.dataset.val;
+          const newOpt = options.find(o => o.value === newVal);
+          const newLabel = newOpt ? newOpt.label : newVal;
+
+          // Mettre à jour le state visuel
+          wrapper.dataset.value = newVal;
+          wrapper.querySelector('.custom-dropdown-label').innerHTML = this._renderLabel(newOpt, placeholder);
+
+          // Marquer l'option sélectionnée
+          list.querySelectorAll('.custom-dropdown-option').forEach(el => {
+            const isSel = el.dataset.val === newVal;
+            el.classList.toggle('selected', isSel);
+            el.setAttribute('aria-selected', String(isSel));
+            const check = el.querySelector('.custom-dropdown-check');
+            if (check) check.remove();
+            if (isSel) {
+              el.insertAdjacentHTML('beforeend', `<svg class="custom-dropdown-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"></path></svg>`);
+            }
+          });
+
+          CustomDropdown._closeDropdown(wrapper);
+          if (onChange) onChange(newVal, newLabel);
+        });
+
+        optEl.addEventListener('mouseenter', () => {
+          list.querySelectorAll('.custom-dropdown-option').forEach(el => el.classList.remove('hovered'));
+          optEl.classList.add('hovered');
+        });
+      });
+
+      wrapper.addEventListener('keydown', (e) => {
+        if (!wrapper.classList.contains('open')) return;
+        const opts = Array.from(list.querySelectorAll('.custom-dropdown-option'));
+        const current = list.querySelector('.custom-dropdown-option.hovered') || list.querySelector('.custom-dropdown-option.selected');
+        const idx = opts.indexOf(current);
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          const next = opts[Math.min(idx + 1, opts.length - 1)];
+          if (next) { opts.forEach(el => el.classList.remove('hovered')); next.classList.add('hovered'); next.scrollIntoView({ block: 'nearest' }); }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          const prev = opts[Math.max(idx - 1, 0)];
+          if (prev) { opts.forEach(el => el.classList.remove('hovered')); prev.classList.add('hovered'); prev.scrollIntoView({ block: 'nearest' }); }
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          const hovered = list.querySelector('.custom-dropdown-option.hovered');
+          if (hovered) hovered.click();
+        } else if (e.key === 'Escape') {
+          CustomDropdown._closeDropdown(wrapper);
+        }
+      });
+
+      return wrapper;
+    },
+
+    _renderLabel(opt, placeholder) {
+      if (!opt) return `<span class="text-zinc-400">${placeholder}</span>`;
+      if (opt.color) return `<span class="custom-dropdown-opt-dot" style="background-color:${opt.color}"></span><span>${opt.label}</span>`;
+      return `<span>${opt.label}</span>`;
+    },
+
+    _openDropdown(wrapper) {
+      wrapper.classList.add('open');
+      wrapper.setAttribute('aria-expanded', 'true');
+      CustomDropdown._openInstance = wrapper;
+
+      // Positionner correctement la liste (sous ou au-dessus selon l'espace)
+      const list = wrapper.querySelector('.custom-dropdown-list');
+      const rect = wrapper.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      const listHeight = Math.min(options.length * 44, 300);
+
+      if (spaceBelow < listHeight && spaceAbove > listHeight) {
+        list.classList.add('dropup');
+      } else {
+        list.classList.remove('dropup');
+      }
+
+      setTimeout(() => {
+        document.addEventListener('click', CustomDropdown._globalClickHandler);
+        document.addEventListener('keydown', CustomDropdown._globalEscHandler);
+      }, 10);
+    },
+
+    _closeDropdown(wrapper) {
+      if (!wrapper) return;
+      wrapper.classList.remove('open');
+      wrapper.setAttribute('aria-expanded', 'false');
+      const list = wrapper.querySelector('.custom-dropdown-list');
+      if (list) list.querySelectorAll('.custom-dropdown-option').forEach(el => el.classList.remove('hovered'));
+      if (CustomDropdown._openInstance === wrapper) CustomDropdown._openInstance = null;
+      document.removeEventListener('click', CustomDropdown._globalClickHandler);
+      document.removeEventListener('keydown', CustomDropdown._globalEscHandler);
+    },
+
+    _globalClickHandler(e) {
+      if (CustomDropdown._openInstance && !CustomDropdown._openInstance.contains(e.target)) {
+        CustomDropdown._closeDropdown(CustomDropdown._openInstance);
+      }
+    },
+
+    _globalEscHandler(e) {
+      if (e.key === 'Escape' && CustomDropdown._openInstance) {
+        CustomDropdown._closeDropdown(CustomDropdown._openInstance);
+      }
+    },
+
+    /**
+     * Récupère la valeur actuelle d'un dropdown custom.
+     * @param {HTMLElement} wrapperEl - l'élément wrapper retourné par create()
+     * @returns {string}
+     */
+    getValue(wrapperEl) {
+      return wrapperEl ? wrapperEl.dataset.value || '' : '';
+    },
+
+    /**
+     * Met à jour la valeur sélectionnée d'un dropdown existant.
+     */
+    setValue(wrapperEl, newValue) {
+      if (!wrapperEl) return;
+      const list = wrapperEl.querySelector('.custom-dropdown-list');
+      const optEl = list ? list.querySelector(`[data-val="${newValue}"]`) : null;
+      if (optEl) optEl.click();
+    },
+
+    /**
+     * Remplace automatiquement tous les <select class="custom-select"> d'un panneau
+     * par des composants CustomDropdown. La valeur est accessible via el.dataset.value.
+     * Les handlers qui lisent .value sur le select original sont migrés via un proxy.
+     * @param {HTMLElement} panelEl
+     */
+    _autoInitPanel(panelEl) {
+      if (!panelEl) return;
+
+      panelEl.querySelectorAll('select.custom-select').forEach(sel => {
+        // Extraire les options du select natif
+        const options = Array.from(sel.options).map(o => ({
+          value: o.value,
+          label: o.text,
+          color: o.dataset.color || null
+        }));
+
+        const currentValue = sel.value;
+        const idAttr = sel.id || '';
+        const nameAttr = sel.name || '';
+        const dataAttrs = sel.dataset;
+
+        // Récupérer les classes supplémentaires (ex: w-full, compact)
+        const extraClasses = Array.from(sel.classList)
+          .filter(c => c !== 'custom-select' && !c.startsWith('text-') && !c.startsWith('font-') && !c.startsWith('px-') && !c.startsWith('py-') && !c.startsWith('rounded-'))
+          .join(' ');
+
+        const isCompact = sel.classList.contains('compact') || sel.offsetHeight < 35;
+
+        const dropdownEl = this.create({
+          options,
+          value: currentValue,
+          className: `${extraClasses} ${isCompact ? 'compact' : ''}`.trim(),
+          name: nameAttr || idAttr,
+          onChange: (newVal) => {
+            // Propager le changement sur le select natif (pour compatibilité avec les handlers existants)
+            sel.value = newVal;
+            const event = new Event('change', { bubbles: true });
+            sel.dispatchEvent(event);
+          }
+        });
+
+        // Copier les attributs data-* du select sur le wrapper
+        Object.keys(dataAttrs).forEach(key => {
+          dropdownEl.dataset[key] = dataAttrs[key];
+        });
+
+        if (idAttr) {
+          dropdownEl.id = idAttr + '-dd';
+          // Garder le select original masqué mais fonctionnel (pour les handlers qui cherchent par ID)
+          sel.id = idAttr;
+          sel.style.cssText = 'position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;overflow:hidden;';
+          sel.setAttribute('aria-hidden', 'true');
+          sel.setAttribute('tabindex', '-1');
+          // Insérer le dropdown AVANT le select masqué
+          sel.parentNode.insertBefore(dropdownEl, sel);
+        } else {
+          // Remplacer directement
+          sel.parentNode.replaceChild(dropdownEl, sel);
+        }
+      });
+    }
+  };
+
+  // Injection des styles CSS du CustomDropdown dans le <head> au chargement
+  (function injectCustomDropdownStyles() {
+    if (document.getElementById('custom-dropdown-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'custom-dropdown-styles';
+    style.textContent = `
+      /* =====================================================================
+         CustomDropdown — Composant Menus Déroulants Pop & Solaire
+         ===================================================================== */
+      .custom-dropdown-wrapper {
+        position: relative;
+        display: inline-flex;
+        flex-direction: column;
+        width: 100%;
+        user-select: none;
+      }
+
+      .custom-dropdown-trigger {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 10px 14px;
+        background-color: #fcfaf6;
+        border: 1.5px solid #ded4c1;
+        border-radius: 16px;
+        cursor: pointer;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #0f0f12;
+        font-family: inherit;
+        transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+        min-height: 40px;
+        white-space: nowrap;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .dark .custom-dropdown-trigger {
+        background-color: #0a0a0d;
+        border-color: #272730;
+        color: #fdfdfd;
+      }
+
+      .custom-dropdown-wrapper:focus .custom-dropdown-trigger,
+      .custom-dropdown-wrapper.open .custom-dropdown-trigger {
+        border-color: #ff3366 !important;
+        box-shadow: 0 0 0 3.5px rgba(255, 51, 102, 0.22) !important;
+        outline: none;
+      }
+
+      .custom-dropdown-label {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .custom-dropdown-chevron {
+        width: 15px;
+        height: 15px;
+        flex-shrink: 0;
+        color: #ff3366;
+        transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        pointer-events: none;
+      }
+
+      .custom-dropdown-wrapper.open .custom-dropdown-chevron {
+        transform: rotate(180deg);
+      }
+
+      /* La liste déroulante */
+      .custom-dropdown-list {
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 0;
+        right: 0;
+        z-index: 9999;
+        background-color: #ffffff;
+        border: 1.5px solid #ded4c1;
+        border-radius: 18px;
+        box-shadow: 0 16px 40px -8px rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.08);
+        overflow: hidden;
+        max-height: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: max-height 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        transform: translateY(-4px) scale(0.98);
+        overflow-y: auto;
+      }
+
+      .dark .custom-dropdown-list {
+        background-color: #16161b;
+        border-color: #272730;
+        box-shadow: 0 16px 40px -8px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3);
+      }
+
+      .custom-dropdown-wrapper.open .custom-dropdown-list {
+        max-height: 320px;
+        opacity: 1;
+        pointer-events: all;
+        transform: translateY(0) scale(1);
+      }
+
+      /* Dropup : la liste s'affiche au-dessus */
+      .custom-dropdown-list.dropup {
+        top: auto;
+        bottom: calc(100% + 6px);
+        transform-origin: bottom;
+      }
+
+      /* Scrollbar de la liste */
+      .custom-dropdown-list::-webkit-scrollbar { width: 5px; }
+      .custom-dropdown-list::-webkit-scrollbar-track { background: transparent; }
+      .custom-dropdown-list::-webkit-scrollbar-thumb { background: rgba(120,113,108,0.3); border-radius: 4px; }
+
+      /* Option individuelle */
+      .custom-dropdown-option {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 10px 14px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #0f0f12;
+        cursor: pointer;
+        transition: background-color 0.14s ease, color 0.14s ease;
+        border-radius: 0;
+        position: relative;
+      }
+
+      .dark .custom-dropdown-option {
+        color: #e4e4e7;
+      }
+
+      .custom-dropdown-option:first-child { border-radius: 16px 16px 0 0; }
+      .custom-dropdown-option:last-child { border-radius: 0 0 16px 16px; }
+      .custom-dropdown-option:first-child:last-child { border-radius: 16px; }
+
+      .custom-dropdown-option:hover,
+      .custom-dropdown-option.hovered {
+        background-color: rgba(255, 51, 102, 0.07);
+        color: #ff3366;
+      }
+
+      .dark .custom-dropdown-option:hover,
+      .dark .custom-dropdown-option.hovered {
+        background-color: rgba(255, 51, 102, 0.12);
+        color: #ff6680;
+      }
+
+      .custom-dropdown-option.selected {
+        background-color: rgba(255, 51, 102, 0.06);
+        color: #ff3366;
+        font-weight: 900;
+      }
+
+      .dark .custom-dropdown-option.selected {
+        background-color: rgba(255, 51, 102, 0.1);
+        color: #ff6680;
+      }
+
+      .custom-dropdown-check {
+        width: 13px;
+        height: 13px;
+        flex-shrink: 0;
+        color: #ff3366;
+        margin-left: auto;
+      }
+
+      .custom-dropdown-opt-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      }
+
+      /* Séparateurs optionnels entre groupes (si data-separator="true") */
+      .custom-dropdown-separator {
+        height: 1px;
+        background-color: #eee7da;
+        margin: 4px 12px;
+      }
+
+      .dark .custom-dropdown-separator {
+        background-color: #272730;
+      }
+
+      /* Petite taille pour les dropdowns compacts */
+      .custom-dropdown-wrapper.compact .custom-dropdown-trigger {
+        padding: 7px 11px;
+        font-size: 0.7rem;
+        border-radius: 12px;
+        min-height: 32px;
+      }
+
+      .custom-dropdown-wrapper.compact .custom-dropdown-list {
+        border-radius: 14px;
+      }
+
+      .custom-dropdown-wrapper.compact .custom-dropdown-option {
+        padding: 8px 12px;
+        font-size: 0.7rem;
+      }
+
+      .custom-dropdown-wrapper.compact .custom-dropdown-option:first-child { border-radius: 12px 12px 0 0; }
+      .custom-dropdown-wrapper.compact .custom-dropdown-option:last-child { border-radius: 0 0 12px 12px; }
+    `;
+    document.head.appendChild(style);
+  })();
+
+  // ==========================================================================
+  // 5. TIROIRS COULISSANTS (DRAWERS)
   // ==========================================================================
   const Drawer = {
     activeDrawer: null,
@@ -176,6 +670,10 @@
       document.addEventListener('keydown', this._handleKeyDown);
 
       if (window.lucide) window.lucide.createIcons();
+
+      // Auto-remplace tous les <select class="custom-select"> du tiroir par des CustomDropdown
+      CustomDropdown._autoInitPanel(panel);
+
       if (onOpen) onOpen(panel);
     },
 
@@ -1391,6 +1889,7 @@
       `;
 
       if (window.lucide) window.lucide.createIcons();
+      CustomDropdown._autoInitPanel(container);
 
       this._bindEvents(container);
       this._renderTimetableEvents();
@@ -2459,6 +2958,7 @@
       `;
 
       if (window.lucide) window.lucide.createIcons();
+      CustomDropdown._autoInitPanel(container);
       this._bindEvents(container);
     },
 
@@ -2673,6 +3173,7 @@
       `;
 
       if (window.lucide) window.lucide.createIcons();
+      CustomDropdown._autoInitPanel(container);
       this._bindEvents(container);
     },
 
@@ -2979,6 +3480,7 @@
       `;
 
       if (window.lucide) window.lucide.createIcons();
+      CustomDropdown._autoInitPanel(container);
       this._bindEvents(container);
     },
 
@@ -3585,6 +4087,7 @@
       `;
 
       if (window.lucide) window.lucide.createIcons();
+      CustomDropdown._autoInitPanel(container);
       this._bindEvents(container);
     },
 
@@ -3795,219 +4298,8 @@
     }
 
     _bindGitHubSync() {
-      const syncBtn = document.getElementById('github-sync-btn');
-      if (syncBtn) {
-        syncBtn.addEventListener('click', () => this._openGitHubSettingsDrawer());
-      }
-    }
-
-    _openGitHubSettingsDrawer() {
-      const cfg = GitHubSync.getConfig();
-      const isConf = GitHubSync.isConfigured();
-      const lastSyncStr = GitHubSync.lastSyncTime ? GitHubSync.lastSyncTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'Automatique';
-
-      const content = `
-        <div class="space-y-5">
-          <div class="p-4 rounded-2xl bg-creme-100 dark:bg-ink-darkbg border border-creme-300 dark:border-zinc-800 space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="font-black text-xs text-ink dark:text-white flex items-center gap-2">
-                <i data-lucide="cloud" class="w-4 h-4 text-solaire-500"></i>
-                Synchronisation GitHub (API REST)
-              </span>
-              <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md ${isConf ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400'}">
-                ${isConf ? 'Connecté ✓' : 'Non configuré'}
-              </span>
-            </div>
-            <p class="text-[11px] text-zinc-600 dark:text-zinc-300 leading-relaxed font-medium">
-              Vos données sont commitées automatiquement en direct dans le fichier <code>${cfg.path || 'data.json'}</code> du dépôt <b>${cfg.owner}/${cfg.repo}</b>.
-            </p>
-          </div>
-
-          <form id="github-config-form" class="space-y-3.5">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div>
-                <label class="block text-[11px] font-black text-ink dark:text-zinc-300 mb-1">Utilisateur GitHub *</label>
-                <input type="text" id="gh-owner" required value="${cfg.owner || ''}" class="custom-input w-full text-xs px-3.5 py-2.5 rounded-2xl font-bold">
-              </div>
-              <div>
-                <label class="block text-[11px] font-black text-ink dark:text-zinc-300 mb-1">Nom du Dépôt *</label>
-                <input type="text" id="gh-repo" required value="${cfg.repo || ''}" class="custom-input w-full text-xs px-3.5 py-2.5 rounded-2xl font-bold">
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div>
-                <label class="block text-[11px] font-black text-ink dark:text-zinc-300 mb-1">Branche *</label>
-                <input type="text" id="gh-branch" required value="${cfg.branch || 'main'}" class="custom-input w-full text-xs px-3.5 py-2.5 rounded-2xl font-mono">
-              </div>
-              <div>
-                <label class="block text-[11px] font-black text-ink dark:text-zinc-300 mb-1">Fichier de données *</label>
-                <input type="text" id="gh-path" required value="${cfg.path || 'data.json'}" class="custom-input w-full text-xs px-3.5 py-2.5 rounded-2xl font-mono">
-              </div>
-            </div>
-
-            <div>
-              <label class="block text-[11px] font-black text-ink dark:text-zinc-300 mb-1">Personal Access Token (PAT) GitHub *</label>
-              <div class="relative">
-                <input type="password" id="gh-token" required value="${cfg.token || ''}" class="custom-input w-full text-xs px-3.5 py-2.5 pr-10 rounded-2xl font-mono">
-                <button type="button" id="gh-toggle-token" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-ink dark:hover:text-white p-1">
-                  <i data-lucide="eye" class="w-4 h-4"></i>
-                </button>
-              </div>
-            </div>
-          </form>
-
-          <div class="p-3.5 rounded-2xl bg-creme-100/70 dark:bg-ink-darkbg/70 border border-creme-300 dark:border-zinc-800 flex items-center justify-between text-xs font-bold">
-            <span class="text-zinc-500">Dernière sync : <span class="font-mono text-ink dark:text-white">${lastSyncStr}</span></span>
-            <button id="gh-test-btn" class="px-3 py-1.5 rounded-xl bg-creme-200 hover:bg-creme-300 dark:bg-zinc-800 text-ink dark:text-white text-xs font-black transition-colors flex items-center gap-1">
-              <i data-lucide="zap" class="w-3.5 h-3.5 text-orangePop-500"></i>
-              <span>Tester</span>
-            </button>
-          </div>
-
-          ${isConf ? `
-            <div class="grid grid-cols-2 gap-2.5 pt-1">
-              <button id="gh-pull-btn" class="px-3 py-2.5 bg-creme-200 hover:bg-creme-300 dark:bg-zinc-800 text-ink dark:text-white rounded-2xl text-xs font-black flex items-center justify-center gap-1.5 transition-colors">
-                <i data-lucide="download-cloud" class="w-3.5 h-3.5 text-sky-500"></i>
-                <span>Recharger depuis GitHub</span>
-              </button>
-              <button id="gh-push-btn" class="px-3 py-2.5 bg-solaire-500 hover:bg-solaire-600 text-white rounded-2xl text-xs font-black flex items-center justify-center gap-1.5 transition-colors shadow-sm">
-                <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
-                <span>Pousser vers GitHub</span>
-              </button>
-            </div>
-          ` : ''}
-
-          <div class="pt-3 border-t border-creme-200 dark:border-zinc-800 flex items-center justify-between text-[11px] text-zinc-500">
-            <span>Sauvegarde locale JSON :</span>
-            <div class="flex items-center gap-2">
-              <button id="gh-export-local-json" class="font-bold text-solaire-600 dark:text-solaire-400 hover:underline">Exporter</button>
-              <span>•</span>
-              <button id="gh-import-local-json" class="font-bold text-solaire-600 dark:text-solaire-400 hover:underline">Importer</button>
-            </div>
-          </div>
-        </div>
-      `;
-
-      Drawer.open({
-        title: 'Synchronisation GitHub',
-        icon: '<i data-lucide="github" class="w-5 h-5 text-ink dark:text-white"></i>',
-        content,
-        footer: `
-          <button id="gh-cancel-btn" class="px-4 py-2 rounded-xl text-xs font-bold text-zinc-500 hover:text-ink">Fermer</button>
-          <button id="gh-save-btn" class="px-6 py-2.5 bg-solaire-500 hover:bg-solaire-600 text-white rounded-2xl text-xs font-black shadow-md shadow-solaire-500/25 transition-all">Enregistrer &amp; Sync</button>
-        `,
-        onOpen: (panelEl) => {
-          const toggleBtn = panelEl.querySelector('#gh-toggle-token');
-          const tokenInput = panelEl.querySelector('#gh-token');
-          toggleBtn.addEventListener('click', () => {
-            tokenInput.type = tokenInput.type === 'password' ? 'text' : 'password';
-          });
-
-          panelEl.querySelector('#gh-cancel-btn').addEventListener('click', () => Drawer.close());
-
-          panelEl.querySelector('#gh-test-btn').addEventListener('click', async () => {
-            const testCfg = {
-              owner: panelEl.querySelector('#gh-owner').value.trim(),
-              repo: panelEl.querySelector('#gh-repo').value.trim(),
-              branch: panelEl.querySelector('#gh-branch').value.trim() || 'main',
-              path: panelEl.querySelector('#gh-path').value.trim() || 'data.json',
-              token: panelEl.querySelector('#gh-token').value.trim()
-            };
-
-            try {
-              Toast.info('Test de la connexion...');
-              const repoInfo = await GitHubSync.testConnection(testCfg);
-              Toast.success(`Connexion réussie au dépôt "${repoInfo.full_name}" !`);
-            } catch (err) {
-              Toast.error(`Échec : ${err.message}`);
-            }
-          });
-
-          panelEl.querySelector('#gh-save-btn').addEventListener('click', async () => {
-            const newCfg = {
-              owner: panelEl.querySelector('#gh-owner').value.trim(),
-              repo: panelEl.querySelector('#gh-repo').value.trim(),
-              branch: panelEl.querySelector('#gh-branch').value.trim() || 'main',
-              path: panelEl.querySelector('#gh-path').value.trim() || 'data.json',
-              token: panelEl.querySelector('#gh-token').value.trim()
-            };
-
-            try {
-              Toast.info('Vérification et synchronisation...');
-              await GitHubSync.testConnection(newCfg);
-              GitHubSync.saveConfig(newCfg);
-
-              const remote = await GitHubSync.fetchRemoteData(newCfg);
-              if (remote && remote.data) {
-                store.applyRemoteData(remote.data);
-                Toast.success(`Données chargées depuis GitHub (${newCfg.path}) !`);
-              } else {
-                await GitHubSync.commitRemoteData(store.data, 'Initial commit: StudyFlow data.json');
-                Toast.success(`Fichier ${newCfg.path} créé et synchronisé sur GitHub !`);
-              }
-
-              Drawer.close();
-              this.navigateTo(this.currentPage);
-            } catch (err) {
-              Toast.error(`Erreur : ${err.message}`);
-            }
-          });
-
-          const pushBtn = panelEl.querySelector('#gh-push-btn');
-          if (pushBtn) {
-            pushBtn.addEventListener('click', async () => {
-              try {
-                Toast.info('Envoi vers GitHub...');
-                await GitHubSync.commitRemoteData(store.data, 'Manual sync from StudyFlow');
-                Toast.success('Données poussées sur GitHub !');
-                Drawer.close();
-              } catch (err) {
-                Toast.error(`Échec envoi : ${err.message}`);
-              }
-            });
-          }
-
-          const pullBtn = panelEl.querySelector('#gh-pull-btn');
-          if (pullBtn) {
-            pullBtn.addEventListener('click', async () => {
-              try {
-                Toast.info('Téléchargement...');
-                const remote = await GitHubSync.fetchRemoteData();
-                if (remote && remote.data) {
-                  store.applyRemoteData(remote.data);
-                  Toast.success('Données rechargées depuis GitHub !');
-                  Drawer.close();
-                  this.navigateTo(this.currentPage);
-                }
-              } catch (err) {
-                Toast.error(`Échec : ${err.message}`);
-              }
-            });
-          }
-
-          panelEl.querySelector('#gh-export-local-json').addEventListener('click', () => store.exportJSON());
-
-          panelEl.querySelector('#gh-import-local-json').addEventListener('click', () => {
-            const input = document.getElementById('global-json-import-input');
-            if (input) {
-              input.onchange = (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                  if (store.importJSON(ev.target.result)) {
-                    Drawer.close();
-                    this.navigateTo(this.currentPage);
-                  }
-                };
-                reader.readAsText(file);
-              };
-              input.click();
-            }
-          });
-        }
-      });
+      // Le bouton GitHub a été retiré de l'UI — la sync est 100% automatique.
+      // Le statut s'affiche discrètement via l'indicateur #github-sync-indicator.
     }
 
     _bindGlobalShortcuts() {
