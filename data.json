@@ -204,17 +204,6 @@
       "teacher": "Surveillance",
       "type": "ds",
       "completed": false
-    },
-    {
-      "calendarId": "cal-default",
-      "title": "test",
-      "date": "2026-08-29",
-      "day": "sat",
-      "startTime": "08:00",
-      "duration": 120,
-      "room": "",
-      "completed": false,
-      "id": "ev_1787759707110"
     }
   ],
   "importantDates": [
