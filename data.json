@@ -10895,36 +10895,7 @@
       "type": "colle"
     }
   ],
-  "dailyTodos": [
-    {
-      "id": "td-2",
-      "text": "Finir le compte-rendu de RDM (Résistance des matériaux)",
-      "completed": true,
-      "priority": "high",
-      "tag": "Physique"
-    },
-    {
-      "id": "td-3",
-      "text": "Programmer la classe Arbre Binaire en Python / Java",
-      "completed": false,
-      "priority": "normal",
-      "tag": "Info"
-    },
-    {
-      "id": "td-4",
-      "text": "Séance de sport (Cardio / Muscu)",
-      "completed": false,
-      "priority": "normal",
-      "tag": "Sport"
-    },
-    {
-      "id": "td-5",
-      "text": "Ranger le bureau & courses de la semaine",
-      "completed": false,
-      "priority": "low",
-      "tag": "Maison"
-    }
-  ],
+  "dailyTodos": [],
   "subjectsData": {
     "maths": [
       {
