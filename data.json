@@ -10980,6 +10980,13 @@
         "exosTodo": "• Calcul des estimateurs sans biais de la moyenne et variance\n• Tests d'hypothèse (Student et Chi-2)",
         "exosHard": "• Loi forte des grands nombres et TCL\n• Intervalle de confiance asymptotique",
         "methods": "• Espérance E(X), Variance V(X) = E(X^2) - E(X)^2.\n• Théorème Central Limite : moyenne centrée réduite converge vers N(0,1)."
+      },
+      {
+        "id": "maths_ch_1787766631685",
+        "title": "améliorations site",
+        "exosTodo": "",
+        "exosHard": "",
+        "methods": ""
       }
     ],
     "physique": [
