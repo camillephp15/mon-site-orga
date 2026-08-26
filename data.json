@@ -11181,15 +11181,7 @@
             "id": "sub-p1",
             "name": "Résistance des matériaux",
             "coef": 3,
-            "evaluations": [
-              {
-                "id": "ev-r1",
-                "name": "DS 1 (Moments et contraintes)",
-                "grade": 13.5,
-                "coef": 3,
-                "bonus": 0
-              }
-            ]
+            "evaluations": []
           },
           {
             "id": "sub-p2",
