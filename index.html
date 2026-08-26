@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyFlow - Organisation Personnelle</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            solaire: {
+              50: '#fff5f5',
+              100: '#ffe3e8',
+              200: '#ffccd6',
+              300: '#ffa3b5',
+              400: '#ff668a',
+              500: '#ff3366', // Rose vif / Pop Coral
+              600: '#f41b52',
+              700: '#ce0f3e',
+              800: '#aa1138',
+              900: '#8d1334',
+            },
+            orangePop: {
+              50: '#fff7ed',
+              100: '#ffedd5',
+              200: '#fed7aa',
+              300: '#fdba74',
+              400: '#fb923c',
+              500: '#f97316', // Orange Solaire
+              600: '#ea580c',
+              700: '#c2410c',
+            },
+            creme: {
+              50: '#ffffff',
+              100: '#fcfaf6', // Fond clair chaleureux
+              200: '#f7f3eb',
+              300: '#eee7da',
+              400: '#ded4c1',
+              500: '#c7b79d',
+            },
+            ink: {
+              DEFAULT: '#0f0f12', // Noir profond
+              light: '#18181c',
+              muted: '#52525b',
+              darkcard: '#16161b', // Surface sombre
+              darkbg: '#0a0a0d',   // Fond sombre ultra-profond
+              border: '#272730'
+            }
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+            display: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts: Plus Jakarta Sans (Nette, élégante, ultra-lisible) + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- KaTeX for LaTeX Math rendering (flashcards) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-creme-100 dark:bg-ink-darkbg text-ink dark:text-zinc-100 min-h-screen flex flex-col font-sans transition-colors duration-200 antialiased selection:bg-solaire-500 selection:text-white">
+
+  <!-- Top Navigation Bar - Navigation parfaitement centrée et sans StudyFlow -->
+  <header class="sticky top-0 z-40 bg-creme-100/90 dark:bg-ink-darkbg/90 backdrop-blur-md border-b border-creme-300 dark:border-ink-border transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="relative flex items-center justify-between h-16">
+        
+        <!-- Left spacer to balance right buttons and keep center perfectly centered -->
+        <div class="w-24 hidden md:block flex-shrink-0"></div>
+
+        <!-- Centered Navigation: Accueil, Matières, To-do List, Colles, Notes -->
+        <nav class="hidden md:flex items-center justify-center gap-1.5 bg-creme-200/90 dark:bg-ink-darkcard p-1.5 rounded-2xl border border-creme-300 dark:border-ink-border mx-auto shadow-xs" id="desktop-nav">
+          <button data-page="dashboard" class="nav-btn active flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition-all">
+            <i data-lucide="calendar" class="w-4 h-4"></i>
+            <span>Accueil</span>
+          </button>
+          <button data-page="subjects" class="nav-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition-all">
+            <i data-lucide="book-open" class="w-4 h-4"></i>
+            <span>Matières</span>
+          </button>
+          <button data-page="longterm" class="nav-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition-all">
+            <i data-lucide="check-square" class="w-4 h-4"></i>
+            <span>To-do List</span>
+          </button>
+          <button data-page="flashcards" class="nav-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition-all">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span>Colles</span>
+          </button>
+          <button data-page="grades" class="nav-btn flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-extrabold transition-all">
+            <i data-lucide="calculator" class="w-4 h-4"></i>
+            <span>Notes</span>
+          </button>
+        </nav>
+
+        <!-- Right actions: Dark/Light toggle + Data Backup JSON -->
+        <div class="flex items-center gap-2 ml-auto md:ml-0 flex-shrink-0">
+          
+          <!-- Dark / Light Mode Toggle -->
+          <button id="theme-toggle-btn" title="Basculer Mode Clair / Sombre" class="p-2 rounded-xl text-ink dark:text-zinc-300 hover:bg-creme-200 dark:hover:bg-ink-darkcard border border-creme-300 dark:border-ink-border transition-all">
+            <i data-lucide="moon" class="w-4 h-4 hidden dark:block text-orangePop-400"></i>
+            <i data-lucide="sun" class="w-4 h-4 block dark:hidden text-orangePop-500"></i>
+          </button>
+
+          <!-- Local Data Backup Pill -->
+          <button id="backup-menu-btn" title="Sauvegarde locale & transfert (JSON)" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-extrabold bg-creme-200 hover:bg-creme-300 dark:bg-ink-darkcard dark:hover:bg-zinc-800 text-ink dark:text-zinc-200 border border-creme-300 dark:border-ink-border transition-all shadow-xs">
+            <i data-lucide="database" class="w-3.5 h-3.5 text-solaire-500"></i>
+            <span class="hidden sm:inline">Données JSON</span>
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-7 pb-24 md:pb-10">
+    
+    <!-- View 1: Accueil / Dashboard -->
+    <section id="view-dashboard" class="page-view active animate-fade-in"></section>
+
+    <!-- View 2: Matières -->
+    <section id="view-subjects" class="page-view hidden animate-fade-in"></section>
+
+    <!-- View 3: To-do List -->
+    <section id="view-longterm" class="page-view hidden animate-fade-in"></section>
+
+    <!-- View 4: Colles & Flashcards -->
+    <section id="view-flashcards" class="page-view hidden animate-fade-in"></section>
+
+    <!-- View 5: Notes & Semestre -->
+    <section id="view-grades" class="page-view hidden animate-fade-in"></section>
+
+  </main>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-creme-100/95 dark:bg-ink-darkbg/95 backdrop-blur-lg border-t border-creme-300 dark:border-ink-border px-2 py-2 flex justify-around items-center transition-colors shadow-lg" id="mobile-nav">
+    <button data-page="dashboard" class="mobile-nav-btn active flex flex-col items-center gap-0.5 p-1 rounded-xl text-[11px] font-bold">
+      <i data-lucide="calendar" class="w-5 h-5"></i>
+      <span>Accueil</span>
+    </button>
+    <button data-page="subjects" class="mobile-nav-btn flex flex-col items-center gap-0.5 p-1 rounded-xl text-[11px] font-bold">
+      <i data-lucide="book-open" class="w-5 h-5"></i>
+      <span>Matières</span>
+    </button>
+    <button data-page="longterm" class="mobile-nav-btn flex flex-col items-center gap-0.5 p-1 rounded-xl text-[11px] font-bold">
+      <i data-lucide="check-square" class="w-5 h-5"></i>
+      <span>To-do</span>
+    </button>
+    <button data-page="flashcards" class="mobile-nav-btn flex flex-col items-center gap-0.5 p-1 rounded-xl text-[11px] font-bold">
+      <i data-lucide="sparkles" class="w-5 h-5"></i>
+      <span>Colles</span>
+    </button>
+    <button data-page="grades" class="mobile-nav-btn flex flex-col items-center gap-0.5 p-1 rounded-xl text-[11px] font-bold">
+      <i data-lucide="calculator" class="w-5 h-5"></i>
+      <span>Notes</span>
+    </button>
+  </nav>
+
+  <!-- Global Modals Container -->
+  <div id="modals-root"></div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-20 right-4 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- Hidden file input for JSON import -->
+  <input type="file" id="global-json-import-input" accept=".json,application/json" class="hidden">
+
+  <!-- Standalone Application Script -->
+  <script src="js/app.js"></script>
+</body>
+</html>
