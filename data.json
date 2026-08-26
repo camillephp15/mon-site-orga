@@ -11318,15 +11318,7 @@
             "id": "sub-ss1",
             "name": "Green IT",
             "coef": 1,
-            "evaluations": [
-              {
-                "id": "ev-g1",
-                "name": "Étude de cas & Présentation",
-                "grade": 13.5,
-                "coef": 1,
-                "bonus": 0
-              }
-            ]
+            "evaluations": []
           },
           {
             "id": "sub-ss2",
