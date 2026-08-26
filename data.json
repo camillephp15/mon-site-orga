@@ -10860,13 +10860,6 @@
   ],
   "importantDates": [
     {
-      "id": "imp-1",
-      "title": "DS 1 Maths - Algèbre",
-      "date": "2026-09-12",
-      "color": "#ff3366",
-      "type": "ds"
-    },
-    {
       "id": "imp-3",
       "title": "DS 3 Info - Algo & POO",
       "date": "2026-10-10",
