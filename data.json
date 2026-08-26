@@ -11161,15 +11161,7 @@
             "id": "sub-m3",
             "name": "Série",
             "coef": 3,
-            "evaluations": [
-              {
-                "id": "ev-se1",
-                "name": "DS Séries numériques & entières",
-                "grade": 12.5,
-                "coef": 3,
-                "bonus": 0
-              }
-            ]
+            "evaluations": []
           }
         ]
       },
