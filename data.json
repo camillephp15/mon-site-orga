@@ -11195,29 +11195,13 @@
             "id": "sub-p2",
             "name": "Mécanique des fluides",
             "coef": 2,
-            "evaluations": [
-              {
-                "id": "ev-mf1",
-                "name": "DS 1 (Hydrostatique & Écoulements)",
-                "grade": 11.5,
-                "coef": 2,
-                "bonus": 0
-              }
-            ]
+            "evaluations": []
           },
           {
             "id": "sub-p3",
             "name": "Systèmes électroniques",
             "coef": 2,
-            "evaluations": [
-              {
-                "id": "ev-e1",
-                "name": "TP Noté (Filtres & Bode)",
-                "grade": 15,
-                "coef": 2,
-                "bonus": 0
-              }
-            ]
+            "evaluations": []
           }
         ]
       },
