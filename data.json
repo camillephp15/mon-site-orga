@@ -11021,15 +11021,6 @@
   ],
   "longtermTodos": [
     {
-      "id": "lt-2",
-      "title": "Ficher toutes les formules d'Algèbre linéaire & Séries",
-      "categoryId": "cat-2",
-      "deadline": "2026-11-01",
-      "priority": "important",
-      "status": "in_progress",
-      "notes": "Théorème de Cayley-Hamilton, critères de Cauchy et d'Abel."
-    },
-    {
       "id": "lt-3",
       "title": "Objectif Semestre : Valider les 5 blocs avec moyenne > 13.5",
       "categoryId": "cat-3",
