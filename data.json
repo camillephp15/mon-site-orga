@@ -11057,58 +11057,7 @@
       "notes": "Cardio le mardi, renforcement le jeudi et samedi."
     }
   ],
-  "flashcards": [
-    {
-      "id": "fc-deck-1",
-      "subject": "Maths",
-      "deckName": "Formules Algèbre & Réduction",
-      "cards": [
-        {
-          "id": "c1",
-          "front": "Quelle est la définition d'une valeur propre $\\lambda$ et d'un vecteur propre $x$ ?",
-          "back": "$\\lambda \\in \\mathbb{K}$ est valeur propre de $u$ s'il existe $x \\neq 0$ tel que :\n$$u(x) = \\lambda x$$\n$E_\\lambda(u) = \\ker(u - \\lambda \\mathrm{id}_E) \\neq \\{0\\}$.",
-          "status": "learning"
-        },
-        {
-          "id": "c2",
-          "front": "Énoncer le Théorème de Cayley-Hamilton.",
-          "back": "Pour toute matrice $A \\in \\mathcal{M}_n(\\mathbb{K})$ :\n$$\\chi_A(A) = 0_{\\mathcal{M}_n}$$",
-          "status": "learning"
-        },
-        {
-          "id": "c3",
-          "front": "CNS de diagonalisabilité via polynôme annulateur ?",
-          "back": "$A$ est diagonalisable ssi elle admet un **polynôme annulateur scindé à racines simples**.",
-          "status": "learning"
-        },
-        {
-          "id": "c4",
-          "front": "Formule de l'intégrale de Gauss $\\int_{-\\infty}^{+\\infty} e^{-x^2} dx$ ?",
-          "back": "$$\\int_{-\\infty}^{+\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$",
-          "status": "learning"
-        }
-      ]
-    },
-    {
-      "id": "fc-deck-2",
-      "subject": "Maths",
-      "deckName": "Séries Numériques & Entières",
-      "cards": [
-        {
-          "id": "c5",
-          "front": "Règle de d'Alembert pour une série à termes positifs $\\sum u_n$ ?",
-          "back": "Si $\\lim \\frac{u_{n+1}}{u_n} = l$ :\n• Si $l < 1$, la série **converge**.\n• Si $l > 1$, la série **diverge** grossièrement.\n• Si $l = 1$, on ne peut pas conclure.",
-          "status": "learning"
-        },
-        {
-          "id": "c6",
-          "front": "Critère Spécial des Séries Alternées (CSSA) ?",
-          "back": "Si $u_n = (-1)^n a_n$ avec $a_n \\ge 0$, $(a_n)$ décroissante vers $0$ :\n• La série $\\sum u_n$ converge.\n• Le reste $|R_n| \\le a_{n+1}$.",
-          "status": "learning"
-        }
-      ]
-    }
-  ],
+  "flashcards": [],
   "gradesData": {
     "blocks": [
       {
