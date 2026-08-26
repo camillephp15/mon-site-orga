@@ -11284,15 +11284,7 @@
             "id": "sub-pr1",
             "name": "Projet PIX",
             "coef": 2,
-            "evaluations": [
-              {
-                "id": "ev-px1",
-                "name": "Rapport intermédiaire & Démo",
-                "grade": 15.5,
-                "coef": 2,
-                "bonus": 0
-              }
-            ]
+            "evaluations": []
           },
           {
             "id": "sub-pr2",
