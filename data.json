@@ -10881,6 +10881,17 @@
       "room": "",
       "completed": false,
       "id": "ev_1787764199145"
+    },
+    {
+      "calendarId": "cal_1787764281104",
+      "title": "Escalade",
+      "date": "2026-08-27",
+      "day": "thu",
+      "startTime": "16:30",
+      "duration": 180,
+      "room": "",
+      "completed": false,
+      "id": "ev_1787764301873"
     }
   ],
   "importantDates": [
