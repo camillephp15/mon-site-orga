@@ -11036,7 +11036,14 @@
     {
       "subject": "Maths",
       "deckName": "e,aù",
-      "cards": [],
+      "cards": [
+        {
+          "front": "dieidk",
+          "back": "dpz)djf",
+          "id": "c_830srlb",
+          "status": "learning"
+        }
+      ],
       "id": "deck_1787832422749"
     }
   ],
