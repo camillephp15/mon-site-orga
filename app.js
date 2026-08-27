@@ -1,18 +1,22 @@
 /**
  * StudyFlow - Application Web d'Organisation (Prépa / Ingénieur)
  * 
- * NOUVEAUX AJUSTEMENTS :
- * 1. Disposition Dashboard : EDT à GAUCHE, Calendrier mensuel à DROITE, To-Do List du jour spacieuse EN DESSOUS.
- * 2. Formulaires & Sélecteurs Pop & Solaire : Styles ultra-soignés (crème, pêche, rose vif, chevrons custom, pills de catégories).
- * 3. Mobile Touch : Défilement/scroll 100% libre par défaut ; appui long de 2 secondes pour créer un cours en glissant.
- * 4. GitHub Sync : Identifiants & Token GitHub (PAT) intégrés en dur par défaut pour synchronisation automatique immédiate.
+ * FONCTIONNALITÉS & AJUSTEMENTS :
+ * 1. EDT immersif à gauche & Calendrier mensuel étendu à droite, To-Do List spacieuse en dessous.
+ * 2. Glisser-déposer fluide à la souris sur l'EDT avec encadré rose pointillé temps réel + appui long 2s tactile.
+ * 3. Menus déroulants 100% personnalisés (CustomDropdown) aux couleurs du site (Pop & Solaire).
+ * 4. Sélecteur de vue mobile adaptatif (1j, 2j, 3j, 4j, 5j, 7j) avec menu déroulant fluide.
+ * 5. Panneaux latéraux (Drawers) coulissants sur la droite de l'écran & Toasts de succès silencieux.
+ * 6. Raccourcis claviers : Flashcards (Espace = retourner, Flèche gauche = à revoir, Flèche droite = maîtrisé)
+ *    et navigation de formulaires (Entrée = champ suivant / validation sur dernier champ).
+ * 7. Synchronisation GitHub REST API configurable manuellement via le bouton de navigation.
  */
 
 (function() {
   'use strict';
 
   // ==========================================================================
-  // 1. UTILITAIRES ENCODAGE BASE64 UTF-8
+  // 1. UTILITAIRES ENCODAGE BASE64 UTF-8 (Support accents, formules & LaTeX)
   // ==========================================================================
   function utf8ToBase64(str) {
     return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
@@ -44,10 +48,11 @@
   }
 
   // ==========================================================================
-  // 3. TOAST NOTIFICATIONS
+  // 3. TOAST NOTIFICATIONS (Succès silencieux pour création/mise à jour)
   // ==========================================================================
   const Toast = {
     show(message, type = 'info', duration = 3500) {
+      if (type === 'success' || type === 'info') return; // Silence des toasts de succès/info demandés
       const container = document.getElementById('toast-container');
       if (!container) return;
 
@@ -81,18 +86,16 @@
     },
 
     success(msg, duration) {
-      // Désactivation des pop-ups de confirmation de création d'éléments
+      // Silence total des pop-ups de succès lors de la création / modification
     },
     info(msg, duration) {
-      // Désactivation des toasts informatifs intempestifs
+      // Silence des notifications informatives intempestives
     },
     error(msg, duration) { this.show(msg, 'error', duration || 5000); },
     warning(msg, duration) { this.show(msg, 'warning', duration); },
 
     _getStyle(type) {
       switch (type) {
-        case 'success':
-          return 'bg-emerald-500 text-white border-emerald-600 shadow-emerald-500/20';
         case 'error':
           return 'bg-rose-500 text-white border-rose-600 shadow-rose-500/20';
         case 'warning':
@@ -104,8 +107,6 @@
 
     _getIcon(type) {
       switch (type) {
-        case 'success':
-          return '<span class="font-bold text-sm">✓</span>';
         case 'error':
           return '<svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
         case 'warning':
@@ -117,32 +118,14 @@
   };
 
   // ==========================================================================
-  // 4. MENUS DÉROULANTS CUSTOM (CustomDropdown) — 100% HTML/CSS/JS, zéro natif
+  // 4. MENUS DÉROULANTS CUSTOM (CustomDropdown) — 100% HTML/CSS/JS Pop & Solaire
   // ==========================================================================
-  /**
-   * CustomDropdown : remplace complètement les <select> natifs par un composant
-   * entièrement stylisé avec la DA Pop & Solaire.
-   * 
-   * Usage : CustomDropdown.create({ options, value, onChange, placeholder, className })
-   * Retourne un élément DOM prêt à être inséré.
-   */
   const CustomDropdown = {
     _openInstance: null,
 
-    /**
-     * Crée un dropdown custom et retourne l'élément wrapper (div).
-     * @param {Object} opts
-     * @param {Array<{value: string, label: string, color?: string}>} opts.options
-     * @param {string} [opts.value] - valeur sélectionnée par défaut
-     * @param {function} [opts.onChange] - appelé avec (newValue, newLabel) à chaque sélection
-     * @param {string} [opts.placeholder] - texte affiché si aucune valeur
-     * @param {string} [opts.className] - classes supplémentaires sur le wrapper
-     * @param {string} [opts.name] - nom du champ (pour récupérer la valeur via .dataset.value)
-     */
     create({ options = [], value = null, onChange = null, placeholder = 'Sélectionner...', className = '', name = '' }) {
       const selectedOption = options.find(o => o.value === value) || options[0] || null;
       const currentValue = selectedOption ? selectedOption.value : '';
-      const currentLabel = selectedOption ? selectedOption.label : placeholder;
 
       const wrapper = document.createElement('div');
       wrapper.className = `custom-dropdown-wrapper ${className}`;
@@ -179,15 +162,10 @@
 
       const openDropdown = (e) => {
         e.stopPropagation();
-
-        // Fermer tout autre dropdown ouvert
         if (CustomDropdown._openInstance && CustomDropdown._openInstance !== wrapper) {
           CustomDropdown._closeDropdown(CustomDropdown._openInstance);
         }
-
-        const isOpen = wrapper.classList.contains('open');
-
-        if (isOpen) {
+        if (wrapper.classList.contains('open')) {
           CustomDropdown._closeDropdown(wrapper);
         } else {
           CustomDropdown._openDropdown(wrapper);
@@ -207,11 +185,9 @@
           const newOpt = options.find(o => o.value === newVal);
           const newLabel = newOpt ? newOpt.label : newVal;
 
-          // Mettre à jour le state visuel
           wrapper.dataset.value = newVal;
           wrapper.querySelector('.custom-dropdown-label').innerHTML = this._renderLabel(newOpt, placeholder);
 
-          // Marquer l'option sélectionnée
           list.querySelectorAll('.custom-dropdown-option').forEach(el => {
             const isSel = el.dataset.val === newVal;
             el.classList.toggle('selected', isSel);
@@ -270,7 +246,6 @@
       wrapper.setAttribute('aria-expanded', 'true');
       CustomDropdown._openInstance = wrapper;
 
-      // Positionner correctement la liste (sous ou au-dessus selon l'espace)
       const list = wrapper.querySelector('.custom-dropdown-list');
       const rect = wrapper.getBoundingClientRect();
       const spaceBelow = window.innerHeight - rect.bottom;
@@ -313,18 +288,10 @@
       }
     },
 
-    /**
-     * Récupère la valeur actuelle d'un dropdown custom.
-     * @param {HTMLElement} wrapperEl - l'élément wrapper retourné par create()
-     * @returns {string}
-     */
     getValue(wrapperEl) {
       return wrapperEl ? wrapperEl.dataset.value || '' : '';
     },
 
-    /**
-     * Met à jour la valeur sélectionnée d'un dropdown existant.
-     */
     setValue(wrapperEl, newValue) {
       if (!wrapperEl) return;
       const list = wrapperEl.querySelector('.custom-dropdown-list');
@@ -332,17 +299,10 @@
       if (optEl) optEl.click();
     },
 
-    /**
-     * Remplace automatiquement tous les <select class="custom-select"> d'un panneau
-     * par des composants CustomDropdown. La valeur est accessible via el.dataset.value.
-     * Les handlers qui lisent .value sur le select original sont migrés via un proxy.
-     * @param {HTMLElement} panelEl
-     */
     _autoInitPanel(panelEl) {
       if (!panelEl) return;
 
       panelEl.querySelectorAll('select.custom-select').forEach(sel => {
-        // Extraire les options du select natif
         const options = Array.from(sel.options).map(o => ({
           value: o.value,
           label: o.text,
@@ -354,7 +314,6 @@
         const nameAttr = sel.name || '';
         const dataAttrs = sel.dataset;
 
-        // Récupérer les classes supplémentaires (ex: w-full, compact)
         const extraClasses = Array.from(sel.classList)
           .filter(c => c !== 'custom-select' && !c.startsWith('text-') && !c.startsWith('font-') && !c.startsWith('px-') && !c.startsWith('py-') && !c.startsWith('rounded-'))
           .join(' ');
@@ -367,44 +326,36 @@
           className: `${extraClasses} ${isCompact ? 'compact' : ''}`.trim(),
           name: nameAttr || idAttr,
           onChange: (newVal) => {
-            // Propager le changement sur le select natif (pour compatibilité avec les handlers existants)
             sel.value = newVal;
             const event = new Event('change', { bubbles: true });
             sel.dispatchEvent(event);
           }
         });
 
-        // Copier les attributs data-* du select sur le wrapper
         Object.keys(dataAttrs).forEach(key => {
           dropdownEl.dataset[key] = dataAttrs[key];
         });
 
         if (idAttr) {
           dropdownEl.id = idAttr + '-dd';
-          // Garder le select original masqué mais fonctionnel (pour les handlers qui cherchent par ID)
           sel.id = idAttr;
           sel.style.cssText = 'position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;overflow:hidden;';
           sel.setAttribute('aria-hidden', 'true');
           sel.setAttribute('tabindex', '-1');
-          // Insérer le dropdown AVANT le select masqué
           sel.parentNode.insertBefore(dropdownEl, sel);
         } else {
-          // Remplacer directement
           sel.parentNode.replaceChild(dropdownEl, sel);
         }
       });
     }
   };
 
-  // Injection des styles CSS du CustomDropdown dans le <head> au chargement
+  // Styles injectés pour CustomDropdown
   (function injectCustomDropdownStyles() {
     if (document.getElementById('custom-dropdown-styles')) return;
     const style = document.createElement('style');
     style.id = 'custom-dropdown-styles';
     style.textContent = `
-      /* =====================================================================
-         CustomDropdown — Composant Menus Déroulants Pop & Solaire
-         ===================================================================== */
       .custom-dropdown-wrapper {
         position: relative;
         display: inline-flex;
@@ -412,7 +363,6 @@
         width: 100%;
         user-select: none;
       }
-
       .custom-dropdown-trigger {
         display: flex;
         align-items: center;
@@ -431,22 +381,18 @@
         min-height: 40px;
         white-space: nowrap;
         overflow: hidden;
-        position: relative;
       }
-
       .dark .custom-dropdown-trigger {
         background-color: #0a0a0d;
         border-color: #272730;
         color: #fdfdfd;
       }
-
       .custom-dropdown-wrapper:focus .custom-dropdown-trigger,
       .custom-dropdown-wrapper.open .custom-dropdown-trigger {
         border-color: #ff3366 !important;
         box-shadow: 0 0 0 3.5px rgba(255, 51, 102, 0.22) !important;
         outline: none;
       }
-
       .custom-dropdown-label {
         display: flex;
         align-items: center;
@@ -456,7 +402,6 @@
         overflow: hidden;
         text-overflow: ellipsis;
       }
-
       .custom-dropdown-chevron {
         width: 15px;
         height: 15px;
@@ -465,12 +410,9 @@
         transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
         pointer-events: none;
       }
-
       .custom-dropdown-wrapper.open .custom-dropdown-chevron {
         transform: rotate(180deg);
       }
-
-      /* La liste déroulante */
       .custom-dropdown-list {
         position: absolute;
         top: calc(100% + 6px);
@@ -485,37 +427,28 @@
         max-height: 0;
         opacity: 0;
         pointer-events: none;
-        transition: max-height 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        transition: max-height 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         transform: translateY(-4px) scale(0.98);
         overflow-y: auto;
       }
-
       .dark .custom-dropdown-list {
         background-color: #16161b;
         border-color: #272730;
         box-shadow: 0 16px 40px -8px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3);
       }
-
       .custom-dropdown-wrapper.open .custom-dropdown-list {
-        max-height: 320px;
+        max-height: 300px;
         opacity: 1;
         pointer-events: all;
         transform: translateY(0) scale(1);
       }
-
-      /* Dropup : la liste s'affiche au-dessus */
       .custom-dropdown-list.dropup {
         top: auto;
         bottom: calc(100% + 6px);
-        transform-origin: bottom;
       }
-
-      /* Scrollbar de la liste */
       .custom-dropdown-list::-webkit-scrollbar { width: 5px; }
       .custom-dropdown-list::-webkit-scrollbar-track { background: transparent; }
       .custom-dropdown-list::-webkit-scrollbar-thumb { background: rgba(120,113,108,0.3); border-radius: 4px; }
-
-      /* Option individuelle */
       .custom-dropdown-option {
         display: flex;
         align-items: center;
@@ -526,41 +459,25 @@
         color: #0f0f12;
         cursor: pointer;
         transition: background-color 0.14s ease, color 0.14s ease;
-        border-radius: 0;
-        position: relative;
       }
-
-      .dark .custom-dropdown-option {
-        color: #e4e4e7;
-      }
-
-      .custom-dropdown-option:first-child { border-radius: 16px 16px 0 0; }
-      .custom-dropdown-option:last-child { border-radius: 0 0 16px 16px; }
-      .custom-dropdown-option:first-child:last-child { border-radius: 16px; }
-
-      .custom-dropdown-option:hover,
-      .custom-dropdown-option.hovered {
-        background-color: rgba(255, 51, 102, 0.07);
+      .dark .custom-dropdown-option { color: #e4e4e7; }
+      .custom-dropdown-option:hover, .custom-dropdown-option.hovered {
+        background-color: rgba(255, 51, 102, 0.08);
         color: #ff3366;
       }
-
-      .dark .custom-dropdown-option:hover,
-      .dark .custom-dropdown-option.hovered {
-        background-color: rgba(255, 51, 102, 0.12);
+      .dark .custom-dropdown-option:hover, .dark .custom-dropdown-option.hovered {
+        background-color: rgba(255, 51, 102, 0.14);
         color: #ff6680;
       }
-
       .custom-dropdown-option.selected {
         background-color: rgba(255, 51, 102, 0.06);
         color: #ff3366;
         font-weight: 900;
       }
-
       .dark .custom-dropdown-option.selected {
-        background-color: rgba(255, 51, 102, 0.1);
+        background-color: rgba(255, 51, 102, 0.12);
         color: #ff6680;
       }
-
       .custom-dropdown-check {
         width: 13px;
         height: 13px;
@@ -568,7 +485,6 @@
         color: #ff3366;
         margin-left: auto;
       }
-
       .custom-dropdown-opt-dot {
         width: 9px;
         height: 9px;
@@ -576,59 +492,36 @@
         flex-shrink: 0;
         box-shadow: 0 1px 3px rgba(0,0,0,0.2);
       }
-
-      /* Séparateurs optionnels entre groupes (si data-separator="true") */
-      .custom-dropdown-separator {
-        height: 1px;
-        background-color: #eee7da;
-        margin: 4px 12px;
-      }
-
-      .dark .custom-dropdown-separator {
-        background-color: #272730;
-      }
-
-      /* Petite taille pour les dropdowns compacts */
       .custom-dropdown-wrapper.compact .custom-dropdown-trigger {
         padding: 7px 11px;
         font-size: 0.7rem;
         border-radius: 12px;
         min-height: 32px;
       }
-
-      .custom-dropdown-wrapper.compact .custom-dropdown-list {
-        border-radius: 14px;
-      }
-
       .custom-dropdown-wrapper.compact .custom-dropdown-option {
         padding: 8px 12px;
         font-size: 0.7rem;
       }
-
-      .custom-dropdown-wrapper.compact .custom-dropdown-option:first-child { border-radius: 12px 12px 0 0; }
-      .custom-dropdown-wrapper.compact .custom-dropdown-option:last-child { border-radius: 0 0 12px 12px; }
     `;
     document.head.appendChild(style);
   })();
 
   // ==========================================================================
-  // 5. TIROIRS COULISSANTS (DRAWERS)
+  // 5. PANNEAUX LATÉRAUX COULISSANTS (DRAWERS SUR LA DROITE)
   // ==========================================================================
   const Drawer = {
     activeDrawer: null,
 
-    open({ title, icon = '', content, footer = '', maxWidth = 'max-w-lg', position = 'auto', onOpen = null, onClose = null }) {
+    open({ title, icon = '', content, footer = '', maxWidth = 'max-w-lg', onOpen = null, onClose = null }) {
       this.close();
 
       const root = document.getElementById('drawers-root') || document.getElementById('modals-root') || document.body;
-      const isMobile = window.innerWidth < 768;
-      const useBottom = position === 'bottom' || (position === 'auto' && isMobile);
 
       const backdrop = document.createElement('div');
-      backdrop.className = `drawer-backdrop ${useBottom ? 'items-end' : 'items-stretch'}`;
+      backdrop.className = 'drawer-backdrop items-stretch';
 
       const panel = document.createElement('div');
-      panel.className = `${useBottom ? 'drawer-panel-bottom' : 'drawer-panel-right'} ${maxWidth} flex flex-col overflow-hidden`;
+      panel.className = `drawer-panel-right ${maxWidth} flex flex-col overflow-hidden`;
 
       panel.innerHTML = `
         <!-- Drawer Header -->
@@ -676,14 +569,13 @@
 
       if (window.lucide) window.lucide.createIcons();
 
-      // Auto-remplace tous les <select class="custom-select"> du tiroir par des CustomDropdown
+      // Remplacement automatique des <select> natifs par des CustomDropdowns
       CustomDropdown._autoInitPanel(panel);
 
-      // Navigation intelligente par touche "Entrée" : passe au champ suivant ou valide
+      // Productivité : Touche Entrée passe au champ suivant ou valide le formulaire
       panel.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           if (e.target.tagName === 'TEXTAREA' && !e.ctrlKey && !e.metaKey) return;
-
           e.preventDefault();
 
           const focusables = Array.from(panel.querySelectorAll('input:not([type=hidden]):not([type=submit]):not([type=button]):not([disabled]), textarea:not([disabled]), .custom-dropdown-wrapper[tabindex="0"]'));
@@ -695,8 +587,7 @@
             next.focus();
             if (next.select) next.select();
           } else {
-            // Dernier champ atteint -> Validation automatique du tiroir
-            const submitBtn = panel.querySelector('#save-course-btn, #update-course-btn, #save-mcal-btn, #save-imp-btn, #save-goal-btn, #save-egoal-btn, #save-deck-btn, #confirm-batch-import-btn, #save-nd-btn, #save-card-btn, button[type=submit], button.btn-primary');
+            const submitBtn = panel.querySelector('#save-course-btn, #update-course-btn, #btn-create-manual-cal, #save-imp-btn, #save-goal-btn, #save-cat-btn, #save-deck-btn, #confirm-batch-import-btn, #save-nd-btn, #save-card-btn, #gh-save-btn, #save-eval-btn, button[type=submit], button.btn-primary');
             if (submitBtn) submitBtn.click();
           }
         }
@@ -722,23 +613,16 @@
     }
   };
 
+  // Alias universel Modal -> Drawer pour que toutes les modales glissent sur la droite
   const Modal = {
     open(options) { Drawer.open(options); },
     close() { Drawer.close(); }
   };
 
   // ==========================================================================
-  // 5. GITHUB REST API SYNC CLIENT (CONFIG INTÉGRÉE EN DUR PAR DÉFAUT)
+  // 6. GITHUB REST API SYNC CLIENT (PAT & data.json Manuel)
   // ==========================================================================
-  const GITHUB_CONFIG_KEY = 'studyflow_github_config_v2';
-
-  const DEFAULT_GITHUB_CREDENTIALS = {
-    owner: 'camillephp15',
-    repo: 'mon-site-orga',
-    branch: 'main',
-    path: 'data.json',
-    token: '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'
-  };
+  const GITHUB_CONFIG_KEY = 'studyflow_github_config';
 
   const GitHubSync = {
     lastSha: null,
@@ -749,27 +633,24 @@
     getConfig() {
       try {
         const stored = localStorage.getItem(GITHUB_CONFIG_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          return {
-            owner: parsed.owner || DEFAULT_GITHUB_CREDENTIALS.owner,
-            repo: parsed.repo || DEFAULT_GITHUB_CREDENTIALS.repo,
-            branch: parsed.branch || DEFAULT_GITHUB_CREDENTIALS.branch,
-            path: parsed.path || DEFAULT_GITHUB_CREDENTIALS.path,
-            token: parsed.token || DEFAULT_GITHUB_CREDENTIALS.token
-          };
-        }
+        if (stored) return JSON.parse(stored);
       } catch (e) {}
-      return { ...DEFAULT_GITHUB_CREDENTIALS };
+      return {
+        owner: '',
+        repo: '',
+        branch: 'main',
+        path: 'data.json',
+        token: ''
+      };
     },
 
     saveConfig(cfg) {
       const clean = {
-        owner: (cfg.owner || DEFAULT_GITHUB_CREDENTIALS.owner).trim(),
-        repo: (cfg.repo || DEFAULT_GITHUB_CREDENTIALS.repo).trim(),
+        owner: (cfg.owner || '').trim(),
+        repo: (cfg.repo || '').trim(),
         branch: (cfg.branch || 'main').trim(),
         path: (cfg.path || 'data.json').trim().replace(/^\//, ''),
-        token: (cfg.token || DEFAULT_GITHUB_CREDENTIALS.token).trim()
+        token: (cfg.token || '').trim()
       };
       localStorage.setItem(GITHUB_CONFIG_KEY, JSON.stringify(clean));
       this._updateStatus(this.isConfigured() ? 'synced' : 'unconfigured');
@@ -782,11 +663,26 @@
     },
 
     _updateStatus(status, label = '') {
-      // Sync 100% silencieuse — aucun élément visuel dans l'UI
       this.status = status;
-      if (status === 'error') console.warn('[GitHubSync] Erreur:', label || '');
-    },
+      const indicator = document.getElementById('github-sync-indicator');
+      const labelEl = document.getElementById('github-sync-label');
 
+      if (indicator) {
+        indicator.className = 'w-2 h-2 rounded-full inline-block transition-all';
+        if (status === 'synced') indicator.classList.add('bg-emerald-500', 'shadow-xs', 'shadow-emerald-500');
+        else if (status === 'syncing') indicator.classList.add('bg-amber-400', 'animate-pulse');
+        else if (status === 'error') indicator.classList.add('bg-rose-500');
+        else indicator.classList.add('bg-zinc-400');
+      }
+
+      if (labelEl) {
+        if (label) labelEl.textContent = label;
+        else if (status === 'synced') labelEl.textContent = 'GitHub Sync';
+        else if (status === 'syncing') labelEl.textContent = 'Sync...';
+        else if (status === 'error') labelEl.textContent = 'GitHub Erreur';
+        else labelEl.textContent = 'GitHub Sync';
+      }
+    },
 
     _getHeaders(token) {
       return {
@@ -808,7 +704,8 @@
         if (res.status === 404) throw new Error(`Dépôt "${config.owner}/${config.repo}" introuvable ou privé sans permission.`);
         throw new Error(`Erreur GitHub (${res.status}) : ${res.statusText}`);
       }
-      return await res.json();
+      const repoInfo = await res.json();
+      return repoInfo;
     },
 
     async fetchRemoteData(cfg) {
@@ -824,7 +721,9 @@
           this._updateStatus('synced');
           return { notFound: true, sha: null, data: null };
         }
-        if (!res.ok) throw new Error(`Erreur récupération (${res.status}) : ${res.statusText}`);
+        if (!res.ok) {
+          throw new Error(`Erreur récupération (${res.status}) : ${res.statusText}`);
+        }
 
         const dataObj = await res.json();
         this.lastSha = dataObj.sha;
@@ -888,11 +787,14 @@
 
             const retryRes = await fetch(putUrl, {
               method: 'PUT',
-              headers: { ...this._getHeaders(config.token), 'Content-Type': 'application/json' },
+              headers: {
+                ...this._getHeaders(config.token),
+                'Content-Type': 'application/json'
+              },
               body: JSON.stringify(bodyPayload)
             });
 
-            if (!retryRes.ok) throw new Error(`Échec retry (${retryRes.status})`);
+            if (!retryRes.ok) throw new Error(`Échec commit retry (${retryRes.status})`);
             const retryJson = await retryRes.json();
             this.lastSha = retryJson.content?.sha || this.lastSha;
             this.lastSyncTime = new Date();
@@ -920,6 +822,7 @@
 
     triggerAutoSync(data) {
       if (!this.isConfigured()) return;
+      this._updateStatus('syncing');
 
       if (this._debounceTimer) clearTimeout(this._debounceTimer);
 
@@ -927,16 +830,14 @@
         try {
           await this.commitRemoteData(data);
         } catch (err) {
-          // Basculement silencieux en mode local — pas de toast agressif
-          console.warn('[GitHubSync] Sync en arrière-plan échouée:', err.message);
+          console.warn('Sync GitHub:', err.message);
         }
       }, 1200);
     }
-
   };
 
   // ==========================================================================
-  // 6. STORE CENTRAL & GESTION UNIVERSELLE DE MODIFICATION
+  // 7. STORE LOCAL & ÉTAT INITIAL 100% PROPRE
   // ==========================================================================
   const CALENDAR_COLORS = [
     { name: 'Rose Pop', hex: '#ff3366' },
@@ -949,7 +850,7 @@
     { name: 'Noir d\'Encre', hex: '#0f0f12' }
   ];
 
-  const STORAGE_KEY = 'studyflow_data_v14';
+  const STORAGE_KEY = 'studyflow_data_v12_clean';
 
   function getMondayOfDate(d) {
     const date = new Date(d);
@@ -1040,7 +941,7 @@
           'studyflow_data_v1', 'studyflow_data_v2', 'studyflow_data_v3',
           'studyflow_data_v4', 'studyflow_data_v5', 'studyflow_data_v6',
           'studyflow_data_v7', 'studyflow_data_v8', 'studyflow_data_v9_clean',
-          'studyflow_data_v10', 'studyflow_data_v11_clean', 'studyflow_data_v12_clean'
+          'studyflow_data_v10', 'studyflow_data_v11'
         ];
         legacyKeys.forEach(k => localStorage.removeItem(k));
       } catch (e) {}
@@ -1112,7 +1013,6 @@
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        Toast.success('Sauvegarde JSON exportée !');
       } catch (err) {
         Toast.error('Erreur lors de l\'export JSON.');
       }
@@ -1124,7 +1024,6 @@
         if (!parsed || typeof parsed !== 'object') throw new Error('Format JSON invalide.');
         this.applyRemoteData(parsed);
         this.save();
-        Toast.success('Données restaurées avec succès !');
         return true;
       } catch (err) {
         Toast.error('Fichier JSON corrompu ou invalide.');
@@ -1151,7 +1050,6 @@
       }
     }
 
-    // Calendriers
     getCalendars() { return this.data.calendars || []; }
     getCalendar(id) { return (this.data.calendars || []).find(c => c.id === id); }
     
@@ -1214,10 +1112,7 @@
       return totalUpdated;
     }
 
-    // Événements EDT
     getEvents() { return this.data.events || []; }
-    getEvent(id) { return (this.data.events || []).find(e => e.id === id); }
-
     addEvent(ev) {
       if (!ev.id) ev.id = 'ev_' + Date.now();
       if (!ev.calendarId) {
@@ -1228,58 +1123,38 @@
       this.save();
       return ev;
     }
-
     updateEvent(id, updates) {
-      const ev = this.getEvent(id);
+      const ev = this.data.events.find(e => e.id === id);
       if (ev) {
         Object.assign(ev, updates);
         this.save();
-        return ev;
       }
-      return null;
     }
-
     deleteEvent(id) {
       this.data.events = this.data.events.filter(e => e.id !== id);
       this.save();
     }
-
     toggleEventCompleted(id) {
-      const ev = this.getEvent(id);
+      const ev = this.data.events.find(e => e.id === id);
       if (ev) {
         ev.completed = !ev.completed;
         this.save();
       }
     }
 
-    // Dates importantes / Événements Persos
     getImportantDates() { return this.data.importantDates || []; }
-    getImportantDate(id) { return (this.data.importantDates || []).find(i => i.id === id); }
-
     addImportantDate(item) {
       if (!item.id) item.id = 'imp_' + Date.now();
       this.data.importantDates.push(item);
       this.save();
       return item;
     }
-
-    updateImportantDate(id, updates) {
-      const item = this.getImportantDate(id);
-      if (item) {
-        Object.assign(item, updates);
-        this.save();
-      }
-    }
-
     deleteImportantDate(id) {
       this.data.importantDates = this.data.importantDates.filter(i => i.id !== id);
       this.save();
     }
 
-    // To-Do Journalière
     getDailyTodos() { return this.data.dailyTodos || []; }
-    getDailyTodo(id) { return (this.data.dailyTodos || []).find(t => t.id === id); }
-
     addDailyTodo(text, priority = 'normal', tag = 'Autres cours') {
       const item = {
         id: 'td_' + Date.now(),
@@ -1293,33 +1168,19 @@
       this.save();
       return item;
     }
-
-    updateDailyTodo(id, updates) {
-      const item = this.getDailyTodo(id);
-      if (item) {
-        Object.assign(item, updates);
-        this.save();
-        return item;
-      }
-      return null;
-    }
-
     toggleDailyTodo(id) {
-      const item = this.getDailyTodo(id);
+      const item = this.data.dailyTodos.find(t => t.id === id);
       if (item) {
         item.completed = !item.completed;
         this.save();
       }
     }
-
     deleteDailyTodo(id) {
       this.data.dailyTodos = this.data.dailyTodos.filter(t => t.id !== id);
       this.save();
     }
 
-    // Matières & Chapitres
     getSubjectData(subjectKey) { return (this.data.subjectsData && this.data.subjectsData[subjectKey]) || []; }
-
     updateSubjectChapter(subjectKey, chapterId, fields) {
       const chapters = this.data.subjectsData[subjectKey];
       if (chapters) {
@@ -1330,14 +1191,12 @@
         }
       }
     }
-
     addSubjectChapter(subjectKey, chapter) {
       if (!this.data.subjectsData[subjectKey]) this.data.subjectsData[subjectKey] = [];
       if (!chapter.id) chapter.id = `${subjectKey}_ch_${Date.now()}`;
       this.data.subjectsData[subjectKey].push(chapter);
       this.save();
     }
-
     deleteSubjectChapter(subjectKey, chapterId) {
       if (this.data.subjectsData[subjectKey]) {
         this.data.subjectsData[subjectKey] = this.data.subjectsData[subjectKey].filter(c => c.id !== chapterId);
@@ -1345,7 +1204,6 @@
       }
     }
 
-    // Tâches Long Terme
     getLongtermCategories() { return this.data.longtermCategories || []; }
     addLongtermCategory(name, color = 'coral') {
       const cat = { id: 'cat_' + Date.now(), name: name.trim(), color };
@@ -1377,7 +1235,6 @@
       this.save();
     }
 
-    // Flashcards
     getFlashcardDecks() { return this.data.flashcards || []; }
     addFlashcardDeck(deck) {
       if (!deck.id) deck.id = 'deck_' + Date.now();
@@ -1385,13 +1242,6 @@
       this.data.flashcards.push(deck);
       this.save();
       return deck;
-    }
-    updateFlashcardDeck(deckId, updates) {
-      const deck = this.data.flashcards.find(d => d.id === deckId);
-      if (deck) {
-        Object.assign(deck, updates);
-        this.save();
-      }
     }
     deleteFlashcardDeck(deckId) {
       this.data.flashcards = this.data.flashcards.filter(d => d.id !== deckId);
@@ -1409,7 +1259,6 @@
       }
     }
 
-    // Notes
     getGradesData() { return this.data.gradesData || DEFAULT_GRADES_DATA; }
 
     addEvaluation(blockId, subjectId, evaluation) {
@@ -1454,7 +1303,7 @@
   const store = new Store();
 
   // ==========================================================================
-  // 7. PARSER ICS
+  // 8. PARSER ICS
   // ==========================================================================
   const ICSParser = {
     parse(icsText, calendarId = 'cal-default') {
@@ -1510,6 +1359,7 @@
       const startTime = `${startHours}:${startMinutes}`;
 
       const { type } = this._detectSubjectInfo(summary, location);
+
       const daysMap = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
       const dayKey = daysMap[startDate.getDay()];
 
@@ -1614,14 +1464,13 @@
   };
 
   // ==========================================================================
-  // 8. VUE ACCUEIL / DASHBOARD (EDT GAUCHE, CALENDRIER DROITE, TO-DO EN DESSOUS)
+  // 9. VUE ACCUEIL / DASHBOARD (EDT À GAUCHE, CALENDRIER À DROITE, TO-DO EN DESSOUS)
   // ==========================================================================
   const DashboardView = {
     activeMonday: getMondayOfDate(new Date()),
     activeDayMobileIndex: 0,
     mobileViewDays: 1,
     miniCalDate: new Date(),
-
     todoFilter: 'all',
     selectedTagForNewTodo: 'Maths',
     _autoSynced: false,
@@ -1649,6 +1498,18 @@
       return days;
     },
 
+    _getTimeSelectOptions(selectedTime = '08:00') {
+      const times = [];
+      for (let h = 6; h <= 23; h++) {
+        for (let m of [0, 15, 30, 45]) {
+          if (h === 23 && m > 0) continue;
+          times.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+        }
+      }
+      if (selectedTime && !times.includes(selectedTime)) times.unshift(selectedTime);
+      return times.map(t => `<option value="${t}" ${t === selectedTime ? 'selected' : ''}>${t}</option>`).join('');
+    },
+
     render(container) {
       const weekDays = this._getWeekDates(this.activeMonday);
       const startDay = weekDays[0];
@@ -1674,7 +1535,6 @@
       });
       const completedTodosCount = dailyTodos.filter(t => t.completed).length;
       const progressPercent = dailyTodos.length > 0 ? Math.round((completedTodosCount / dailyTodos.length) * 100) : 0;
-
       const availableTags = ['Maths', 'Physique', 'Info', 'Autres cours', 'Maison', 'Sport'];
 
       container.innerHTML = `
@@ -1719,9 +1579,8 @@
                 </div>
               </div>
 
-              <!-- Sélecteur de vue mobile (1j, 2j, 3j, 4j, 5j, 7j) sous forme de menu déroulant Pop & Solaire -->
+              <!-- Sélecteur de vue mobile (1j, 2j, 3j, 4j, 5j, 7j) -->
               <div class="lg:hidden space-y-2.5">
-                <!-- Barre de contrôle : dropdown vue + navigation -->
                 <div class="bg-white dark:bg-ink-darkcard p-2.5 rounded-2xl border border-creme-300 dark:border-ink-border shadow-sm flex items-center justify-between gap-2.5">
                   <div class="flex items-center gap-2 flex-1 min-w-0">
                     <span class="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest flex-shrink-0">Vue</span>
@@ -1760,7 +1619,7 @@
               <!-- Grille de l'Emploi du Temps -->
               <div class="bg-white dark:bg-ink-darkcard rounded-3xl border border-creme-300 dark:border-ink-border shadow-sm overflow-hidden flex flex-col min-h-[580px]">
                 
-                <!-- En-têtes des colonnes -->
+                <!-- En-têtes des colonnes Desktop -->
                 <div class="hidden lg:grid border-b border-creme-200 dark:border-ink-border bg-creme-100/70 dark:bg-ink-darkbg/70 text-xs font-extrabold text-ink dark:text-zinc-300 select-none flex-shrink-0"
                      style="grid-template-columns: 54px repeat(7, 1fr);">
                   <div class="py-2.5 text-center text-zinc-400 text-[11px] border-r border-creme-200 dark:border-ink-border font-mono">Heure</div>
@@ -1815,7 +1674,6 @@
                   </div>
                 </div>
 
-
               </div>
 
             </div>
@@ -1841,7 +1699,7 @@
                 <div id="mini-cal-grid" class="grid grid-cols-7 gap-1.5"></div>
               </div>
 
-              <!-- Dates importantes & Événements personnels manuels -->
+              <!-- Événements personnels manuels -->
               <div class="bg-white dark:bg-ink-darkcard rounded-3xl border border-creme-300 dark:border-ink-border shadow-sm p-5 space-y-3.5">
                 <div class="flex items-center justify-between">
                   <h3 class="text-xs font-black text-ink dark:text-white uppercase tracking-wider flex items-center gap-1.5">
@@ -1861,10 +1719,9 @@
 
           </div>
 
-          <!-- BAS : TO-DO LIST DE LA JOURNÉE (SPACIEUSE, CONFORTABLE ET EN DESSOUS) -->
+          <!-- BAS : TO-DO LIST DU JOUR (PLEINE LARGEUR ET EN DESSOUS) -->
           <div class="bg-white dark:bg-ink-darkcard rounded-3xl border border-creme-300 dark:border-ink-border shadow-sm p-6 sm:p-7 space-y-6">
             
-            <!-- Header To-Do avec progression & filtres de catégories -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-creme-200 dark:border-ink-border">
               <div class="flex items-center gap-3.5">
                 <div class="p-2.5 rounded-2xl bg-emerald-500/10 text-emerald-500">
@@ -1876,7 +1733,6 @@
                 </div>
               </div>
 
-              <!-- Filtres de catégories stylisés Pop & Solaire -->
               <div class="flex items-center gap-1.5 flex-wrap">
                 <button data-filter="all" class="todo-filter-btn px-3 py-1.5 rounded-xl text-xs font-black transition-all ${this.todoFilter === 'all' ? 'bg-ink text-white dark:bg-white dark:text-ink shadow-xs' : 'bg-creme-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-ink'}">Toutes</button>
                 <button data-filter="active" class="todo-filter-btn px-3 py-1.5 rounded-xl text-xs font-black transition-all ${this.todoFilter === 'active' ? 'bg-solaire-500 text-white shadow-xs' : 'bg-creme-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-ink'}">À faire</button>
@@ -1888,10 +1744,10 @@
               </div>
             </div>
 
-            <!-- Formulaire d'ajout rapide Pop & Solaire avec choix de catégorie par boutons élégants -->
+            <!-- Formulaire d'ajout rapide avec sélection de catégorie -->
             <form id="add-daily-todo-form" class="p-4 sm:p-5 rounded-2xl bg-creme-100/80 dark:bg-ink-darkbg/80 border border-creme-300 dark:border-zinc-800 space-y-3.5">
               <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <input type="text" id="daily-todo-text" required placeholder="Que devez-vous accomplir aujourd'hui ? (Ex: Exercice 4 fiche 2, réviser DS...)" class="custom-input flex-1 text-xs px-4 py-3 rounded-2xl bg-white dark:bg-ink-darkcard border border-creme-300 dark:border-zinc-700 font-bold text-ink dark:text-white shadow-2xs">
+                <input type="text" id="daily-todo-text" required placeholder="Ajouter une tâche pour aujourd'hui (Entrée)..." class="custom-input flex-1 text-xs px-4 py-3 rounded-2xl bg-white dark:bg-ink-darkcard border border-creme-300 dark:border-zinc-700 font-bold text-ink dark:text-white shadow-2xs">
                 
                 <button type="submit" class="px-6 py-3 bg-solaire-500 hover:bg-solaire-600 text-white rounded-2xl text-xs font-black shadow-md shadow-solaire-500/25 transition-all flex items-center justify-center gap-2 flex-shrink-0">
                   <i data-lucide="plus" class="w-4 h-4"></i>
@@ -1899,7 +1755,6 @@
                 </button>
               </div>
 
-              <!-- Choix de catégorie interactif (Pills Pop & Solaire) -->
               <div class="flex items-center gap-2 flex-wrap">
                 <span class="text-[11px] font-black text-zinc-500 uppercase tracking-wider mr-1">Catégorie :</span>
                 ${availableTags.map(tag => {
@@ -1914,7 +1769,7 @@
               </div>
             </form>
 
-            <!-- Liste des tâches de la journée (Grid 1 ou 2 colonnes ultra-spacieuse) -->
+            <!-- Liste des tâches de la journée -->
             <div id="daily-todos-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
               ${filteredTodos.length === 0 ? `
                 <div class="col-span-full p-8 text-center bg-creme-100/50 dark:bg-ink-darkbg/50 rounded-2xl border border-dashed border-creme-300 dark:border-zinc-800">
@@ -1930,9 +1785,10 @@
                     </label>
 
                     <div class="flex items-center gap-2 flex-shrink-0">
-                      <span class="text-[10px] px-2.5 py-0.5 rounded-lg font-black border ${catInfo.bg}">${todo.tag || 'Autre'}</span>
-                      <button data-edit-dtodo="${todo.id}" title="Modifier" class="text-zinc-400 hover:text-orangePop-500 p-1 rounded-lg"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
-                      <button data-delete-dtodo="${todo.id}" title="Supprimer" class="text-zinc-400 hover:text-rose-500 p-1 rounded-lg"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                      <span class="text-[10px] font-black px-2.5 py-0.5 rounded-lg border ${catInfo.bg}">${todo.tag || 'Autre'}</span>
+                      <button data-delete-todo="${todo.id}" class="text-zinc-400 hover:text-rose-500 p-1 rounded-lg">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                      </button>
                     </div>
                   </div>
                 `;
@@ -1945,6 +1801,8 @@
       `;
 
       if (window.lucide) window.lucide.createIcons();
+
+      // Initialiser les CustomDropdowns sur le conteneur principal
       CustomDropdown._autoInitPanel(container);
 
       this._bindEvents(container);
@@ -1961,7 +1819,6 @@
           store.refreshAllFeeds().then(count => {
             if (count > 0) {
               this._renderTimetableEvents();
-              Toast.info(`EDT actualisé : ${count} cours synchronisés.`);
             }
           });
         }
@@ -1988,7 +1845,7 @@
         this.render(container);
       });
 
-      // Sélecteur de vue mobile (1j, 2j, 3j, 4j, 5j, 7j)
+      // Sélecteur déroulant de vue mobile (1, 2, 3, 4, 5, 7 jours)
       const mobileViewSelect = container.querySelector('#mobile-view-select');
       if (mobileViewSelect) {
         mobileViewSelect.addEventListener('change', () => {
@@ -1999,7 +1856,6 @@
         });
       }
 
-      // Navigation mobile : prev / today / next (avance/recule de mobileViewDays jours)
       const mobilePrevBtn = container.querySelector('#mobile-prev-btn');
       const mobileNextBtn = container.querySelector('#mobile-next-btn');
       const mobileTodayBtn = container.querySelector('#mobile-today-btn');
@@ -2013,7 +1869,6 @@
             this.activeDayMobileIndex = newIdx;
             this.render(container);
           } else {
-            // Reculer d'une semaine
             const d = new Date(this.activeMonday);
             d.setDate(d.getDate() - 7);
             this.activeMonday = d;
@@ -2032,7 +1887,6 @@
             this.activeDayMobileIndex = newIdx;
             this.render(container);
           } else {
-            // Avancer d'une semaine
             const d = new Date(this.activeMonday);
             d.setDate(d.getDate() + 7);
             this.activeMonday = d;
@@ -2090,18 +1944,20 @@
         });
       });
 
-      // Formulaire ajout To-Do du jour
-      container.querySelector('#add-daily-todo-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const input = container.querySelector('#daily-todo-text');
-        const text = input.value.trim();
-        if (text) {
-          store.addDailyTodo(text, 'normal', this.selectedTagForNewTodo);
-          input.value = '';
-          Toast.success('Tâche ajoutée !');
-          this.render(container);
-        }
-      });
+      // Formulaire ajout To-Do
+      const todoForm = container.querySelector('#add-daily-todo-form');
+      if (todoForm) {
+        todoForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const input = container.querySelector('#daily-todo-text');
+          const text = input.value.trim();
+          if (text) {
+            store.addDailyTodo(text, 'normal', this.selectedTagForNewTodo);
+            input.value = '';
+            this.render(container);
+          }
+        });
+      }
 
       container.querySelectorAll('[data-todo-id]').forEach(chk => {
         chk.addEventListener('change', () => {
@@ -2110,28 +1966,15 @@
         });
       });
 
-      container.querySelectorAll('[data-delete-dtodo]').forEach(btn => {
+      container.querySelectorAll('[data-delete-todo]').forEach(btn => {
         btn.addEventListener('click', () => {
-          store.deleteDailyTodo(btn.dataset.deleteDtodo);
+          store.deleteDailyTodo(btn.dataset.deleteTodo);
           this.render(container);
-        });
-      });
-
-      container.querySelectorAll('[data-edit-dtodo]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const todo = store.getDailyTodo(btn.dataset.editDtodo);
-          if (todo) {
-            const newText = prompt('Modifier la tâche :', todo.text);
-            if (newText && newText.trim()) {
-              store.updateDailyTodo(todo.id, { text: newText.trim() });
-              this.render(container);
-            }
-          }
         });
       });
     },
 
-    // INTERACTION GLISSER POUR CRÉER (AVEC APPUI LONG 2 SECONDES SUR MOBILE)
+    // GLISSER-DÉPOSER FLUIDE SUR L'EDT (Desktop drag + Mobile touch hold 2s)
     _initDragToCreateEvents(container) {
       const HOUR_HEIGHT = 56;
       const START_HOUR = 5;
@@ -2160,7 +2003,7 @@
           return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
         };
 
-        // --- 1. SOURIS SUR PC (Desktop Drag-to-Select) ---
+        // --- 1. SOURIS SUR PC : Encadré rose pointillé temps réel ---
         col.addEventListener('mousedown', (e) => {
           if (e.target.closest('.timetable-event')) return;
           if (e.button !== 0) return;
@@ -2223,7 +2066,7 @@
           window.addEventListener('mouseup', upHandler);
         });
 
-        // --- 2. TACTILE SUR MOBILE : SCROLL LIBRE ET APPUI LONG DE 2 SECONDES ---
+        // --- 2. TACTILE SUR MOBILE : Scroll fluide & appui long 2 secondes ---
         let touchTimer = null;
         let touchStartPos = { x: 0, y: 0 };
         let isLongPressed = false;
@@ -2238,10 +2081,9 @@
           touchStartPos = { x: touch.clientX, y: touch.clientY };
           isLongPressed = false;
 
-          // Démarre le décompte de 2 secondes (2000ms)
           touchTimer = setTimeout(() => {
             isLongPressed = true;
-            if (navigator.vibrate) navigator.vibrate(60); // Retour haptique si supporté
+            if (navigator.vibrate) navigator.vibrate(60);
 
             const startY = getYFromEvent(e);
             touchStartMin = yToMinutes(startY);
@@ -2252,8 +2094,6 @@
             touchSelectionEl.style.height = `28px`;
             touchSelectionEl.innerHTML = `<span class="timetable-drag-badge">${formatMinToTime(touchStartMin)} (Glissez pour étirer)</span>`;
             col.appendChild(touchSelectionEl);
-
-            Toast.info('Glissez pour ajuster la durée du cours', 2000);
           }, 2000);
         }, { passive: true });
 
@@ -2261,7 +2101,6 @@
           const touch = e.touches[0];
           const dist = Math.hypot(touch.clientX - touchStartPos.x, touch.clientY - touchStartPos.y);
 
-          // Si l'utilisateur bouge avant les 2s, c'est un scroll normal -> on annule la création
           if (!isLongPressed) {
             if (dist > 10 && touchTimer) {
               clearTimeout(touchTimer);
@@ -2270,7 +2109,6 @@
             return;
           }
 
-          // Si l'appui long a été validé, on gère la sélection
           e.preventDefault();
           const currentY = getYFromEvent(e);
           const currentMin = yToMinutes(currentY);
@@ -2448,6 +2286,24 @@
       });
     },
 
+    _updateCurrentTimeIndicator() {
+      const indicators = [document.getElementById('current-time-indicator'), document.getElementById('current-time-indicator-mobile')];
+      const now = new Date();
+      const hour = now.getHours();
+      const min = now.getMinutes();
+
+      indicators.forEach(indicator => {
+        if (!indicator) return;
+        if (hour >= 5 && hour < 24) {
+          const topPx = ((hour - 5) + min / 60) * 56;
+          indicator.style.top = `${topPx}px`;
+          indicator.classList.remove('hidden');
+        } else {
+          indicator.classList.add('hidden');
+        }
+      });
+    },
+
     _renderMiniCalendar() {
       const grid = document.getElementById('mini-cal-grid');
       const title = document.getElementById('mini-cal-title');
@@ -2479,10 +2335,11 @@
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const isToday = isCurrentMonth && today.getDate() === day;
 
-        cell.className = `mini-cal-day text-xs ${isToday ? 'today' : 'text-zinc-800 dark:text-zinc-200'}`;
+        cell.className = `mini-cal-day text-[11px] ${isToday ? 'today' : 'text-zinc-800 dark:text-zinc-200'}`;
         cell.textContent = day;
 
         const dayImportant = importantDates.filter(imp => imp.date === dateStr);
+
         if (dayImportant.length > 0) {
           const dot = document.createElement('span');
           dot.className = 'event-dot';
@@ -2492,10 +2349,7 @@
         }
 
         cell.addEventListener('click', () => {
-          const targetDate = new Date(year, month, day);
-          this.activeMonday = getMondayOfDate(targetDate);
-          Toast.info(`Semaine du ${targetDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}`);
-          this.render(document.getElementById('view-dashboard'));
+          this._openAddImportantDateDrawer(null, dateStr);
         });
 
         grid.appendChild(cell);
@@ -2506,17 +2360,17 @@
       const container = document.getElementById('important-dates-list');
       if (!container) return;
 
-      const dates = store.getImportantDates();
-      if (!dates.length) {
-        container.innerHTML = `<p class="text-xs text-zinc-400 italic py-2 text-center select-none">Aucun événement personnel prévu.</p>`;
+      const items = store.getImportantDates();
+      if (!items.length) {
+        container.innerHTML = `<p class="text-xs text-zinc-400 italic py-2 text-center select-none">Aucun événement personnel enregistré.</p>`;
         return;
       }
 
-      container.innerHTML = dates.map(item => `
-        <div class="p-3 rounded-2xl bg-creme-100/90 dark:bg-ink-darkbg/90 border border-creme-300/80 dark:border-zinc-800 flex items-center justify-between gap-3 text-xs">
+      container.innerHTML = items.map(item => `
+        <div class="flex items-center justify-between p-2.5 rounded-2xl bg-creme-100/90 dark:bg-ink-darkbg/90 border border-creme-200 dark:border-zinc-800 text-xs">
           <div class="flex items-center gap-2.5 min-w-0">
-            <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: ${item.color || '#ff3366'};"></span>
-            <div class="min-w-0 truncate">
+            <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-xs" style="background-color: ${item.color || '#ff3366'};"></span>
+            <div class="min-w-0">
               <h4 class="font-extrabold text-ink dark:text-white truncate">${item.title}</h4>
               <p class="text-[10px] text-zinc-500 font-mono font-bold">${item.date || ''}</p>
             </div>
@@ -2534,34 +2388,6 @@
           this._renderMiniCalendar();
         });
       });
-    },
-
-    _updateCurrentTimeIndicator() {
-      const indicator = document.getElementById('current-time-indicator');
-      if (!indicator) return;
-      const now = new Date();
-      const hour = now.getHours();
-      const min = now.getMinutes();
-
-      if (hour >= 5 && hour < 24) {
-        const topPx = ((hour - 5) + min / 60) * 56;
-        indicator.style.top = `${topPx}px`;
-        indicator.classList.remove('hidden');
-      } else {
-        indicator.classList.add('hidden');
-      }
-    },
-
-    _getTimeSelectOptions(selectedTime = '08:00') {
-      const times = [];
-      for (let h = 6; h <= 23; h++) {
-        for (let m of [0, 15, 30, 45]) {
-          if (h === 23 && m > 0) continue;
-          times.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
-        }
-      }
-      if (selectedTime && !times.includes(selectedTime)) times.unshift(selectedTime);
-      return times.map(t => `<option value="${t}" ${t === selectedTime ? 'selected' : ''}>${t}</option>`).join('');
     },
 
     // TIROIR AJOUT DE COURS
@@ -2742,7 +2568,6 @@
               room: panelEl.querySelector('#ed-room').value.trim()
             });
 
-            Toast.success('Cours mis à jour !');
             Drawer.close();
             this._renderTimetableEvents();
           });
@@ -2750,7 +2575,6 @@
           panelEl.querySelector('#delete-course-btn').addEventListener('click', () => {
             if (confirm(`Supprimer le cours "${event.title}" ?`)) {
               store.deleteEvent(event.id);
-              Toast.info('Cours supprimé');
               Drawer.close();
               this._renderTimetableEvents();
             }
@@ -2766,44 +2590,50 @@
 
       const content = `
         <div class="space-y-6">
-          <div class="p-5 rounded-3xl bg-creme-100 dark:bg-ink-darkbg border border-creme-300 dark:border-zinc-800 space-y-4 shadow-xs">
-            <h4 class="text-xs font-black uppercase tracking-wider text-ink dark:text-white flex items-center gap-2">
+          <div class="p-5 rounded-3xl bg-creme-100 dark:bg-ink-darkbg border border-creme-300 dark:border-ink-border space-y-4 shadow-xs">
+            <h4 class="text-xs font-black uppercase tracking-wider text-ink dark:text-white flex items-center gap-1.5">
               <i data-lucide="plus-circle" class="w-4 h-4 text-solaire-500"></i>
-              Nouveau calendrier manuel
+              Créer un calendrier manuel
             </h4>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label class="block text-[11px] font-black text-ink dark:text-zinc-300 mb-1">Nom du calendrier *</label>
-                <input type="text" id="mcal-name" placeholder="Ex: Perso, Sport, Projets..." class="custom-input w-full text-xs px-3.5 py-2.5 rounded-2xl font-bold">
+                <input type="text" id="manual-cal-name" placeholder="Ex: Perso, Sport..." class="custom-input w-full text-xs px-3 py-2 rounded-xl font-bold">
               </div>
               <div>
-                <label class="block text-[11px] font-black text-ink dark:text-zinc-300 mb-1">Couleur *</label>
-                <div class="flex items-center gap-2">
-                  <select id="mcal-color" class="custom-select flex-1 text-xs px-3 py-2.5 rounded-2xl font-bold">
-                    ${CALENDAR_COLORS.map(c => `<option value="${c.hex}">${c.name}</option>`).join('')}
-                  </select>
-                  <input type="color" id="mcal-color-picker" value="#ff3366" class="w-9 h-9 rounded-2xl cursor-pointer bg-transparent border-0">
-                </div>
+                <label class="block text-[11px] font-black text-ink dark:text-zinc-300 mb-1">Couleur associée *</label>
+                <select id="mcal-color" class="custom-select flex-1 text-xs px-3 py-2.5 rounded-2xl font-bold">
+                  ${CALENDAR_COLORS.map(c => `<option value="${c.hex}" data-color="${c.hex}">${c.name}</option>`).join('')}
+                </select>
               </div>
             </div>
 
-            <button id="btn-create-cal" class="w-full py-3 bg-solaire-500 hover:bg-solaire-600 text-white rounded-2xl text-xs font-black flex items-center justify-center gap-1.5 shadow-sm transition-all">
+            <button id="btn-create-manual-cal" class="w-full py-2.5 bg-solaire-500 hover:bg-solaire-600 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-sm transition-all">
               <i data-lucide="plus" class="w-4 h-4"></i>
               <span>Créer le calendrier</span>
             </button>
           </div>
 
           <div class="p-5 rounded-3xl bg-creme-100/70 dark:bg-ink-darkbg/70 border border-creme-300 dark:border-zinc-800 space-y-3.5">
-            <h4 class="text-xs font-black uppercase tracking-wider text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
+            <h4 class="text-xs font-black uppercase tracking-wider text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
               <i data-lucide="download-cloud" class="w-4 h-4 text-orangePop-500"></i>
-              Ou Synchroniser un flux permanent iCal
+              Ou Synchroniser un flux iCal / Webcal
             </h4>
-            <div class="flex gap-2">
-              <input type="text" id="ics-url-input" placeholder="https://... ou webcal://..." class="custom-input flex-1 text-xs px-3.5 py-2.5 rounded-2xl font-mono">
-              <button id="btn-sync-ics-url" class="px-4 py-2.5 bg-orangePop-500 hover:bg-orangePop-600 text-white rounded-2xl text-xs font-black flex-shrink-0 flex items-center gap-1 shadow-sm transition-all">
-                <span>Importer</span>
-              </button>
+
+            <div>
+              <label class="block text-[11px] font-black text-ink dark:text-zinc-300 mb-1">Nom du flux</label>
+              <input type="text" id="ics-cal-name" placeholder="Ex: ESILV / ADE Campus" class="custom-input w-full text-xs px-3 py-2 rounded-xl font-bold">
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-black text-ink dark:text-zinc-300 mb-1">Lien URL permanent</label>
+              <div class="flex gap-2">
+                <input type="text" id="ics-cal-url" placeholder="https://... ou webcal://..." class="custom-input w-full text-xs px-3 py-2 rounded-xl font-mono">
+                <button id="btn-import-ics-url" class="px-4 py-2 bg-orangePop-500 hover:bg-orangePop-600 text-white rounded-xl text-xs font-black flex-shrink-0 flex items-center gap-1 shadow-sm">
+                  <span>Sync</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -2812,20 +2642,20 @@
               Calendriers enregistrés (${calendars.length})
             </h4>
 
-            <div class="space-y-3 max-h-64 overflow-y-auto pr-1">
+            <div class="space-y-3 max-h-60 overflow-y-auto pr-1">
               ${calendars.map(cal => {
                 const count = allEvents.filter(e => e.calendarId === cal.id).length;
                 return `
                   <div class="p-4 rounded-2xl bg-white dark:bg-ink-darkcard border border-creme-300 dark:border-ink-border flex items-center justify-between gap-3 shadow-xs">
-                    <div class="flex items-center gap-3 flex-1 min-w-0">
-                      <input type="color" value="${cal.color}" data-edit-cal-color="${cal.id}" title="Changer la couleur" class="w-8 h-8 rounded-xl cursor-pointer bg-transparent border-0 flex-shrink-0">
-                      <div class="flex-1 min-w-0">
-                        <input type="text" value="${cal.name}" data-edit-cal-name="${cal.id}" class="w-full text-xs font-black bg-transparent border-0 focus:ring-1 focus:ring-solaire-500 rounded-lg px-1.5 -mx-1.5 text-ink dark:text-white" title="Cliquer pour renommer">
-                        <p class="text-[10px] text-zinc-500 font-bold mt-0.5">${count} cours associés ${cal.feedUrl ? '• Flux synchronisé' : '• Manuel'}</p>
+                    <div class="flex items-center gap-3">
+                      <span class="w-4 h-4 rounded-full flex-shrink-0 shadow-xs" style="background-color: ${cal.color};"></span>
+                      <div>
+                        <h5 class="text-xs font-black text-ink dark:text-white">${cal.name}</h5>
+                        <p class="text-[10px] text-zinc-500 font-bold">${count} cours associés</p>
                       </div>
                     </div>
 
-                    <button data-delete-cal="${cal.id}" title="Supprimer ce calendrier" class="p-2 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors">
+                    <button data-delete-cal="${cal.id}" title="Supprimer ce calendrier" class="p-1.5 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors">
                       <i data-lucide="trash-2" class="w-4 h-4"></i>
                     </button>
                   </div>
@@ -2837,38 +2667,31 @@
       `;
 
       Drawer.open({
-        title: 'Gérer les Calendriers',
-        icon: '<i data-lucide="layers" class="w-5 h-5 text-solaire-500"></i>',
+        title: 'Gérer les Calendriers de l\'EDT',
         content,
-        footer: `<button id="close-cals-drawer-btn" class="px-6 py-2.5 bg-ink dark:bg-white text-white dark:text-ink rounded-2xl text-xs font-black">Fermer</button>`,
+        footer: `<button id="close-manage-cal-btn" class="px-5 py-2.5 bg-ink dark:bg-white text-white dark:text-ink hover:opacity-90 rounded-2xl text-xs font-black">Fermer</button>`,
         onOpen: (panelEl) => {
-          panelEl.querySelector('#close-cals-drawer-btn').addEventListener('click', () => Drawer.close());
+          panelEl.querySelector('#close-manage-cal-btn').addEventListener('click', () => Drawer.close());
 
-          const colorSelect = panelEl.querySelector('#mcal-color');
-          const colorPicker = panelEl.querySelector('#mcal-color-picker');
-          colorSelect.addEventListener('change', () => { colorPicker.value = colorSelect.value; });
-          colorPicker.addEventListener('input', () => { colorSelect.value = colorPicker.value; });
-
-          panelEl.querySelector('#btn-create-cal').addEventListener('click', () => {
-            const name = panelEl.querySelector('#mcal-name').value.trim();
-            const color = colorPicker.value;
+          panelEl.querySelector('#btn-create-manual-cal').addEventListener('click', () => {
+            const name = panelEl.querySelector('#manual-cal-name').value.trim();
+            const color = panelEl.querySelector('#mcal-color').value;
             if (!name) { Toast.warning('Veuillez renseigner un nom pour le calendrier.'); return; }
 
             store.addCalendar(name, color, '');
-            Toast.success(`Calendrier "${name}" créé !`);
             Drawer.close();
             this.render(container);
           });
 
-          panelEl.querySelector('#btn-sync-ics-url').addEventListener('click', async () => {
-            const url = panelEl.querySelector('#ics-url-input').value.trim();
-            if (!url) { Toast.warning('Veuillez renseigner une URL.'); return; }
+          panelEl.querySelector('#btn-import-ics-url').addEventListener('click', async () => {
+            const name = panelEl.querySelector('#ics-cal-name').value.trim() || 'EDT École';
+            const url = panelEl.querySelector('#ics-cal-url').value.trim();
+            if (!url) { Toast.warning('Veuillez renseigner une URL de flux.'); return; }
 
             try {
-              const newCal = store.addCalendar('EDT Synchronisé', '#ff3366', url);
+              const newCal = store.addCalendar(name, '#ff3366', url);
               const events = await ICSParser.fetchFromUrl(url, newCal.id);
               events.forEach(e => store.addEvent(e));
-              Toast.success(`Flux synchronisé (${events.length} cours) !`);
               Drawer.close();
               this.render(container);
             } catch (err) {
@@ -2876,28 +2699,12 @@
             }
           });
 
-          panelEl.querySelectorAll('[data-edit-cal-name]').forEach(input => {
-            input.addEventListener('change', () => {
-              store.updateCalendar(input.dataset.editCalName, { name: input.value.trim() });
-              Toast.success('Nom du calendrier mis à jour');
-            });
-          });
-
-          panelEl.querySelectorAll('[data-edit-cal-color]').forEach(input => {
-            input.addEventListener('change', () => {
-              store.updateCalendar(input.dataset.editCalColor, { color: input.value });
-              Toast.info('Couleur mise à jour');
-              this._renderTimetableEvents();
-            });
-          });
-
           panelEl.querySelectorAll('[data-delete-cal]').forEach(btn => {
             btn.addEventListener('click', () => {
               const calId = btn.dataset.deleteCal;
               const cal = store.getCalendar(calId);
-              if (confirm(`Supprimer le calendrier "${cal ? cal.name : ''}" et tous ses cours ?`)) {
+              if (confirm(`Supprimer le calendrier "${cal ? cal.name : ''}" et retirer tous ses cours ?`)) {
                 store.deleteCalendar(calId);
-                Toast.info('Calendrier supprimé');
                 Drawer.close();
                 this.render(container);
               }
@@ -2907,27 +2714,26 @@
       });
     },
 
-    // TIROIR AJOUT ÉVÉNEMENT PERSONNEL
-    _openAddImportantDateDrawer(container) {
+    // TIROIR ÉVÉNEMENT PERSONNEL (Mini-calendrier)
+    _openAddImportantDateDrawer(container, prefilledDate = null) {
+      const defaultDate = prefilledDate || new Date().toISOString().split('T')[0];
+
       const content = `
-        <form id="add-imp-form" class="space-y-4">
+        <form id="add-imp-date-form" class="space-y-4">
           <div>
-            <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Titre de l'événement *</label>
-            <input type="text" id="imp-title" required placeholder="Ex: Anniversaire, Soirée promo, Rendez-vous" class="custom-input w-full text-xs px-3.5 py-3 rounded-2xl font-bold">
+            <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Intitulé de l'événement *</label>
+            <input type="text" id="imp-title" required placeholder="Ex: Anniversaire, DS Maths, Rendez-vous..." class="custom-input w-full text-xs px-4 py-3 rounded-2xl font-bold">
           </div>
-          <div class="grid grid-cols-2 gap-3.5">
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
-              <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Date *</label>
-              <input type="date" id="imp-date" required value="${new Date().toISOString().split('T')[0]}" class="custom-input w-full text-xs px-3.5 py-2.5 rounded-2xl font-mono">
+              <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Date de l'événement *</label>
+              <input type="date" id="imp-date" required value="${defaultDate}" class="custom-input w-full text-xs px-4 py-2.5 rounded-2xl font-mono">
             </div>
             <div>
-              <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Couleur</label>
+              <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Couleur de la pastille *</label>
               <select id="imp-color" class="custom-select w-full text-xs px-3 py-2.5 rounded-2xl font-bold">
-                <option value="#ff3366">Rose Pop</option>
-                <option value="#f97316">Orange Solaire</option>
-                <option value="#8b5cf6">Violet</option>
-                <option value="#10b981">Vert Menthe</option>
-                <option value="#0284c7">Bleu</option>
+                ${CALENDAR_COLORS.map(c => `<option value="${c.hex}" data-color="${c.hex}">${c.name}</option>`).join('')}
               </select>
             </div>
           </div>
@@ -2936,11 +2742,11 @@
 
       Drawer.open({
         title: 'Ajouter un événement personnel',
-        icon: '<i data-lucide="bookmark" class="w-5 h-5 text-solaire-500"></i>',
+        icon: '<i data-lucide="bookmark" class="w-5 h-5 text-orangePop-500"></i>',
         content,
         footer: `
-          <button id="cancel-imp-btn" class="px-4 py-2.5 rounded-2xl text-xs font-bold text-zinc-500 hover:text-ink">Annuler</button>
-          <button id="save-imp-btn" class="px-6 py-2.5 bg-solaire-500 hover:bg-solaire-600 text-white rounded-2xl text-xs font-black shadow-md shadow-solaire-500/25 transition-all">Enregistrer</button>
+          <button id="cancel-imp-btn" class="px-4 py-2.5 rounded-2xl text-xs font-bold text-zinc-500">Annuler</button>
+          <button id="save-imp-btn" class="px-6 py-2.5 bg-solaire-500 hover:bg-solaire-600 text-white rounded-2xl text-xs font-black shadow-sm transition-all">Enregistrer</button>
         `,
         onOpen: (panelEl) => {
           panelEl.querySelector('#cancel-imp-btn').addEventListener('click', () => Drawer.close());
@@ -2948,13 +2754,12 @@
             const title = panelEl.querySelector('#imp-title').value.trim();
             const date = panelEl.querySelector('#imp-date').value;
             const color = panelEl.querySelector('#imp-color').value;
-            if (!title || !date) return;
+            if (!title || !date) { Toast.warning('Veuillez renseigner le titre et la date.'); return; }
 
             store.addImportantDate({ title, date, color });
-            Toast.success('Événement personnel ajouté !');
             Drawer.close();
-            this._renderImportantDates();
             this._renderMiniCalendar();
+            this._renderImportantDates();
           });
         }
       });
@@ -2962,7 +2767,7 @@
   };
 
   // ==========================================================================
-  // 9. VUE MATIÈRES
+  // 10. VUE MATIÈRES (STICKER MARGUERITE ROSE & ACCORDÉONS)
   // ==========================================================================
   const ACCORDION_STORAGE_KEY = 'studyflow_accordions_state';
 
@@ -3033,8 +2838,8 @@
               <button data-subj="info" class="subj-tab-btn px-5 py-2.5 rounded-xl text-xs font-black transition-all ${this.currentSubject === 'info' ? 'bg-purple-600 text-white shadow-sm' : 'text-zinc-600 dark:text-zinc-400 hover:text-ink'}">Informatique</button>
             </div>
 
-            <button id="add-chapter-btn" class="px-5 py-2.5 rounded-2xl text-xs font-black ${theme.btnClass} transition-all flex items-center gap-2 shadow-md sm:ml-auto">
-              <i data-lucide="plus" class="w-4 h-4"></i>
+            <button id="add-chapter-btn" class="px-4 py-2.5 rounded-2xl text-xs font-black ${theme.btnClass} transition-all flex items-center gap-1.5 shadow-md sm:ml-auto">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i>
               <span>Ajouter une sous-matière</span>
             </button>
           </div>
@@ -3053,10 +2858,7 @@
                       <span class="w-2.5 h-2.5 rounded-full ${theme.dotClass}"></span>
                       <h3 class="text-sm font-extrabold text-ink dark:text-white">${ch.title}</h3>
                     </div>
-                    <div class="flex items-center gap-2">
-                      <button data-rename-ch="${ch.id}" title="Renommer la sous-matière" class="text-zinc-400 hover:text-orangePop-500 p-1 rounded-lg">
-                        <i data-lucide="edit-2" class="w-4 h-4"></i>
-                      </button>
+                    <div class="flex items-center gap-3">
                       <button data-delete-ch="${ch.id}" title="Supprimer" class="text-zinc-400 hover:text-rose-500 p-1 rounded-lg">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                       </button>
@@ -3074,7 +2876,7 @@
                             <i data-lucide="${cat.icon}" class="w-3.5 h-3.5 ${theme.iconClass}"></i>
                             <span>${cat.label}</span>
                           </label>
-                          <textarea data-ch-id="${ch.id}" data-cat="${cat.key}" placeholder="Notes, exercices ou méthodes..." rows="8" class="chapter-textarea custom-textarea flex-1 w-full text-xs font-sans p-3.5 rounded-xl leading-relaxed resize-y font-medium">${ch[cat.key] || ''}</textarea>
+                          <textarea data-ch-id="${ch.id}" data-cat="${cat.key}" placeholder="Notes, exercices ou méthodes..." rows="8" class="chapter-textarea flex-1 w-full text-xs font-sans p-3.5 rounded-xl bg-white dark:bg-ink-darkcard border border-creme-300 dark:border-zinc-700 text-ink dark:text-white focus:outline-none focus:ring-2 focus:ring-solaire-500 leading-relaxed resize-y font-medium">${ch[cat.key] || ''}</textarea>
                         </div>
                       `).join('')}
                     </div>
@@ -3087,7 +2889,6 @@
       `;
 
       if (window.lucide) window.lucide.createIcons();
-      CustomDropdown._autoInitPanel(container);
       this._bindEvents(container);
     },
 
@@ -3104,7 +2905,7 @@
 
       container.querySelectorAll('[data-toggle-ch]').forEach(header => {
         header.addEventListener('click', (e) => {
-          if (e.target.closest('[data-delete-ch]') || e.target.closest('[data-rename-ch]')) return;
+          if (e.target.closest('[data-delete-ch]')) return;
           const chId = header.dataset.toggleCh;
           const content = container.querySelector(`#acc-content-${chId}`);
           const chevron = container.querySelector(`#acc-chevron-${chId}`);
@@ -3117,30 +2918,12 @@
         });
       });
 
-      container.querySelectorAll('[data-rename-ch]').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const chId = btn.dataset.renameCh;
-          const chapters = store.getSubjectData(this.currentSubject);
-          const ch = chapters.find(c => c.id === chId);
-          if (ch) {
-            const newTitle = prompt('Nouveau nom de la sous-matière :', ch.title);
-            if (newTitle && newTitle.trim()) {
-              store.updateSubjectChapter(this.currentSubject, chId, { title: newTitle.trim() });
-              Toast.success('Sous-matière renommée !');
-              this.render(container);
-            }
-          }
-        });
-      });
-
       container.querySelectorAll('[data-delete-ch]').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           const chId = btn.dataset.deleteCh;
           if (confirm('Supprimer cette sous-matière ?')) {
             store.deleteSubjectChapter(this.currentSubject, chId);
-            Toast.info('Sous-matière supprimée');
             this.render(container);
           }
         });
@@ -3168,11 +2951,11 @@
 
       Drawer.open({
         title: `Ajouter une sous-matière (${theme.name})`,
-        icon: '<i data-lucide="plus-circle" class="w-5 h-5 text-solaire-500"></i>',
+        icon: '<i data-lucide="book-open" class="w-5 h-5 text-solaire-500"></i>',
         content,
         footer: `
-          <button id="cancel-ch-btn" class="px-4 py-2.5 rounded-2xl text-xs font-bold text-zinc-500 hover:text-ink">Annuler</button>
-          <button id="save-ch-btn" class="px-6 py-2.5 ${theme.btnClass} rounded-2xl text-xs font-black shadow-sm transition-all">Ajouter</button>
+          <button id="cancel-ch-btn" class="px-4 py-2.5 rounded-2xl text-xs font-bold text-zinc-500">Annuler</button>
+          <button id="save-ch-btn" class="px-6 py-2.5 ${theme.btnClass} rounded-2xl text-xs font-black shadow-sm">Ajouter</button>
         `,
         onOpen: (panelEl) => {
           panelEl.querySelector('#cancel-ch-btn').addEventListener('click', () => Drawer.close());
@@ -3182,7 +2965,6 @@
             const newChapter = { id: `${this.currentSubject}_ch_${Date.now()}`, title, exosTodo: '', exosHard: '', methods: '' };
             store.addSubjectChapter(this.currentSubject, newChapter);
             this._saveAccordionState(newChapter.id, true);
-            Toast.success('Sous-matière ajoutée !');
             Drawer.close();
             this.render(container);
           });
@@ -3192,7 +2974,7 @@
   };
 
   // ==========================================================================
-  // 10. VUE TO-DO LIST LONG TERME
+  // 11. VUE TO-DO LIST LONG TERME
   // ==========================================================================
   const LongtermView = {
     render(container) {
@@ -3222,7 +3004,7 @@
                 <span>Nouvelle Catégorie</span>
               </button>
 
-              <button id="add-longterm-btn" class="px-5 py-2.5 rounded-2xl text-xs font-black bg-solaire-500 hover:bg-solaire-600 text-white transition-all flex items-center gap-2 shadow-md shadow-solaire-500/25">
+              <button id="add-longterm-btn" class="px-4 py-2.5 rounded-2xl text-xs font-black bg-solaire-500 hover:bg-solaire-600 text-white transition-all flex items-center gap-2 shadow-md shadow-solaire-500/25">
                 <i data-lucide="plus" class="w-4 h-4"></i>
                 <span>Ajouter une tâche</span>
               </button>
@@ -3269,10 +3051,7 @@
                           <div>
                             <div class="flex items-start justify-between gap-2 mb-1.5">
                               <span class="text-[10px] font-black px-2.5 py-0.5 rounded-full ${todo.priority === 'urgent' ? 'bg-rose-500 text-white' : 'bg-creme-200 text-ink dark:bg-zinc-800 dark:text-zinc-300'}">${todo.priority === 'urgent' ? '🔥 Urgent' : 'Normal'}</span>
-                              <div class="flex items-center gap-1">
-                                <button data-edit-lt="${todo.id}" title="Modifier" class="text-zinc-400 hover:text-orangePop-500 p-0.5"><i data-lucide="edit-2" class="w-3.5 h-3.5"></i></button>
-                                <button data-delete-lt="${todo.id}" title="Supprimer" class="text-zinc-400 hover:text-rose-500 p-0.5"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-                              </div>
+                              <button data-delete-lt="${todo.id}" class="text-zinc-400 hover:text-rose-500 p-0.5"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                             </div>
                             <h4 class="text-sm font-black text-ink dark:text-white ${todo.status === 'done' ? 'line-through text-zinc-400' : ''}">${todo.title}</h4>
                             ${todo.notes ? `<p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1.5 leading-relaxed font-medium">${todo.notes}</p>` : ''}
@@ -3316,21 +3095,14 @@
 
     _bindEvents(container) {
       const addBtn = container.querySelector('#add-longterm-btn');
-      if (addBtn) addBtn.addEventListener('click', () => this._openGoalDrawer(null, container));
+      if (addBtn) addBtn.addEventListener('click', () => this._openAddGoalDrawer(null, container));
 
       const addCatBtn = container.querySelector('#add-cat-btn');
       if (addCatBtn) addCatBtn.addEventListener('click', () => this._openAddCatDrawer(container));
 
       container.querySelectorAll('[data-add-to-cat]').forEach(btn => {
         btn.addEventListener('click', () => {
-          this._openGoalDrawer(btn.dataset.addToCat, container);
-        });
-      });
-
-      container.querySelectorAll('[data-edit-lt]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const todo = store.getLongtermTodos().find(t => t.id === btn.dataset.editLt);
-          if (todo) this._openEditGoalDrawer(todo, container);
+          this._openAddGoalDrawer(btn.dataset.addToCat, container);
         });
       });
 
@@ -3338,7 +3110,6 @@
         btn.addEventListener('click', () => {
           if (confirm('Supprimer cette catégorie et toutes ses tâches ?')) {
             store.deleteLongtermCategory(btn.dataset.deleteCat);
-            Toast.info('Catégorie supprimée');
             this.render(container);
           }
         });
@@ -3355,7 +3126,6 @@
         btn.addEventListener('click', () => {
           if (confirm('Supprimer cette tâche ?')) {
             store.deleteLongtermTodo(btn.dataset.deleteLt);
-            Toast.info('Tâche supprimée');
             this.render(container);
           }
         });
@@ -3377,8 +3147,8 @@
         icon: '<i data-lucide="folder-plus" class="w-5 h-5 text-solaire-500"></i>',
         content,
         footer: `
-          <button id="cancel-cat-btn" class="px-4 py-2.5 rounded-2xl text-xs font-bold text-zinc-500 hover:text-ink">Annuler</button>
-          <button id="save-cat-btn" class="px-6 py-2.5 bg-solaire-500 hover:bg-solaire-600 text-white rounded-2xl text-xs font-black shadow-sm transition-all">Créer</button>
+          <button id="cancel-cat-btn" class="px-4 py-2.5 rounded-2xl text-xs font-bold text-zinc-500">Annuler</button>
+          <button id="save-cat-btn" class="px-6 py-2.5 bg-solaire-500 hover:bg-solaire-600 text-white rounded-2xl text-xs font-black shadow-sm">Créer</button>
         `,
         onOpen: (panelEl) => {
           panelEl.querySelector('#cancel-cat-btn').addEventListener('click', () => Drawer.close());
@@ -3386,7 +3156,6 @@
             const name = panelEl.querySelector('#cat-name-input').value.trim();
             if (!name) return;
             store.addLongtermCategory(name, 'coral');
-            Toast.success('Catégorie créée !');
             Drawer.close();
             this.render(container);
           });
@@ -3394,7 +3163,7 @@
       });
     },
 
-    _openGoalDrawer(preselectedCatId, container) {
+    _openAddGoalDrawer(preselectedCatId, container) {
       const categories = store.getLongtermCategories();
       if (!categories.length) {
         Toast.warning('Veuillez créer une catégorie d\'abord.');
@@ -3428,8 +3197,8 @@
             <input type="date" id="goal-deadline" value="${new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0]}" class="custom-input w-full text-xs px-4 py-2.5 rounded-2xl font-mono">
           </div>
           <div>
-            <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Notes & Détails</label>
-            <textarea id="goal-notes" rows="3" placeholder="Détails..." class="custom-textarea w-full text-xs px-4 py-3 rounded-2xl font-medium"></textarea>
+            <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Notes</label>
+            <textarea id="goal-notes" rows="3" placeholder="Détails..." class="custom-textarea w-full text-xs px-4 py-2.5 rounded-2xl font-medium"></textarea>
           </div>
         </form>
       `;
@@ -3439,8 +3208,8 @@
         icon: '<i data-lucide="plus-circle" class="w-5 h-5 text-solaire-500"></i>',
         content,
         footer: `
-          <button id="cancel-goal-btn" class="px-4 py-2.5 rounded-2xl text-xs font-bold text-zinc-500 hover:text-ink">Annuler</button>
-          <button id="save-goal-btn" class="px-6 py-2.5 bg-solaire-500 hover:bg-solaire-600 text-white rounded-2xl text-xs font-black shadow-md shadow-solaire-500/25 transition-all">Enregistrer</button>
+          <button id="cancel-goal-btn" class="px-4 py-2.5 rounded-2xl text-xs font-bold text-zinc-500">Annuler</button>
+          <button id="save-goal-btn" class="px-6 py-2.5 bg-solaire-500 hover:bg-solaire-600 text-white rounded-2xl text-xs font-black shadow-md shadow-solaire-500/25">Enregistrer</button>
         `,
         onOpen: (panelEl) => {
           panelEl.querySelector('#cancel-goal-btn').addEventListener('click', () => Drawer.close());
@@ -3456,82 +3225,8 @@
               notes: panelEl.querySelector('#goal-notes').value.trim(),
               status: 'todo'
             });
-            Toast.success('Tâche ajoutée !');
             Drawer.close();
             this.render(container);
-          });
-        }
-      });
-    },
-
-    _openEditGoalDrawer(todo, container) {
-      const categories = store.getLongtermCategories();
-
-      const content = `
-        <form id="edit-goal-form" class="space-y-4">
-          <div>
-            <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Titre de la tâche *</label>
-            <input type="text" id="egoal-title" required value="${todo.title}" class="custom-input w-full text-xs px-4 py-3 rounded-2xl font-bold">
-          </div>
-          <div class="grid grid-cols-2 gap-3.5">
-            <div>
-              <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Catégorie</label>
-              <select id="egoal-category" class="custom-select w-full text-xs px-4 py-3 rounded-2xl font-bold">
-                ${categories.map(c => `<option value="${c.id}" ${todo.categoryId === c.id ? 'selected' : ''}>${c.name}</option>`).join('')}
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Priorité</label>
-              <select id="egoal-priority" class="custom-select w-full text-xs px-4 py-3 rounded-2xl font-bold">
-                <option value="normal" ${todo.priority === 'normal' ? 'selected' : ''}>Normal</option>
-                <option value="urgent" ${todo.priority === 'urgent' ? 'selected' : ''}>🔥 Urgent</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Date limite</label>
-            <input type="date" id="egoal-deadline" value="${todo.deadline || ''}" class="custom-input w-full text-xs px-4 py-2.5 rounded-2xl font-mono">
-          </div>
-          <div>
-            <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Notes & Détails</label>
-            <textarea id="egoal-notes" rows="3" class="custom-textarea w-full text-xs px-4 py-3 rounded-2xl font-medium">${todo.notes || ''}</textarea>
-          </div>
-        </form>
-      `;
-
-      Drawer.open({
-        title: 'Modifier la tâche',
-        icon: '<i data-lucide="edit-3" class="w-5 h-5 text-orangePop-500"></i>',
-        content,
-        footer: `
-          <button id="del-goal-btn" class="px-4 py-2.5 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-2xl text-xs font-black mr-auto transition-all">Supprimer</button>
-          <button id="cancel-egoal-btn" class="px-4 py-2.5 rounded-2xl text-xs font-bold text-zinc-500 hover:text-ink">Annuler</button>
-          <button id="save-egoal-btn" class="px-6 py-2.5 bg-solaire-500 hover:bg-solaire-600 text-white rounded-2xl text-xs font-black shadow-md shadow-solaire-500/25 transition-all">Sauvegarder</button>
-        `,
-        onOpen: (panelEl) => {
-          panelEl.querySelector('#cancel-egoal-btn').addEventListener('click', () => Drawer.close());
-          panelEl.querySelector('#save-egoal-btn').addEventListener('click', () => {
-            const title = panelEl.querySelector('#egoal-title').value.trim();
-            if (!title) return;
-            store.updateLongtermTodo(todo.id, {
-              title,
-              categoryId: panelEl.querySelector('#egoal-category').value,
-              priority: panelEl.querySelector('#egoal-priority').value,
-              deadline: panelEl.querySelector('#egoal-deadline').value,
-              notes: panelEl.querySelector('#egoal-notes').value.trim()
-            });
-            Toast.success('Tâche mise à jour !');
-            Drawer.close();
-            this.render(container);
-          });
-
-          panelEl.querySelector('#del-goal-btn').addEventListener('click', () => {
-            if (confirm('Supprimer cette tâche ?')) {
-              store.deleteLongtermTodo(todo.id);
-              Toast.info('Tâche supprimée');
-              Drawer.close();
-              this.render(container);
-            }
           });
         }
       });
@@ -3539,7 +3234,7 @@
   };
 
   // ==========================================================================
-  // 11. VUE FLASHCARDS
+  // 12. VUE FLASHCARDS (RACCOURCIS CLAVIERS ESPACE, GAUCHE, DROITE)
   // ==========================================================================
   const FlashcardsView = {
     activeSession: null,
@@ -3557,16 +3252,18 @@
         <div class="space-y-6">
           <div class="bg-white dark:bg-ink-darkcard p-5 sm:p-6 rounded-3xl border border-creme-300 dark:border-ink-border shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h2 class="font-extrabold text-xl text-ink dark:text-white">Flashcards</h2>
+              <h2 class="font-extrabold text-xl text-ink dark:text-white">
+                Flashcards
+              </h2>
               <p class="text-xs text-zinc-500 font-bold mt-0.5">${totalCardsCount} carte${totalCardsCount > 1 ? 's' : ''} au total</p>
             </div>
 
             <div class="flex items-center gap-2 flex-wrap">
               <button id="import-deck-file-btn" class="px-3.5 py-2.5 rounded-2xl text-xs font-black bg-creme-200 hover:bg-creme-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-ink dark:text-white border border-creme-300 dark:border-zinc-700 transition-colors flex items-center gap-1.5 shadow-xs">
                 <i data-lucide="file-up" class="w-4 h-4 text-solaire-500"></i>
-                <span>Importer (:::)</span>
+                <span>Importer un fichier (:::)</span>
               </button>
-              <button id="create-deck-btn" class="px-5 py-2.5 rounded-2xl text-xs font-black bg-solaire-500 hover:bg-solaire-600 text-white transition-all flex items-center gap-1.5 shadow-md shadow-solaire-500/25">
+              <button id="create-deck-btn" class="px-4 py-2.5 rounded-2xl text-xs font-black bg-solaire-500 hover:bg-solaire-600 text-white transition-all flex items-center gap-1.5 shadow-md shadow-solaire-500/25">
                 <i data-lucide="plus" class="w-4 h-4"></i>
                 <span>Nouveau paquet</span>
               </button>
@@ -3576,7 +3273,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="decks-grid">
             ${decks.length === 0 ? `
               <div class="col-span-full p-12 text-center bg-white dark:bg-ink-darkcard rounded-3xl border border-creme-300 dark:border-ink-border">
-                <p class="text-xs text-zinc-400 font-bold">Aucun paquet de flashcards.<br><span class="text-[11px] text-zinc-500">Créez votre premier paquet pour commencer à réviser.</span></p>
+                <p class="text-xs text-zinc-400 font-bold">Aucun paquet de flashcards.<br><span class="text-[11px] text-zinc-500">Créez votre premier paquet ou importez vos questions pour commencer à réviser.</span></p>
               </div>
             ` : decks.map(deck => {
               const cardCount = deck.cards ? deck.cards.length : 0;
@@ -3609,7 +3306,6 @@
       `;
 
       if (window.lucide) window.lucide.createIcons();
-      CustomDropdown._autoInitPanel(container);
       this._bindEvents(container);
     },
 
@@ -3628,7 +3324,6 @@
         btn.addEventListener('click', () => {
           if (confirm('Supprimer ce paquet ?')) {
             store.deleteFlashcardDeck(btn.dataset.deleteDeck);
-            Toast.info('Paquet supprimé');
             this.render(container);
           }
         });
@@ -3816,7 +3511,7 @@
         this.render(container);
       });
 
-      // Raccourcis claviers : [Espace] retourne la carte, [←] À revoir, [→] Maîtrisé
+      // Raccourcis claviers : [Espace] = Retourner, [←] = À revoir, [→] = Maîtrisé
       if (this._keyRevisionHandler) {
         document.removeEventListener('keydown', this._keyRevisionHandler);
       }
@@ -3908,7 +3603,6 @@
 
             if (!cards.length) { Toast.warning('Aucune carte détectée.'); return; }
             store.addFlashcardDeck({ subject: 'Maths', deckName, cards });
-            Toast.success(`${cards.length} flashcards importées !`);
             Drawer.close();
             this.render(container);
           });
@@ -3964,7 +3658,6 @@
             const deckName = panelEl.querySelector('#new-deck-name').value.trim();
             if (!deckName) return;
             store.addFlashcardDeck({ subject: 'Maths', deckName, cards: [] });
-            Toast.success('Paquet créé !');
             Drawer.close();
             this.render(container);
           });
@@ -4001,7 +3694,6 @@
             const back = panelEl.querySelector('#card-back-input').value.trim();
             if (!front || !back) return;
             store.addCardsToDeck(deckId, [{ front, back }]);
-            Toast.success('Carte ajoutée !');
             Drawer.close();
             this.render(container);
           });
@@ -4016,15 +3708,15 @@
 
       const content = `
         <div class="space-y-4">
-          <div class="space-y-3 max-h-[65vh] overflow-y-auto pr-1">
+          <div class="space-y-2.5 max-h-96 overflow-y-auto">
             ${cards.map((c, idx) => `
-              <div class="p-4 rounded-2xl bg-creme-100 dark:bg-ink-darkbg border border-creme-300 dark:border-zinc-700 text-xs space-y-1.5">
+              <div class="p-3.5 rounded-2xl bg-creme-100 dark:bg-ink-darkbg border border-creme-300 dark:border-zinc-700 text-xs space-y-1">
                 <div class="flex items-start justify-between gap-2">
-                  <span class="font-black text-ink dark:text-white">#${idx + 1} Recto :</span>
-                  <button data-del-card="${c.id}" class="text-zinc-400 hover:text-rose-500 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                  <span class="font-black">#${idx + 1} Recto :</span>
+                  <button data-del-card="${c.id}" class="text-zinc-400 hover:text-rose-500"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
                 </div>
                 <div class="text-ink dark:text-zinc-200 font-mono text-[11px]">${c.front}</div>
-                <div class="font-black text-solaire-600 dark:text-solaire-400 mt-2">Verso :</div>
+                <div class="font-black text-solaire-600 dark:text-solaire-400 mt-1">Verso :</div>
                 <div class="text-ink dark:text-zinc-200 font-mono text-[11px]">${c.back}</div>
               </div>
             `).join('')}
@@ -4034,16 +3726,14 @@
 
       Drawer.open({
         title: `Cartes de "${deck.deckName}"`,
-        icon: '<i data-lucide="layers" class="w-5 h-5 text-solaire-500"></i>',
         content,
-        footer: `<button id="close-deck-m-btn" class="px-6 py-2.5 bg-ink dark:bg-white text-white dark:text-ink rounded-2xl text-xs font-black">Fermer</button>`,
+        footer: `<button id="close-deck-m-btn" class="px-5 py-2 bg-ink dark:bg-white text-white dark:text-ink rounded-2xl text-xs font-black">Fermer</button>`,
         onOpen: (panelEl) => {
           panelEl.querySelector('#close-deck-m-btn').addEventListener('click', () => Drawer.close());
           panelEl.querySelectorAll('[data-del-card]').forEach(btn => {
             btn.addEventListener('click', () => {
               deck.cards = deck.cards.filter(c => c.id !== btn.dataset.delCard);
               store.save();
-              Toast.info('Carte supprimée');
               Drawer.close();
               this.render(container);
             });
@@ -4054,7 +3744,7 @@
   };
 
   // ==========================================================================
-  // 12. VUE NOTES & SEMESTRE
+  // 13. VUE NOTES & SEMESTRE
   // ==========================================================================
   const GradesView = {
     render(container) {
@@ -4094,7 +3784,11 @@
             blockSubjectCoefSum += (subject.coef || 1);
           }
 
-          return { ...subject, evaluations: evals, subjectAverage };
+          return {
+            ...subject,
+            evaluations: evals,
+            subjectAverage
+          };
         });
 
         const blockAverage = blockSubjectCoefSum > 0 ? (blockWeightedSum / blockSubjectCoefSum) : null;
@@ -4112,7 +3806,12 @@
           allBlocksValidated = false;
         }
 
-        return { ...block, subjects: computedSubjects, blockAverage, isValidated };
+        return {
+          ...block,
+          subjects: computedSubjects,
+          blockAverage,
+          isValidated
+        };
       });
 
       const semesterAverage = totalBlocksEvaluated > 0 ? (totalBlockScores / totalBlocksEvaluated) : null;
@@ -4121,7 +3820,9 @@
         <div class="space-y-6">
           <div class="bg-white dark:bg-ink-darkcard p-5 sm:p-6 rounded-3xl border border-creme-300 dark:border-ink-border shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
-              <h2 class="font-extrabold text-xl text-ink dark:text-white">Notes du semestre</h2>
+              <h2 class="font-extrabold text-xl text-ink dark:text-white">
+                Notes du semestre
+              </h2>
             </div>
 
             <div class="p-4 px-6 rounded-3xl border flex items-center gap-4 ${semesterAverage !== null && allBlocksValidated ? 'bg-emerald-500 text-white border-emerald-600 shadow-lg shadow-emerald-500/20' : 'bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20'}">
@@ -4134,7 +3835,11 @@
 
               <div>
                 <div class="text-xs font-black tracking-wider">
-                  ${allBlocksValidated && semesterAverage !== null ? `<span>SEMESTRE VALIDÉ 🎉</span>` : `<span>SEMESTRE NON VALIDÉ ❌</span>`}
+                  ${allBlocksValidated && semesterAverage !== null ? `
+                    <span>SEMESTRE VALIDÉ 🎉</span>
+                  ` : `
+                    <span>SEMESTRE NON VALIDÉ ❌</span>
+                  `}
                 </div>
                 ${!allBlocksValidated && failedBlocksCount > 0 ? `
                   <div class="text-[11px] opacity-90 mt-0.5 font-bold">
@@ -4177,21 +3882,21 @@
                             Moyenne matière : <span class="font-mono font-black ${subject.subjectAverage !== null && subject.subjectAverage >= 10 ? 'text-emerald-600 dark:text-emerald-400' : (subject.subjectAverage !== null ? 'text-rose-600 dark:text-rose-400' : 'text-zinc-400')}">${subject.subjectAverage !== null ? subject.subjectAverage.toFixed(2) + ' / 20' : '--'}</span>
                           </div>
 
-                          <button data-add-eval-sub="${subject.id}" data-block-id="${block.id}" class="px-3.5 py-2 rounded-xl bg-solaire-500 hover:bg-solaire-600 text-white text-xs font-black transition-all flex items-center gap-1.5 shadow-xs">
+                          <button data-add-eval-sub="${subject.id}" data-block-id="${block.id}" class="px-3 py-1.5 rounded-xl bg-solaire-500 hover:bg-solaire-600 text-white text-xs font-black transition-all flex items-center gap-1 shadow-xs">
                             <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                            <span>+ Ajouter une note</span>
+                            <span>Ajouter une épreuve</span>
                           </button>
                         </div>
                       </div>
 
                       <div class="overflow-x-auto grade-table p-2">
                         ${(!subject.evaluations || subject.evaluations.length === 0) ? `
-                          <p class="text-xs text-zinc-400 italic py-4 text-center select-none">Aucune note enregistrée pour cette matière. Cliquez sur "+ Ajouter une note".</p>
+                          <p class="text-xs text-zinc-400 italic py-4 text-center select-none">Aucune épreuve renseignée pour cette matière. Cliquez sur "+ Ajouter une épreuve".</p>
                         ` : `
                           <table class="w-full text-left text-xs">
                             <thead class="text-[10px] uppercase tracking-wider text-zinc-400 border-b border-creme-200 dark:border-zinc-800 font-black">
                               <tr>
-                                <th class="py-2.5 px-4">Épreuve / Examen</th>
+                                <th class="py-2.5 px-4">Épreuve</th>
                                 <th class="py-2.5 px-4 w-28">Note (/20)</th>
                                 <th class="py-2.5 px-4 w-24">Coef</th>
                                 <th class="py-2.5 px-4 w-28">Bonus</th>
@@ -4206,10 +3911,10 @@
                                     <input type="text" value="${ev.name}" data-block="${block.id}" data-sub="${subject.id}" data-eval="${ev.id}" data-field="name" class="w-full bg-transparent border-0 focus:ring-1 focus:ring-solaire-500 rounded-lg px-1.5 -mx-1.5 text-xs text-ink dark:text-white font-bold">
                                   </td>
                                   <td class="py-2.5 px-4">
-                                    <input type="number" step="0.25" min="0" max="20" placeholder="--" value="${ev.rawGrade !== null ? ev.rawGrade : ''}" data-block="${block.id}" data-sub="${subject.id}" data-eval="${ev.id}" data-field="grade" class="custom-input w-20 font-mono font-black text-center py-1 rounded-xl">
+                                    <input type="number" step="0.25" min="0" max="20" placeholder="--" value="${ev.rawGrade !== null ? ev.rawGrade : ''}" data-block="${block.id}" data-sub="${subject.id}" data-eval="${ev.id}" data-field="grade" class="w-20 font-mono font-black text-center py-1 rounded-xl bg-white dark:bg-ink-darkcard border border-creme-300 dark:border-zinc-700 text-ink dark:text-white">
                                   </td>
                                   <td class="py-2.5 px-4">
-                                    <input type="number" step="0.5" min="0.5" max="20" value="${ev.coef || 1}" data-block="${block.id}" data-sub="${subject.id}" data-eval="${ev.id}" data-field="coef" class="custom-input w-16 font-mono font-bold text-center py-1 rounded-xl">
+                                    <input type="number" step="0.5" min="0.5" max="20" value="${ev.coef || 1}" data-block="${block.id}" data-sub="${subject.id}" data-eval="${ev.id}" data-field="coef" class="w-16 font-mono font-bold text-center py-1 rounded-xl bg-white dark:bg-ink-darkcard border border-creme-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300">
                                   </td>
                                   <td class="py-2.5 px-4">
                                     <select data-block="${block.id}" data-sub="${subject.id}" data-eval="${ev.id}" data-field="bonus" class="custom-select w-24 text-xs font-black py-1 px-2 rounded-xl">
@@ -4223,7 +3928,7 @@
                                   </td>
                                   <td class="py-2.5 px-3 text-center">
                                     <button data-delete-eval="${ev.id}" data-sub="${subject.id}" data-block="${block.id}" class="text-zinc-400 hover:text-rose-500 p-1 rounded-lg">
-                                      <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                                     </button>
                                   </td>
                                 </tr>
@@ -4283,9 +3988,8 @@
           const blockId = btn.dataset.block;
           const subId = btn.dataset.sub;
           const evalId = btn.dataset.deleteEval;
-          if (confirm('Supprimer cette note ?')) {
+          if (confirm('Supprimer cette épreuve ?')) {
             store.deleteEvaluation(blockId, subId, evalId);
-            Toast.info('Note supprimée');
             this.render(container);
           }
         });
@@ -4302,7 +4006,7 @@
         <form id="add-eval-form" class="space-y-4">
           <div>
             <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Intitulé de l'épreuve *</label>
-            <input type="text" id="eval-name" required placeholder="Ex: DS 1 / Examen final / TP noté" class="custom-input w-full text-xs px-4 py-3 rounded-2xl font-bold">
+            <input type="text" id="eval-name" required placeholder="Ex: DS 2 / Examen final / TP noté" class="custom-input w-full text-xs px-4 py-3 rounded-2xl font-bold">
           </div>
           <div class="grid grid-cols-2 gap-3.5">
             <div>
@@ -4318,12 +4022,12 @@
       `;
 
       Drawer.open({
-        title: `Ajouter une note (${subName})`,
-        icon: '<i data-lucide="calculator" class="w-5 h-5 text-solaire-500"></i>',
+        title: `Ajouter une épreuve (${subName})`,
+        icon: '<i data-lucide="plus-circle" class="w-5 h-5 text-solaire-500"></i>',
         content,
         footer: `
-          <button id="cancel-eval-btn" class="px-4 py-2.5 rounded-2xl text-xs font-bold text-zinc-500 hover:text-ink">Annuler</button>
-          <button id="save-eval-btn" class="px-6 py-2.5 bg-solaire-500 hover:bg-solaire-600 text-white rounded-2xl text-xs font-black shadow-sm transition-all">Ajouter la note</button>
+          <button id="cancel-eval-btn" class="px-4 py-2.5 rounded-2xl text-xs font-bold text-zinc-500">Annuler</button>
+          <button id="save-eval-btn" class="px-6 py-2.5 bg-solaire-500 hover:bg-solaire-600 text-white rounded-2xl text-xs font-black shadow-sm">Ajouter</button>
         `,
         onOpen: (panelEl) => {
           panelEl.querySelector('#cancel-eval-btn').addEventListener('click', () => Drawer.close());
@@ -4340,7 +4044,6 @@
               coef,
               bonus: 0
             });
-            Toast.success('Note ajoutée au semestre !');
             Drawer.close();
             this.render(container);
           });
@@ -4350,7 +4053,7 @@
   };
 
   // ==========================================================================
-  // 13. ORCHESTRATEUR PRINCIPAL & NAVIGATION
+  // 14. ORCHESTRATEUR PRINCIPAL & NAVIGATION
   // ==========================================================================
   class App {
     constructor() {
@@ -4372,22 +4075,24 @@
       this._bindGitHubSync();
       this._bindGlobalShortcuts();
 
-      // 1. On affiche l'interface IMMÉDIATEMENT avec le stockage local (zéro écran noir)
       this.navigateTo('dashboard');
 
-      // 2. On tente la synchro GitHub en douceur. Si le token bug, on s'en fout, le site marche quand même.
-      try {
-        const remote = await GitHubSync.fetchRemoteData();
-        if (remote && remote.data) {
-          store.applyRemoteData(remote.data);
-          // On rafraîchit l'affichage avec les données distantes
-          this.navigateTo(this.currentPage);
+      if (GitHubSync.isConfigured()) {
+        try {
+          const remote = await GitHubSync.fetchRemoteData();
+          if (remote && remote.data) {
+            store.applyRemoteData(remote.data);
+            this.navigateTo(this.currentPage);
+          } else if (remote && remote.notFound) {
+            await GitHubSync.commitRemoteData(store.data, 'Initial commit: StudyFlow data.json');
+          }
+        } catch (err) {
+          console.warn('Sync GitHub au démarrage:', err);
         }
-      } catch (err) {
-        console.warn('GitHub injoignable ou Token expiré. Mode local 100% activé.');
+      } else {
+        GitHubSync._updateStatus('unconfigured');
       }
     }
-
 
     _initTheme() {
       const savedTheme = localStorage.getItem('studyflow_theme') || 'dark';
@@ -4449,8 +4154,235 @@
     }
 
     _bindGitHubSync() {
-      // Le bouton GitHub a été retiré de l'UI — la sync est 100% automatique.
-      // Le statut s'affiche discrètement via l'indicateur #github-sync-indicator.
+      const syncBtn = document.getElementById('github-sync-btn');
+      if (syncBtn) {
+        syncBtn.addEventListener('click', () => this._openGitHubSettingsDrawer());
+      }
+    }
+
+    _openGitHubSettingsDrawer() {
+      const cfg = GitHubSync.getConfig();
+      const isConf = GitHubSync.isConfigured();
+      const lastSyncStr = GitHubSync.lastSyncTime ? GitHubSync.lastSyncTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'Aucune';
+
+      const content = `
+        <div class="space-y-5">
+          <div class="p-4 rounded-2xl bg-creme-100 dark:bg-ink-darkbg border border-creme-300 dark:border-zinc-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="font-black text-xs text-ink dark:text-white flex items-center gap-1.5">
+                <i data-lucide="cloud" class="w-4 h-4 text-solaire-500"></i>
+                Synchronisation GitHub (API REST)
+              </span>
+              <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md ${isConf ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-400'}">
+                ${isConf ? 'Configuré ✓' : 'Non configuré'}
+              </span>
+            </div>
+            <p class="text-[11px] text-zinc-600 dark:text-zinc-300 leading-relaxed font-medium">
+              Vos données sont sauvegardées en continu dans le fichier <code>${cfg.path || 'data.json'}</code> sur votre dépôt GitHub.
+            </p>
+          </div>
+
+          <form id="github-config-form" class="space-y-3.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-black text-ink dark:text-zinc-300 mb-1">Utilisateur / Organisation *</label>
+                <input type="text" id="gh-owner" required value="${cfg.owner || ''}" placeholder="Ex: mon-pseudo" class="custom-input w-full text-xs px-3 py-2 rounded-xl font-bold">
+              </div>
+              <div>
+                <label class="block text-[11px] font-black text-ink dark:text-zinc-300 mb-1">Nom du Dépôt *</label>
+                <input type="text" id="gh-repo" required value="${cfg.repo || ''}" placeholder="Ex: site_orga" class="custom-input w-full text-xs px-3 py-2 rounded-xl font-bold">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-black text-ink dark:text-zinc-300 mb-1">Branche *</label>
+                <input type="text" id="gh-branch" required value="${cfg.branch || 'main'}" placeholder="main" class="custom-input w-full text-xs px-3 py-2 rounded-xl font-mono">
+              </div>
+              <div>
+                <label class="block text-[11px] font-black text-ink dark:text-zinc-300 mb-1">Chemin du fichier *</label>
+                <input type="text" id="gh-path" required value="${cfg.path || 'data.json'}" placeholder="data.json" class="custom-input w-full text-xs px-3 py-2 rounded-xl font-mono">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-black text-ink dark:text-zinc-300 mb-1">
+                Personal Access Token (PAT) GitHub *
+              </label>
+              <div class="relative">
+                <input type="password" id="gh-token" required value="${cfg.token || ''}" placeholder="ghp_... ou github_pat_..." class="custom-input w-full text-xs px-3 py-2 pr-10 rounded-xl font-mono">
+                <button type="button" id="gh-toggle-token" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-ink dark:hover:text-white p-1">
+                  <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <div class="p-3.5 rounded-2xl bg-creme-100/70 dark:bg-ink-darkbg/70 border border-creme-300 dark:border-zinc-800 flex items-center justify-between text-xs font-bold">
+            <span class="text-zinc-500">Dernière sync : <span class="font-mono text-ink dark:text-white">${lastSyncStr}</span></span>
+            <button id="gh-test-btn" class="px-3 py-1.5 rounded-xl bg-creme-200 hover:bg-creme-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-ink dark:text-white text-xs font-black transition-colors flex items-center gap-1">
+              <i data-lucide="zap" class="w-3.5 h-3.5 text-orangePop-500"></i>
+              <span>Tester la connexion</span>
+            </button>
+          </div>
+
+          ${isConf ? `
+            <div class="grid grid-cols-2 gap-2.5 pt-1">
+              <button id="gh-pull-btn" class="px-3 py-2.5 bg-creme-200 hover:bg-creme-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-ink dark:text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-colors">
+                <i data-lucide="download-cloud" class="w-3.5 h-3.5 text-sky-500"></i>
+                <span>Recharger depuis GitHub</span>
+              </button>
+              <button id="gh-push-btn" class="px-3 py-2.5 bg-solaire-500 hover:bg-solaire-600 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-colors shadow-sm">
+                <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                <span>Pousser vers GitHub</span>
+              </button>
+            </div>
+          ` : ''}
+
+          <div class="pt-3 border-t border-creme-200 dark:border-zinc-800 flex items-center justify-between text-[11px] text-zinc-500">
+            <span>Sauvegarde fichier locale (secours) :</span>
+            <div class="flex items-center gap-2">
+              <button id="gh-export-local-json" class="font-bold text-solaire-600 dark:text-solaire-400 hover:underline">Exporter JSON</button>
+              <span>•</span>
+              <button id="gh-import-local-json" class="font-bold text-solaire-600 dark:text-solaire-400 hover:underline">Importer JSON</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      Drawer.open({
+        title: 'Synchronisation GitHub',
+        icon: '<i data-lucide="github" class="w-5 h-5 text-ink dark:text-white"></i>',
+        content,
+        maxWidth: 'max-w-lg',
+        footer: `
+          <button id="gh-disconnect-btn" class="px-4 py-2 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl text-xs font-black mr-auto ${isConf ? '' : 'hidden'}">Déconnecter</button>
+          <button id="gh-cancel-btn" class="px-4 py-2 rounded-xl text-xs font-bold text-zinc-500">Fermer</button>
+          <button id="gh-save-btn" class="px-5 py-2 bg-solaire-500 hover:bg-solaire-600 text-white rounded-xl text-xs font-black shadow-md shadow-solaire-500/25">Enregistrer &amp; Sync</button>
+        `,
+        onOpen: (panelEl) => {
+          const toggleBtn = panelEl.querySelector('#gh-toggle-token');
+          const tokenInput = panelEl.querySelector('#gh-token');
+          toggleBtn.addEventListener('click', () => {
+            tokenInput.type = tokenInput.type === 'password' ? 'text' : 'password';
+          });
+
+          panelEl.querySelector('#gh-cancel-btn').addEventListener('click', () => Drawer.close());
+
+          panelEl.querySelector('#gh-test-btn').addEventListener('click', async () => {
+            const testCfg = {
+              owner: panelEl.querySelector('#gh-owner').value.trim(),
+              repo: panelEl.querySelector('#gh-repo').value.trim(),
+              branch: panelEl.querySelector('#gh-branch').value.trim() || 'main',
+              path: panelEl.querySelector('#gh-path').value.trim() || 'data.json',
+              token: panelEl.querySelector('#gh-token').value.trim()
+            };
+
+            try {
+              const repoInfo = await GitHubSync.testConnection(testCfg);
+              alert(`Connexion réussie au dépôt "${repoInfo.full_name}" !`);
+            } catch (err) {
+              Toast.error(`Échec connexion : ${err.message}`);
+            }
+          });
+
+          panelEl.querySelector('#gh-save-btn').addEventListener('click', async () => {
+            const newCfg = {
+              owner: panelEl.querySelector('#gh-owner').value.trim(),
+              repo: panelEl.querySelector('#gh-repo').value.trim(),
+              branch: panelEl.querySelector('#gh-branch').value.trim() || 'main',
+              path: panelEl.querySelector('#gh-path').value.trim() || 'data.json',
+              token: panelEl.querySelector('#gh-token').value.trim()
+            };
+
+            if (!newCfg.owner || !newCfg.repo || !newCfg.token) {
+              Toast.warning('Veuillez renseigner tous les champs obligatoires.');
+              return;
+            }
+
+            try {
+              await GitHubSync.testConnection(newCfg);
+              GitHubSync.saveConfig(newCfg);
+
+              const remote = await GitHubSync.fetchRemoteData(newCfg);
+              if (remote && remote.data) {
+                store.applyRemoteData(remote.data);
+              } else {
+                await GitHubSync.commitRemoteData(store.data, 'Initial commit: StudyFlow data.json');
+              }
+
+              Drawer.close();
+              this.navigateTo(this.currentPage);
+            } catch (err) {
+              Toast.error(`Erreur GitHub : ${err.message}`);
+            }
+          });
+
+          const pushBtn = panelEl.querySelector('#gh-push-btn');
+          if (pushBtn) {
+            pushBtn.addEventListener('click', async () => {
+              try {
+                await GitHubSync.commitRemoteData(store.data, 'Manual sync from StudyFlow');
+                Drawer.close();
+              } catch (err) {
+                Toast.error(`Échec envoi GitHub : ${err.message}`);
+              }
+            });
+          }
+
+          const pullBtn = panelEl.querySelector('#gh-pull-btn');
+          if (pullBtn) {
+            pullBtn.addEventListener('click', async () => {
+              try {
+                const remote = await GitHubSync.fetchRemoteData();
+                if (remote && remote.data) {
+                  store.applyRemoteData(remote.data);
+                  Drawer.close();
+                  this.navigateTo(this.currentPage);
+                } else {
+                  Toast.warning('Aucun fichier data.json trouvé sur le dépôt.');
+                }
+              } catch (err) {
+                Toast.error(`Échec rechargement GitHub : ${err.message}`);
+              }
+            });
+          }
+
+          const discBtn = panelEl.querySelector('#gh-disconnect-btn');
+          if (discBtn) {
+            discBtn.addEventListener('click', () => {
+              if (confirm('Déconnecter la synchronisation GitHub ? (Vos données restent en mémoire locale)')) {
+                localStorage.removeItem(GITHUB_CONFIG_KEY);
+                GitHubSync._updateStatus('unconfigured');
+                Drawer.close();
+              }
+            });
+          }
+
+          panelEl.querySelector('#gh-export-local-json').addEventListener('click', () => {
+            store.exportJSON();
+          });
+
+          panelEl.querySelector('#gh-import-local-json').addEventListener('click', () => {
+            const input = document.getElementById('global-json-import-input');
+            if (input) {
+              input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                  if (store.importJSON(ev.target.result)) {
+                    Drawer.close();
+                    this.navigateTo(this.currentPage);
+                  }
+                };
+                reader.readAsText(file);
+              };
+              input.click();
+            }
+          });
+        }
+      });
     }
 
     _bindGlobalShortcuts() {
