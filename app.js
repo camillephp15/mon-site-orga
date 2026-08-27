@@ -710,7 +710,7 @@
     repo: 'mon-site-orga',
     branch: 'main',
     path: 'data.json',
-    token: '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'
+    token: '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'
   };
 
   const GitHubSync = {
