@@ -11032,7 +11032,14 @@
   },
   "longtermCategories": [],
   "longtermTodos": [],
-  "flashcards": [],
+  "flashcards": [
+    {
+      "subject": "Maths",
+      "deckName": "e,aù",
+      "cards": [],
+      "id": "deck_1787832422749"
+    }
+  ],
   "gradesData": {
     "blocks": [
       {
