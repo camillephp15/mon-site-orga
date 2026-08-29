@@ -7365,7 +7365,7 @@
       "duration": 90,
       "room": "ZOOM",
       "type": "course",
-      "completed": true
+      "completed": false
     },
     {
       "id": "ics_7mldp91_1787759806947",
