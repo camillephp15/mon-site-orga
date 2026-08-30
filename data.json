@@ -10892,6 +10892,17 @@
       "room": "",
       "completed": false,
       "id": "ev_1787764301873"
+    },
+    {
+      "calendarId": "cal_1787759806939",
+      "title": "nm",
+      "date": "2026-09-05",
+      "day": "sat",
+      "startTime": "08:00",
+      "duration": 120,
+      "room": "",
+      "completed": false,
+      "id": "ev_1788109619868"
     }
   ],
   "importantDates": [
