@@ -1621,13 +1621,17 @@
                 </div>
 
                 <div class="relative overflow-y-auto flex-1 timetable-grid" id="timetable-scroll-area" style="min-height: 520px;">
-                  <div class="hidden lg:grid relative" style="grid-template-columns: 54px repeat(7, 1fr); height: 1064px;">
+                  <!-- Grille Desktop (Lundi à Dimanche) -->
+                  <div class="hidden lg:grid relative" id="desktop-timetable-grid" style="grid-template-columns: 54px repeat(7, 1fr); height: 1064px;">
                     <div class="relative border-r border-creme-200 dark:border-ink-border select-none text-[11px] text-zinc-400 font-mono text-center">
-                      ${Array.from({ length: 19 }, (_, i) => i + 5).map(hour => `
-                        <div class="absolute left-0 right-0 flex items-center justify-center -translate-y-2.5" style="top: ${(hour - 5) * 56}px;">
-                          ${String(hour).padStart(2, '0')}h
-                        </div>
-                      `).join('')}
+                      ${Array.from({ length: 19 }, (_, i) => i + 5).map(hour => {
+                        const isFirst = hour === 5;
+                        return `
+                          <div class="absolute left-0 right-0 flex items-center justify-center font-bold select-none text-[11px] text-zinc-400 font-mono" style="top: ${isFirst ? '6px' : `${(hour - 5) * 56}px`}; ${isFirst ? '' : 'transform: translateY(-50%);'}">
+                            ${String(hour).padStart(2, '0')}h
+                          </div>
+                        `;
+                      }).join('')}
                     </div>
                     ${weekDays.map(d => `
                       <div data-col-datestr="${d.dateStr}" class="timetable-column relative border-r border-creme-200/60 dark:border-ink-border/60 last:border-r-0 ${d.dateStr === todayStr ? 'bg-solaire-500/[0.03]' : ''}"></div>
@@ -1635,13 +1639,17 @@
                     <div id="current-time-indicator" class="current-time-line hidden"></div>
                   </div>
 
-                  <div class="lg:hidden relative" id="mobile-timetable-grid" style="grid-template-columns: 48px repeat(${this.mobileViewDays}, 1fr); height: 1064px; display: grid;">
+                  <!-- Grille Mobile (Vue adaptative 1j à 7j) -->
+                  <div class="grid lg:hidden relative" id="mobile-timetable-grid" style="grid-template-columns: 48px repeat(${this.mobileViewDays}, 1fr); height: 1064px;">
                     <div class="relative border-r border-creme-200 dark:border-ink-border select-none text-[11px] text-zinc-400 font-mono text-center">
-                      ${Array.from({ length: 19 }, (_, i) => i + 5).map(hour => `
-                        <div class="absolute left-0 right-0 flex items-center justify-center -translate-y-2.5" style="top: ${(hour - 5) * 56}px;">
-                          ${String(hour).padStart(2, '0')}h
-                        </div>
-                      `).join('')}
+                      ${Array.from({ length: 19 }, (_, i) => i + 5).map(hour => {
+                        const isFirst = hour === 5;
+                        return `
+                          <div class="absolute left-0 right-0 flex items-center justify-center font-bold select-none text-[11px] text-zinc-400 font-mono" style="top: ${isFirst ? '6px' : `${(hour - 5) * 56}px`}; ${isFirst ? '' : 'transform: translateY(-50%);'}">
+                            ${String(hour).padStart(2, '0')}h
+                          </div>
+                        `;
+                      }).join('')}
                     </div>
                     ${weekDays.slice(this.activeDayMobileIndex, this.activeDayMobileIndex + this.mobileViewDays).map(d => `
                       <div data-col-datestr="${d.dateStr}" class="timetable-column relative border-r border-creme-200/60 dark:border-ink-border/60 last:border-r-0 ${d.dateStr === todayStr ? 'bg-solaire-500/[0.03]' : ''}"></div>

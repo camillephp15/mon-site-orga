@@ -472,17 +472,30 @@ h1, h2, h3, h4, h5, h6 {
    -------------------------------------------------------------------------- */
 
 .timetable-grid {
-
   position: relative;
-
   background-size: 100% var(--hour-height);
-
   background-image: linear-gradient(to bottom, rgba(238, 231, 218, 0.8) 1px, transparent 1px);
-
   user-select: none;
-
   touch-action: pan-y;
+}
 
+/* Isolation stricte : une seule grille active à la fois */
+@media (min-width: 1024px) {
+  #mobile-timetable-grid {
+    display: none !important;
+  }
+  #desktop-timetable-grid {
+    display: grid !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  #desktop-timetable-grid {
+    display: none !important;
+  }
+  #mobile-timetable-grid {
+    display: grid !important;
+  }
 }
 
 
