@@ -1,1112 +1,567 @@
-
 /* ==========================================================================
-
    StudyFlow - Design Pop & Solaire (Studio Créatif Épuré)
-
    Typographie nette & lisible, contrastes forts, navigation centrée
-
    ========================================================================== */
 
-
-
 :root {
-
   --bg-creme: #fcfaf6;
-
   --card-light: #ffffff;
-
   --border-light: #eee7da;
-
   --border-crisp: #ded4c1;
-
   --text-ink: #0f0f12;
-
   --text-muted: #57534e;
-
   
-
   --coral-pop: #ff3366;
-
   --orange-solar: #f97316;
-
   --sun-gold: #f59e0b;
-
   
-
   --hour-height: 56px;
-
   --bezier-smooth: cubic-bezier(0.16, 1, 0.3, 1);
-
 }
-
-
 
 .dark {
-
   --bg-dark: #0a0a0d;
-
   --card-dark: #16161b;
-
   --border-dark: #272730;
-
   --text-light: #fdfdfd;
-
   --text-dark-muted: #a1a1aa;
-
   
-
   --coral-pop: #ff4d79;
-
   --orange-solar: #fb923c;
-
 }
-
-
 
 /* Base Body Styles - Typographie ultra nette */
-
 body {
-
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-
   letter-spacing: -0.01em;
-
   line-height: 1.5;
-
   transition: background-color 0.25s var(--bezier-smooth), color 0.25s var(--bezier-smooth);
-
 }
-
-
 
 h1, h2, h3, h4, h5, h6 {
-
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-
   letter-spacing: -0.02em;
-
 }
-
-
 
 /* --------------------------------------------------------------------------
-
    Animations & Transitions Fluides (Axe 1)
-
    -------------------------------------------------------------------------- */
-
 @keyframes fadeIn {
-
   from {
-
     opacity: 0;
-
     transform: translateY(6px);
-
   }
-
   to {
-
     opacity: 1;
-
     transform: translateY(0);
-
   }
-
 }
-
-
 
 @keyframes slideInRight {
-
   from {
-
     opacity: 0;
-
     transform: translateX(100%);
-
   }
-
   to {
-
     opacity: 1;
-
     transform: translateX(0);
-
   }
-
 }
-
-
 
 @keyframes slideOutRight {
-
   from {
-
     opacity: 1;
-
     transform: translateX(0);
-
   }
-
   to {
-
     opacity: 0;
-
     transform: translateX(100%);
-
   }
-
 }
-
-
 
 @keyframes slideInBottom {
-
   from {
-
     opacity: 0;
-
     transform: translateY(100%);
-
   }
-
   to {
-
     opacity: 1;
-
     transform: translateY(0);
-
   }
-
 }
-
-
 
 @keyframes slideOutBottom {
-
   from {
-
     opacity: 1;
-
     transform: translateY(0);
-
   }
-
   to {
-
     opacity: 0;
-
     transform: translateY(100%);
-
   }
-
 }
-
-
 
 .animate-fade-in {
-
   animation: fadeIn 0.22s var(--bezier-smooth) forwards;
-
 }
-
-
 
 /* Daisy Sticker Animation & Glow */
-
 .daisy-sticker {
-
   display: inline-flex;
-
   align-items: center;
-
   justify-content: center;
-
   filter: drop-shadow(0 2px 5px rgba(255, 51, 102, 0.3));
-
   transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-
 }
-
-
 
 .daisy-sticker:hover {
-
   transform: scale(1.15) rotate(15deg);
-
 }
-
-
 
 /* --------------------------------------------------------------------------
-
    Boutons de Navigation & Onglets
-
    -------------------------------------------------------------------------- */
-
 .nav-btn {
-
   color: #57534e;
-
   font-weight: 700;
-
   border: 1px solid transparent;
-
   transition: all 0.2s var(--bezier-smooth);
-
 }
-
 .dark .nav-btn {
-
   color: #a1a1aa;
-
 }
-
 .nav-btn:hover {
-
   color: #0f0f12;
-
   background-color: rgba(0, 0, 0, 0.05);
-
   transform: translateY(-1px);
-
 }
-
 .dark .nav-btn:hover {
-
   color: #ffffff;
-
   background-color: rgba(255, 255, 255, 0.08);
-
 }
-
 .nav-btn.active {
-
   color: #ffffff;
-
   background-color: #0f0f12;
-
   border-color: #0f0f12;
-
   box-shadow: 0 2px 8px rgba(15, 15, 18, 0.25);
-
 }
-
 .dark .nav-btn.active {
-
   color: #0f0f12;
-
   background-color: #ffffff;
-
   border-color: #ffffff;
-
   box-shadow: 0 2px 8px rgba(255, 255, 255, 0.2);
-
 }
-
-
 
 .mobile-nav-btn {
-
   color: #71717a;
-
   transition: all 0.2s var(--bezier-smooth);
-
 }
-
 .dark .mobile-nav-btn {
-
   color: #a1a1aa;
-
 }
-
 .mobile-nav-btn.active {
-
   color: #ff3366;
-
   font-weight: 800;
-
   transform: scale(1.06);
-
 }
-
 .dark .mobile-nav-btn.active {
-
   color: #ff4d79;
-
 }
-
-
 
 /* --------------------------------------------------------------------------
-
    Tiroirs Coulissants Élégants (Drawers) (Axe 9)
-
    -------------------------------------------------------------------------- */
-
 .drawer-backdrop {
-
   position: fixed;
-
   inset: 0;
-
   background-color: rgba(10, 10, 13, 0.65);
-
   backdrop-filter: blur(8px);
-
   -webkit-backdrop-filter: blur(8px);
-
   z-index: 60;
-
   display: flex;
-
   justify-content: flex-end;
-
   opacity: 0;
-
   transition: opacity 0.25s var(--bezier-smooth);
-
 }
-
-
 
 .drawer-backdrop.active {
-
   opacity: 1;
-
 }
-
-
 
 .drawer-panel-right {
-
   position: relative;
-
   width: 100%;
-
   max-width: 520px;
-
   height: 100%;
-
   background-color: #ffffff;
-
   box-shadow: -10px 0 35px -5px rgba(0, 0, 0, 0.25);
-
   display: flex;
-
   flex-direction: column;
-
   animation: slideInRight 0.3s var(--bezier-smooth) forwards;
-
 }
-
-
 
 .dark .drawer-panel-right {
-
   background-color: #16161b;
-
   border-left: 1px solid #272730;
-
 }
-
-
 
 .drawer-panel-bottom {
-
   position: relative;
-
   width: 100%;
-
   max-height: 90vh;
-
   background-color: #ffffff;
-
   border-radius: 28px 28px 0 0;
-
   box-shadow: 0 -10px 35px -5px rgba(0, 0, 0, 0.25);
-
   display: flex;
-
   flex-direction: column;
-
   animation: slideInBottom 0.3s var(--bezier-smooth) forwards;
-
   margin-top: auto;
-
 }
-
-
 
 .dark .drawer-panel-bottom {
-
   background-color: #16161b;
-
   border-top: 1px solid #272730;
-
 }
-
-
 
 .drawer-closing .drawer-panel-right {
-
   animation: slideOutRight 0.22s var(--bezier-smooth) forwards;
-
 }
-
-
 
 .drawer-closing .drawer-panel-bottom {
-
   animation: slideOutBottom 0.22s var(--bezier-smooth) forwards;
-
 }
-
-
 
 /* --------------------------------------------------------------------------
-
    Emploi du Temps (Timetable Pleine Page & Interactivité) (Axe 2 & 5)
-
    -------------------------------------------------------------------------- */
-
 .timetable-grid {
-
   position: relative;
-
   background-size: 100% var(--hour-height);
-
   background-image: linear-gradient(to bottom, rgba(238, 231, 218, 0.8) 1px, transparent 1px);
-
   user-select: none;
-
   touch-action: pan-y;
-
 }
-
-
 
 .dark .timetable-grid {
-
   background-image: linear-gradient(to bottom, rgba(39, 39, 48, 0.9) 1px, transparent 1px);
-
 }
-
-
 
 .timetable-column {
-
   cursor: crosshair;
-
   position: relative;
-
   transition: background-color 0.15s ease;
-
 }
-
-
 
 .timetable-column:hover {
-
   background-color: rgba(255, 51, 102, 0.02);
-
 }
-
-
 
 /* Zone de sélection au glisser (Drag-to-Select & Stretch) */
-
 .timetable-drag-selection {
-
   position: absolute;
-
   left: 3px;
-
   right: 3px;
-
   background-color: rgba(255, 51, 102, 0.2);
-
   border: 2px dashed #ff3366;
-
   border-radius: 12px;
-
   z-index: 40;
-
   pointer-events: none;
-
   display: flex;
-
   flex-direction: column;
-
   justify-content: space-between;
-
   padding: 6px 8px;
-
   box-shadow: 0 4px 14px rgba(255, 51, 102, 0.25);
-
   animation: fadeIn 0.15s var(--bezier-smooth);
-
 }
-
-
 
 .timetable-drag-badge {
-
   background-color: #ff3366;
-
   color: #ffffff;
-
   font-size: 10px;
-
   font-weight: 900;
-
   font-family: 'JetBrains Mono', monospace;
-
   padding: 2px 6px;
-
   border-radius: 6px;
-
   align-self: flex-start;
-
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-
 }
-
-
 
 /* Ligne de l'heure courante */
-
 .current-time-line {
-
   position: absolute;
-
   left: 0;
-
   right: 0;
-
   height: 2.5px;
-
   background-color: #ff3366;
-
   z-index: 25;
-
   pointer-events: none;
-
 }
-
-
 
 .current-time-line::before {
-
   content: '✿';
-
   position: absolute;
-
   left: -8px;
-
   top: -10px;
-
   font-size: 13px;
-
   line-height: 1;
-
   color: #ff3366;
-
   filter: drop-shadow(0 0 3px rgba(255, 51, 102, 0.7));
-
 }
-
-
 
 /* Carte d'événement dans l'EDT */
-
 .timetable-event {
-
   position: absolute;
-
   border-radius: 12px;
-
   padding: 6px 8px;
-
   font-size: 0.75rem;
-
   line-height: 1.25;
-
   transition: transform 0.18s var(--bezier-smooth), box-shadow 0.18s var(--bezier-smooth), opacity 0.18s ease;
-
   overflow: hidden;
-
   box-sizing: border-box;
-
   z-index: 10;
-
   cursor: pointer;
-
   border-left-width: 4.5px;
-
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-
 }
-
-
 
 .timetable-event:hover {
-
   z-index: 30 !important;
-
   transform: translateY(-2px) scale(1.015);
-
   box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.2);
-
 }
-
-
 
 .timetable-event.completed {
-
   opacity: 0.45;
-
   filter: grayscale(0.4);
-
 }
-
-
 
 .timetable-event.completed .event-title {
-
   text-decoration: line-through;
-
 }
-
-
 
 /* Rond de validation du cours */
-
 .event-checkbox {
-
   width: 15px;
-
   height: 15px;
-
   border-radius: 50%;
-
   border: 1.8px solid currentColor;
-
   flex-shrink: 0;
-
   display: inline-flex;
-
   align-items: center;
-
   justify-content: center;
-
   cursor: pointer;
-
   transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.15s ease;
-
 }
-
-
 
 .event-checkbox:hover {
-
   transform: scale(1.3);
-
 }
-
-
 
 .event-checkbox.checked {
-
   background-color: currentColor;
-
 }
-
-
 
 .event-checkbox.checked::after {
-
   content: '✓';
-
   color: #ffffff;
-
   font-size: 9px;
-
   font-weight: 900;
-
   display: block;
-
   line-height: 1;
-
 }
-
-
 
 /* --------------------------------------------------------------------------
-
-   Sélecteurs Stylés & Champs de Formulaires Épurés (Axe 3)
-
+   Sélecteurs Stylés & Champs de Formulaires Épurés (Axe 3 - Uniformisation Noire/Sombre)
    -------------------------------------------------------------------------- */
-
 .custom-input, .custom-select, .custom-textarea {
-
+  background-color: #16161b !important;
+  border: 1.5px solid #272730 !important;
+  color: #fdfdfd !important;
   transition: border-color 0.18s var(--bezier-smooth), box-shadow 0.18s var(--bezier-smooth), background-color 0.18s ease;
-
   border-radius: 14px;
-
 }
 
-
+.custom-input::placeholder, .custom-textarea::placeholder {
+  color: #71717a !important;
+}
 
 .custom-input:focus, .custom-select:focus, .custom-textarea:focus {
-
   outline: none;
-
   border-color: #ff3366 !important;
-
   box-shadow: 0 0 0 3px rgba(255, 51, 102, 0.18) !important;
-
 }
-
-
 
 /* Stylisation moderne des sélecteurs natifs de dates et heures */
-
 input[type="date"], input[type="time"] {
-
   position: relative;
-
   cursor: pointer;
-
+  background-color: #16161b !important;
+  border: 1.5px solid #272730 !important;
+  color: #fdfdfd !important;
+  border-radius: 14px;
 }
-
-
 
 input[type="date"]::-webkit-calendar-picker-indicator,
-
 input[type="time"]::-webkit-calendar-picker-indicator {
-
   cursor: pointer;
-
-  filter: opacity(0.65) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
-
+  filter: invert(1) opacity(0.7);
   transition: transform 0.15s ease, filter 0.15s ease;
-
 }
-
-
 
 input[type="date"]::-webkit-calendar-picker-indicator:hover,
-
 input[type="time"]::-webkit-calendar-picker-indicator:hover {
-
   transform: scale(1.2);
-
-  filter: opacity(1);
-
+  filter: invert(1) opacity(1);
 }
-
-
 
 /* --------------------------------------------------------------------------
-
    Mini-Calendrier Mensuel (Axe 5)
-
    -------------------------------------------------------------------------- */
-
 .mini-cal-day {
-
   aspect-ratio: 1 / 1;
-
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
-
   justify-content: center;
-
   border-radius: 12px;
-
   font-size: 0.75rem;
-
   font-weight: 700;
-
   position: relative;
-
   cursor: pointer;
-
   transition: all 0.18s var(--bezier-smooth);
-
 }
-
-
 
 .mini-cal-day:hover {
-
   background-color: rgba(255, 51, 102, 0.12);
-
   color: #ff3366;
-
   transform: scale(1.08);
-
 }
-
-
 
 .mini-cal-day.today {
-
   font-weight: 900;
-
   border: 2px solid #ff3366;
-
   color: #ff3366;
-
 }
-
 .dark .mini-cal-day.today {
-
   border-color: #ff4d79;
-
   color: #ff4d79;
-
 }
-
-
 
 .mini-cal-day .event-dot {
-
   position: absolute;
-
   bottom: 3px;
-
   width: 5.5px;
-
   height: 5.5px;
-
   border-radius: 50%;
-
   box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-
 }
-
-
 
 /* --------------------------------------------------------------------------
-
    Accordéons & Matières
-
    -------------------------------------------------------------------------- */
-
 .accordion-header {
-
   cursor: pointer;
-
   user-select: none;
-
   transition: background-color 0.18s var(--bezier-smooth);
-
 }
-
-
 
 .accordion-content {
-
   max-height: 0;
-
   overflow: hidden;
-
   transition: max-height 0.35s cubic-bezier(0, 1, 0, 1), opacity 0.25s ease;
-
   opacity: 0;
-
 }
-
-
 
 .accordion-content.open {
-
   max-height: 3000px;
-
   transition: max-height 0.4s ease-in-out, opacity 0.3s ease;
-
   opacity: 1;
-
 }
-
-
 
 /* --------------------------------------------------------------------------
-
    Flashcards (3D Flip Card)
-
    -------------------------------------------------------------------------- */
-
 .flashcard-scene {
-
   perspective: 1000px;
-
   width: 100%;
-
   min-height: 300px;
-
 }
-
-
 
 .flashcard-card {
-
   width: 100%;
-
   height: 100%;
-
   min-height: 300px;
-
   position: relative;
-
   transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
-
   transform-style: preserve-3d;
-
   cursor: pointer;
-
 }
-
-
 
 .flashcard-card.flipped {
-
   transform: rotateY(180deg);
-
 }
-
-
 
 .flashcard-face {
-
   position: absolute;
-
   width: 100%;
-
   height: 100%;
-
   backface-visibility: hidden;
-
   -webkit-backface-visibility: hidden;
-
   border-radius: 24px;
-
   display: flex;
-
   flex-direction: column;
-
   justify-content: space-between;
-
   padding: 1.75rem;
-
 }
-
-
 
 .flashcard-face-back {
-
   transform: rotateY(180deg);
-
 }
-
-
 
 /* --------------------------------------------------------------------------
-
    Tableur de Notes (Grades)
-
    -------------------------------------------------------------------------- */
-
 .grade-table input[type="number"] {
-
   -moz-appearance: textfield;
-
 }
-
 .grade-table input::-webkit-outer-spin-button,
-
 .grade-table input::-webkit-inner-spin-button {
-
   -webkit-appearance: none;
-
   margin: 0;
-
 }
-
-
 
 /* Scrollbars stylisées */
-
 ::-webkit-scrollbar {
-
   width: 6px;
-
   height: 6px;
-
 }
-
 ::-webkit-scrollbar-track {
-
   background: transparent;
-
 }
-
 ::-webkit-scrollbar-thumb {
-
   background: rgba(120, 113, 108, 0.35);
-
   border-radius: 4px;
-
 }
-
 ::-webkit-scrollbar-thumb:hover {
-
   background: rgba(120, 113, 108, 0.65);
-
 }
-
 .dark ::-webkit-scrollbar-thumb {
-
   background: rgba(82, 82, 91, 0.5);
-
 }
-
 .dark ::-webkit-scrollbar-thumb:hover {
-
   background: rgba(82, 82, 91, 0.8);
-
 }
-
-
 
 /* Support KaTeX */
-
 .katex-display {
-
   margin: 0.5em 0 !important;
-
   overflow-x: auto;
-
   overflow-y: hidden;
-
   padding: 2px 0;
-
 }
 
-
-
 /* Modale backdrop */
-
 .modal-backdrop {
-
   background-color: rgba(15, 15, 18, 0.7);
-
   backdrop-filter: blur(8px);
-
 }
