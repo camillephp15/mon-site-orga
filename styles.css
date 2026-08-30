@@ -686,10 +686,19 @@ h1, h2, h3, h4, h5, h6 {
 
 
 
+.event-title {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.25;
+}
+
 .timetable-event.completed .event-title {
-
   text-decoration: line-through;
-
 }
 
 

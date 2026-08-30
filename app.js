@@ -51,57 +51,111 @@
   // PARSEUR ET FORMATTEUR INTELLIGENT DE COURS (Hiérarchie 4 lignes)
   // L1: Matière, L2: Professeur, L3: Horaire, L4: Salle
   // ==========================================================================
-  function parseEventDetails(rawTitle, rawRoom, evTeacher) {
+  function parseEventDetails(rawTitle, rawRoom, evTeacher, rawDescription) {
     let title = (rawTitle || '').trim();
     let teacher = (evTeacher || '').trim();
+    let room = (rawRoom || '').trim();
+    const desc = (rawDescription || '').trim();
+
+    // 1. Extraction du professeur depuis la description (champs ADE/ICS courants)
+    if (!teacher && desc) {
+      const descTeacherMatch = desc.match(/(?:Enseignant|Professeur|Intervenant|Prof|Jury|Responsable)\s*:\s*([^\n\r,;]+)/i);
+      if (descTeacherMatch) {
+        teacher = descTeacherMatch[1].trim();
+      }
+    }
+
+    // 2. Extraction de la salle depuis la description si location vide ou générique
+    const isGenericRoom = (r) => !r || /^(salles?(\s+de\s+cours)?|non\s+pr[ée]cis[ée]e?|inconnue?|[aà]\s+d[ée]finir|salle)$/i.test(r.trim());
+    if (isGenericRoom(room) && desc) {
+      const descRoomMatch = desc.match(/(?:Salle|Lieu|Local|Emplacement)\s*:\s*([^\n\r]+)/i);
+      if (descRoomMatch) {
+        room = descRoomMatch[1].trim();
+      }
+    }
+
     let subject = title;
 
+    // 3. Extraction du professeur depuis le titre (si non encore trouvé)
     if (!teacher) {
-      // Extraire des formats universitaires : [CODE]Matière [TYPE]PROF ou Matière - Prof
-      const typeTeacherMatch = title.match(/^(?:\[[^\]]+\]\s*)?(.+?)(?:\s*\[(CM|TD|TP|DS|Colle|Khôlle|Examen|Partiel|PROJET|CONF|SEMINAIRE)\]|\s*-\s*|\s*:\s*)(.+)$/i);
+      // Format 1 : "[CODE]Matière [CM]NOM PRENOM" ou "Matière [TD] NOM"
+      const typeTeacherMatch = subject.match(/^(?:\[[^\]]+\]\s*)*(.+?)\s*\[(CM|TD|TP|DS|Colle|Khôlle|Examen|Partiel|PROJET|CONF|SEMINAIRE|CONFÉRENCE|SOUTENANCE|COURS)\]\s*(.+)$/i);
       if (typeTeacherMatch) {
         subject = typeTeacherMatch[1].trim();
         teacher = typeTeacherMatch[3].trim();
       } else {
-        const teacherPrefixMatch = title.match(/^(?:\[[^\]]+\]\s*)?(.+?)\s+((?:M\.|Mme|Dr|Prof\.?)\s+[A-ZÀ-ÖØ-öø-ÿ].+)$/i);
-        if (teacherPrefixMatch) {
-          subject = teacherPrefixMatch[1].trim();
-          teacher = teacherPrefixMatch[2].trim();
+        // Format 2 : "Matière - NOM Prénom" ou "Matière : Prof"
+        const dashTeacherMatch = subject.match(/^(?:\[[^\]]+\]\s*)*(.+?)\s+-\s+(.+)$/);
+        if (dashTeacherMatch) {
+          const candidateProf = dashTeacherMatch[2].trim();
+          if (/^(?:salle\s+|amphi\s+|bat\s+|zoom)/i.test(candidateProf) || /^[A-Z0-9]+-\d+/i.test(candidateProf)) {
+            if (isGenericRoom(room)) room = candidateProf;
+            subject = dashTeacherMatch[1].trim();
+          } else {
+            subject = dashTeacherMatch[1].trim();
+            teacher = candidateProf;
+          }
         } else {
-          subject = title.replace(/^\[[^\]]+\]\s*/, '').trim();
+          // Format 3 : "Matière (Prof: Nom Prénom)" ou "Matière (M. Dupont)"
+          const parenTeacherMatch = subject.match(/^(?:\[[^\]]+\]\s*)*(.+?)\s*\((?:Prof\.?|Enseignant)?\s*:?\s*((?:M\.|Mme|Dr|Prof\.?)\s+[A-ZÀ-ÖØ-öø-ÿ\s'-]+|[A-ZÀ-ÖØ-öø-ÿ\s'-]{3,})\)$/i);
+          if (parenTeacherMatch) {
+            subject = parenTeacherMatch[1].trim();
+            teacher = parenTeacherMatch[2].trim();
+          } else {
+            // Format 4 : "Matière M. Dupont"
+            const prefixTeacherMatch = subject.match(/^(?:\[[^\]]+\]\s*)*(.+?)\s+((?:M\.|Mme|Dr|Prof\.?)\s+[A-ZÀ-ÖØ-öø-ÿ\s'-]+)$/i);
+            if (prefixTeacherMatch) {
+              subject = prefixTeacherMatch[1].trim();
+              teacher = prefixTeacherMatch[2].trim();
+            }
+          }
         }
       }
-    } else {
-      subject = title.replace(/^\[[^\]]+\]\s*/, '').trim();
     }
 
-    subject = subject.replace(/\s*\[(CM|TD|TP|DS|Colle|Khôlle|Examen|Partiel|PROJET|CONF)\]\s*$/i, '').trim();
-    if (!subject) subject = rawTitle || 'Cours';
+    // 4. Nettoyage du titre de la matière (suppression des codes type [MESISI...] et balises)
+    subject = subject.replace(/^(?:\[[^\]]+\]\s*)+/, '').trim();
+    subject = subject.replace(/\s*\[(CM|TD|TP|DS|Colle|Khôlle|Examen|Partiel|PROJET|CONF|SEMINAIRE|CONFÉRENCE|SOUTENANCE|COURS)\]\s*/gi, ' ').trim();
+    subject = subject.replace(/\[[A-Z0-9_-]{4,}\]/gi, '').trim();
 
     if (teacher) {
-      teacher = teacher.replace(/\s*\[[^\]]+\]\s*$/, '').trim();
+      const escapedTeacher = teacher.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      subject = subject.replace(new RegExp(`\\s*(?:-|:)?\\s*${escapedTeacher}\\s*$`, 'i'), '').trim();
+    }
+
+    if (!subject) subject = rawTitle || 'Cours';
+
+    // 5. Formatage élégant du nom du professeur
+    if (teacher) {
+      teacher = teacher.replace(/[\[\]\(\)]/g, '').replace(/^(?:Prof\.?|Enseignant|Intervenant)\s*:?\s*/i, '').trim();
       const words = teacher.split(/\s+/);
       const isAllUpper = words.every(w => w === w.toUpperCase() && /[A-Z]/.test(w));
       if (isAllUpper && words.length > 0) {
-        teacher = words.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+        teacher = words.map(w => {
+          if (w.includes('-')) {
+            return w.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join('-');
+          }
+          return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+        }).join(' ');
       }
     }
 
-    let room = (rawRoom || '').trim();
+    // 6. Nettoyage et formatage de la salle
     if (room) {
-      if (/zoom/i.test(room)) {
+      if (isGenericRoom(room)) {
+        room = '';
+      } else if (/zoom/i.test(room)) {
         room = 'ZOOM';
       } else {
         const roomParts = room.split(',').map(part => {
           let p = part.trim();
           p = p.replace(/\s*\(\d+\)\s*/g, '').trim();
-          p = p.replace(/^[A-Z0-9]+[-_]/i, '').trim();
+          p = p.replace(/^(?:MTPL|PARIS|BAT|SALLE|AMP|SITE)[-_]/i, '').trim();
+          p = p.replace(/^salle\s+(\d+[A-Z]?)$/i, '$1').trim();
           return p;
-        }).filter(Boolean);
+        }).filter(p => p && !isGenericRoom(p));
 
-        if (roomParts.length > 0) {
-          room = roomParts.join(', ');
-        }
+        room = roomParts.length > 0 ? roomParts.join(', ') : '';
       }
     }
 
@@ -1400,6 +1454,7 @@
     _processVEvent(raw, calendarId) {
       const summary = (raw['SUMMARY'] || 'Cours').replace(/\\,/g, ',').replace(/\\;/g, ';').trim();
       const location = (raw['LOCATION'] || '').replace(/\\,/g, ',').trim();
+      const description = (raw['DESCRIPTION'] || '').replace(/\\,/g, ',').replace(/\\n/g, '\n').trim();
       const dtStart = raw['DTSTART'];
       const dtEnd = raw['DTEND'];
       if (!dtStart) return null;
@@ -1414,6 +1469,7 @@
       const startTime = `${startHours}:${startMinutes}`;
 
       const { type } = this._detectSubjectInfo(summary, location);
+      const parsed = parseEventDetails(summary, location, '', description);
 
       const daysMap = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
       const dayKey = daysMap[startDate.getDay()];
@@ -1424,12 +1480,13 @@
       resultEvents.push({
         id: 'ics_' + Math.random().toString(36).substring(2, 9) + '_' + Date.now(),
         calendarId: calendarId,
-        title: summary,
+        title: parsed.subject,
+        teacher: parsed.teacher,
+        room: parsed.room,
         date: baseDateStr,
         day: dayKey,
         startTime: startTime,
         duration: durationMin,
-        room: location || 'Salle',
         type: type,
         completed: false
       });
@@ -1447,12 +1504,13 @@
           resultEvents.push({
             id: 'ics_' + Math.random().toString(36).substring(2, 9) + '_' + w,
             calendarId: calendarId,
-            title: summary,
+            title: parsed.subject,
+            teacher: parsed.teacher,
+            room: parsed.room,
             date: this._formatDateYYYYMMDD(nextDate),
             day: dayKey,
             startTime: startTime,
             duration: durationMin,
-            room: location || 'Salle',
             type: type,
             completed: false
           });
@@ -1957,7 +2015,7 @@
           eventEl.style.borderLeftColor = ev.color;
           eventEl.style.color = ev.color;
 
-          const parsed = parseEventDetails(ev.title, ev.room, ev.teacher);
+          const parsed = parseEventDetails(ev.title, ev.room, ev.teacher, ev.description);
 
           const startH = parseInt(ev.startTime.split(':')[0], 10);
           const startM = parseInt(ev.startTime.split(':')[1], 10);
@@ -1970,10 +2028,10 @@
           eventEl.innerHTML = `
             <div class="flex flex-col h-full justify-between overflow-hidden select-none w-full">
               <div class="space-y-0.5 overflow-hidden w-full">
-                <!-- Ligne 1 : Matière -->
-                <div class="flex items-center gap-1.5 min-w-0 w-full">
-                  <span class="event-checkbox ${ev.completed ? 'checked' : ''} flex-shrink-0" title="Cocher le cours"></span>
-                  <span class="event-title font-extrabold truncate text-ink dark:text-zinc-100 text-xs sm:text-[12.5px] leading-tight" title="${parsed.subject}">${parsed.subject}</span>
+                <!-- Ligne 1 : Matière (passe à la ligne proprement si besoin) -->
+                <div class="flex items-start gap-1.5 min-w-0 w-full pointer-events-auto">
+                  <span class="event-checkbox ${ev.completed ? 'checked' : ''} flex-shrink-0 mt-0.5" title="Cocher le cours"></span>
+                  <span class="event-title font-extrabold text-ink dark:text-zinc-100 text-xs sm:text-[12px] leading-snug break-words" title="${parsed.subject}">${parsed.subject}</span>
                 </div>
 
                 <!-- Ligne 2 : Professeur (si présent) -->
