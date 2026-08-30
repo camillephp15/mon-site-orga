@@ -48,6 +48,67 @@
   }
 
   // ==========================================================================
+  // PARSEUR ET FORMATTEUR INTELLIGENT DE COURS (Hiérarchie 4 lignes)
+  // L1: Matière, L2: Professeur, L3: Horaire, L4: Salle
+  // ==========================================================================
+  function parseEventDetails(rawTitle, rawRoom, evTeacher) {
+    let title = (rawTitle || '').trim();
+    let teacher = (evTeacher || '').trim();
+    let subject = title;
+
+    if (!teacher) {
+      // Extraire des formats universitaires : [CODE]Matière [TYPE]PROF ou Matière - Prof
+      const typeTeacherMatch = title.match(/^(?:\[[^\]]+\]\s*)?(.+?)(?:\s*\[(CM|TD|TP|DS|Colle|Khôlle|Examen|Partiel|PROJET|CONF|SEMINAIRE)\]|\s*-\s*|\s*:\s*)(.+)$/i);
+      if (typeTeacherMatch) {
+        subject = typeTeacherMatch[1].trim();
+        teacher = typeTeacherMatch[3].trim();
+      } else {
+        const teacherPrefixMatch = title.match(/^(?:\[[^\]]+\]\s*)?(.+?)\s+((?:M\.|Mme|Dr|Prof\.?)\s+[A-ZÀ-ÖØ-öø-ÿ].+)$/i);
+        if (teacherPrefixMatch) {
+          subject = teacherPrefixMatch[1].trim();
+          teacher = teacherPrefixMatch[2].trim();
+        } else {
+          subject = title.replace(/^\[[^\]]+\]\s*/, '').trim();
+        }
+      }
+    } else {
+      subject = title.replace(/^\[[^\]]+\]\s*/, '').trim();
+    }
+
+    subject = subject.replace(/\s*\[(CM|TD|TP|DS|Colle|Khôlle|Examen|Partiel|PROJET|CONF)\]\s*$/i, '').trim();
+    if (!subject) subject = rawTitle || 'Cours';
+
+    if (teacher) {
+      teacher = teacher.replace(/\s*\[[^\]]+\]\s*$/, '').trim();
+      const words = teacher.split(/\s+/);
+      const isAllUpper = words.every(w => w === w.toUpperCase() && /[A-Z]/.test(w));
+      if (isAllUpper && words.length > 0) {
+        teacher = words.map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+      }
+    }
+
+    let room = (rawRoom || '').trim();
+    if (room) {
+      if (/zoom/i.test(room)) {
+        room = 'ZOOM';
+      } else {
+        const roomParts = room.split(',').map(part => {
+          let p = part.trim();
+          p = p.replace(/\s*\(\d+\)\s*/g, '').trim();
+          p = p.replace(/^[A-Z0-9]+[-_]/i, '').trim();
+          return p;
+        }).filter(Boolean);
+
+        if (roomParts.length > 0) {
+          room = roomParts.join(', ');
+        }
+      }
+    }
+
+    return { subject, teacher, room };
+  }
+
+  // ==========================================================================
   // 3. TOAST NOTIFICATIONS (Succès silencieux pour création/mise à jour)
   // ==========================================================================
   const Toast = {
@@ -1123,6 +1184,11 @@
       this.data.events = this.data.events.filter(e => e.id !== id);
       this.save();
     }
+    deleteEventGroup(groupId) {
+      if (!groupId) return;
+      this.data.events = this.data.events.filter(e => e.groupId !== groupId);
+      this.save();
+    }
     toggleEventCompleted(id) {
       const ev = this.data.events.find(e => e.id === id);
       if (ev) {
@@ -1891,23 +1957,51 @@
           eventEl.style.borderLeftColor = ev.color;
           eventEl.style.color = ev.color;
 
+          const parsed = parseEventDetails(ev.title, ev.room, ev.teacher);
+
           const startH = parseInt(ev.startTime.split(':')[0], 10);
           const startM = parseInt(ev.startTime.split(':')[1], 10);
           const endTotalM = startH * 60 + startM + ev.duration;
           const endH = Math.floor(endTotalM / 60) % 24;
           const endMinStr = String(endTotalM % 60).padStart(2, '0');
-          const endTimeStr = `${String(endH).padStart(2, '0')}:${endMinStr}`;
+          const startFormatted = `${String(startH).padStart(2, '0')}h${startM > 0 ? String(startM).padStart(2, '0') : '00'}`;
+          const endFormatted = `${String(endH).padStart(2, '0')}h${endMinStr !== '00' ? endMinStr : '00'}`;
 
           eventEl.innerHTML = `
-            <div class="flex items-start justify-between gap-1 w-full overflow-hidden">
-              <div class="flex items-center gap-1.5 truncate">
-                <span class="event-checkbox ${ev.completed ? 'checked' : ''}" title="Cocher le cours"></span>
-                <span class="event-title font-extrabold truncate text-ink dark:text-zinc-100">${ev.title}</span>
+            <div class="flex flex-col h-full justify-between overflow-hidden select-none w-full">
+              <div class="space-y-0.5 overflow-hidden w-full">
+                <!-- Ligne 1 : Matière -->
+                <div class="flex items-center gap-1.5 min-w-0 w-full">
+                  <span class="event-checkbox ${ev.completed ? 'checked' : ''} flex-shrink-0" title="Cocher le cours"></span>
+                  <span class="event-title font-extrabold truncate text-ink dark:text-zinc-100 text-xs sm:text-[12.5px] leading-tight" title="${parsed.subject}">${parsed.subject}</span>
+                </div>
+
+                <!-- Ligne 2 : Professeur (si présent) -->
+                ${parsed.teacher ? `
+                  <div class="text-[10.5px] font-semibold text-zinc-600 dark:text-zinc-300 truncate leading-tight flex items-center gap-1 opacity-90 pl-0.5" title="Professeur : ${parsed.teacher}">
+                    <svg class="w-3 h-3 flex-shrink-0 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span class="truncate">${parsed.teacher}</span>
+                  </div>
+                ` : ''}
               </div>
-            </div>
-            <div class="flex items-center justify-between text-[10px] text-zinc-600 dark:text-zinc-300 mt-0.5 font-bold truncate">
-              <span>${ev.startTime} - ${endTimeStr}</span>
-              ${ev.room ? `<span class="truncate ml-1 font-mono px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/15 text-ink dark:text-white">${ev.room}</span>` : ''}
+
+              <div class="space-y-1 mt-auto pt-1 overflow-hidden w-full">
+                <!-- Ligne 3 : Horaire (ex: 13h30-15h00) -->
+                <div class="text-[9.5px] font-bold text-zinc-500 dark:text-zinc-400 font-mono tracking-tight leading-tight flex items-center gap-1">
+                  <svg class="w-2.5 h-2.5 flex-shrink-0 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span>${startFormatted}-${endFormatted}</span>
+                </div>
+
+                <!-- Ligne 4 : Salle (ex: 111, 113 ou ZOOM dans encadré clair) -->
+                ${parsed.room ? `
+                  <div class="flex items-center">
+                    <span class="inline-flex items-center gap-1 text-[9.5px] font-black font-mono px-1.5 py-0.5 rounded-md bg-black/10 dark:bg-white/15 text-ink dark:text-white border border-black/5 dark:border-white/10 truncate max-w-full shadow-xs" title="Salle : ${parsed.room}">
+                      <svg class="w-2.5 h-2.5 flex-shrink-0 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+                      <span class="truncate">${parsed.room}</span>
+                    </span>
+                  </div>
+                ` : ''}
+              </div>
             </div>
           `;
 
@@ -2040,8 +2134,13 @@
       const content = `
         <form id="drawer-course-form" class="space-y-4">
           <div>
-            <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Intitulé du cours / activité *</label>
-            <input type="text" id="dev-title" required placeholder="Ex: Algèbre linéaire" class="custom-input w-full text-xs px-4 py-3 rounded-2xl font-bold">
+            <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Intitulé de la matière *</label>
+            <input type="text" id="dev-title" required placeholder="Ex: Méca. Fluides ou Algèbre linéaire" class="custom-input w-full text-xs px-4 py-3 rounded-2xl font-bold">
+          </div>
+
+          <div>
+            <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Professeur / Enseignant (optionnel)</label>
+            <input type="text" id="dev-teacher" placeholder="Ex: El Eter Ali" class="custom-input w-full text-xs px-4 py-3 rounded-2xl font-bold">
           </div>
 
           <div>
@@ -2080,8 +2179,19 @@
             </div>
             <div>
               <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Salle / Lieu</label>
-              <input type="text" id="dev-room" placeholder="Ex: Amphi Poincaré" class="custom-input w-full text-xs px-4 py-2.5 rounded-2xl">
+              <input type="text" id="dev-room" placeholder="Ex: 111, 113 ou ZOOM" class="custom-input w-full text-xs px-4 py-2.5 rounded-2xl">
             </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Récurrence / Répétition</label>
+            <select id="dev-recurrence" class="custom-select w-full text-xs px-4 py-3 rounded-2xl font-bold">
+              <option value="none">Événement unique (aucune récurrence)</option>
+              <option value="weekly">Toutes les semaines (1 semestre - 16 semaines)</option>
+              <option value="biweekly">Toutes les 2 semaines (8 séances)</option>
+              <option value="daily">Tous les jours (pendant 30 jours)</option>
+              <option value="monthly">Tous les mois (pendant 6 mois)</option>
+            </select>
           </div>
         </form>
       `;
@@ -2098,24 +2208,114 @@
           panelEl.querySelector('#cancel-course-btn').addEventListener('click', () => Drawer.close());
           panelEl.querySelector('#save-course-btn').addEventListener('click', () => {
             const title = panelEl.querySelector('#dev-title').value.trim();
+            const teacher = panelEl.querySelector('#dev-teacher') ? panelEl.querySelector('#dev-teacher').value.trim() : '';
             const dateVal = panelEl.querySelector('#dev-date').value;
             const calendarId = panelEl.querySelector('#dev-calendar').value;
+            const recurrence = panelEl.querySelector('#dev-recurrence') ? panelEl.querySelector('#dev-recurrence').value : 'none';
+            const startTime = panelEl.querySelector('#dev-start').value;
+            const duration = parseInt(panelEl.querySelector('#dev-duration').value, 10);
+            const room = panelEl.querySelector('#dev-room').value.trim();
+
             if (!title || !dateVal) { Toast.warning('Veuillez renseigner le nom et la date.'); return; }
 
             const dObj = new Date(dateVal);
             const daysMap = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
             const dayKey = daysMap[dObj.getDay()];
+            const groupId = recurrence !== 'none' ? ('rec_' + Date.now()) : null;
 
+            // Événement initial
             store.addEvent({
               calendarId,
               title,
+              teacher,
               date: dateVal,
               day: dayKey,
-              startTime: panelEl.querySelector('#dev-start').value,
-              duration: parseInt(panelEl.querySelector('#dev-duration').value, 10),
-              room: panelEl.querySelector('#dev-room').value.trim(),
+              startTime,
+              duration,
+              room,
+              recurrence,
+              groupId,
               completed: false
             });
+
+            // Génération des récurrences
+            if (recurrence === 'weekly') {
+              for (let w = 1; w <= 16; w++) {
+                const nextDate = new Date(dObj.getTime() + w * 7 * 86400000);
+                const nextDateStr = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`;
+                const nextDayKey = daysMap[nextDate.getDay()];
+                store.addEvent({
+                  calendarId,
+                  title,
+                  teacher,
+                  date: nextDateStr,
+                  day: nextDayKey,
+                  startTime,
+                  duration,
+                  room,
+                  recurrence,
+                  groupId,
+                  completed: false
+                });
+              }
+            } else if (recurrence === 'biweekly') {
+              for (let w = 1; w <= 8; w++) {
+                const nextDate = new Date(dObj.getTime() + w * 14 * 86400000);
+                const nextDateStr = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`;
+                const nextDayKey = daysMap[nextDate.getDay()];
+                store.addEvent({
+                  calendarId,
+                  title,
+                  teacher,
+                  date: nextDateStr,
+                  day: nextDayKey,
+                  startTime,
+                  duration,
+                  room,
+                  recurrence,
+                  groupId,
+                  completed: false
+                });
+              }
+            } else if (recurrence === 'daily') {
+              for (let d = 1; d <= 30; d++) {
+                const nextDate = new Date(dObj.getTime() + d * 86400000);
+                const nextDateStr = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`;
+                const nextDayKey = daysMap[nextDate.getDay()];
+                store.addEvent({
+                  calendarId,
+                  title,
+                  teacher,
+                  date: nextDateStr,
+                  day: nextDayKey,
+                  startTime,
+                  duration,
+                  room,
+                  recurrence,
+                  groupId,
+                  completed: false
+                });
+              }
+            } else if (recurrence === 'monthly') {
+              for (let m = 1; m <= 6; m++) {
+                const nextDate = new Date(dObj.getFullYear(), dObj.getMonth() + m, dObj.getDate());
+                const nextDateStr = `${nextDate.getFullYear()}-${String(nextDate.getMonth() + 1).padStart(2, '0')}-${String(nextDate.getDate()).padStart(2, '0')}`;
+                const nextDayKey = daysMap[nextDate.getDay()];
+                store.addEvent({
+                  calendarId,
+                  title,
+                  teacher,
+                  date: nextDateStr,
+                  day: nextDayKey,
+                  startTime,
+                  duration,
+                  room,
+                  recurrence,
+                  groupId,
+                  completed: false
+                });
+              }
+            }
 
             Drawer.close();
             this._renderTimetableEvents();
@@ -2131,8 +2331,13 @@
       const content = `
         <form id="edit-course-form" class="space-y-4">
           <div>
-            <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Intitulé du cours *</label>
+            <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Intitulé de la matière *</label>
             <input type="text" id="ed-title" required value="${event.title}" class="custom-input w-full text-xs px-4 py-3 rounded-2xl font-bold">
+          </div>
+
+          <div>
+            <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Professeur / Enseignant</label>
+            <input type="text" id="ed-teacher" value="${event.teacher || ''}" placeholder="Ex: El Eter Ali" class="custom-input w-full text-xs px-4 py-3 rounded-2xl font-bold">
           </div>
 
           <div>
@@ -2170,8 +2375,8 @@
               </select>
             </div>
             <div>
-              <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Salle</label>
-              <input type="text" id="ed-room" value="${event.room || ''}" placeholder="Ex: Amphi Poincaré" class="custom-input w-full text-xs px-4 py-2.5 rounded-2xl">
+              <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Salle / Lieu</label>
+              <input type="text" id="ed-room" value="${event.room || ''}" placeholder="Ex: 111, 113 ou ZOOM" class="custom-input w-full text-xs px-4 py-2.5 rounded-2xl">
             </div>
           </div>
         </form>
@@ -2191,6 +2396,7 @@
 
           panelEl.querySelector('#update-course-btn').addEventListener('click', () => {
             const title = panelEl.querySelector('#ed-title').value.trim();
+            const teacher = panelEl.querySelector('#ed-teacher') ? panelEl.querySelector('#ed-teacher').value.trim() : '';
             const dateVal = panelEl.querySelector('#ed-date').value;
             const calendarId = panelEl.querySelector('#ed-calendar').value;
             if (!title || !dateVal) { Toast.warning('Veuillez renseigner le titre et la date.'); return; }
@@ -2201,6 +2407,7 @@
 
             store.updateEvent(event.id, {
               title,
+              teacher,
               date: dateVal,
               day: dayKey,
               calendarId,
@@ -2214,11 +2421,19 @@
           });
 
           panelEl.querySelector('#delete-course-btn').addEventListener('click', () => {
-            if (confirm(`Supprimer le cours "${event.title}" ?`)) {
-              store.deleteEvent(event.id);
-              Drawer.close();
-              this._renderTimetableEvents();
+            if (event.groupId) {
+              if (confirm('Voulez-vous supprimer TOUTES les occurrences de cette série récurrente ? (Cliquez sur "Annuler" pour ne supprimer que ce cours précis)')) {
+                store.deleteEventGroup(event.groupId);
+              } else {
+                store.deleteEvent(event.id);
+              }
+            } else {
+              if (confirm(`Supprimer le cours "${event.title}" ?`)) {
+                store.deleteEvent(event.id);
+              }
             }
+            Drawer.close();
+            this._renderTimetableEvents();
           });
         }
       });
