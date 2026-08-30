@@ -7389,7 +7389,7 @@
       "duration": 90,
       "room": "NCHA  - Salles de cours,ZOOM",
       "type": "course",
-      "completed": true
+      "completed": false
     },
     {
       "id": "ics_d4g4zig_1787759806947",
