@@ -247,15 +247,7 @@
       CustomDropdown._openInstance = wrapper;
 
       const list = wrapper.querySelector('.custom-dropdown-list');
-      const rect = wrapper.getBoundingClientRect();
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const spaceAbove = rect.top;
-      const optionCount = list ? list.querySelectorAll('.custom-dropdown-option').length : 5;
-      const listHeight = Math.min(optionCount * 44, 300);
-
-      if (spaceBelow < listHeight && spaceAbove > listHeight) {
-        list.classList.add('dropup');
-      } else {
+      if (list) {
         list.classList.remove('dropup');
       }
 
@@ -383,9 +375,9 @@
         overflow: hidden;
       }
       .dark .custom-dropdown-trigger {
-        background-color: #0a0a0d;
-        border-color: #272730;
-        color: #fdfdfd;
+        background-color: #0d0d11 !important;
+        border-color: #272730 !important;
+        color: #fdfdfd !important;
       }
       .custom-dropdown-wrapper:focus .custom-dropdown-trigger,
       .custom-dropdown-wrapper.open .custom-dropdown-trigger {
@@ -415,10 +407,11 @@
       }
       .custom-dropdown-list {
         position: absolute;
-        top: calc(100% + 6px);
+        top: calc(100% + 6px) !important;
+        bottom: auto !important;
         left: 0;
         right: 0;
-        z-index: 9999;
+        z-index: 99999;
         background-color: #ffffff;
         border: 1.5px solid #ded4c1;
         border-radius: 18px;
@@ -432,19 +425,15 @@
         overflow-y: auto;
       }
       .dark .custom-dropdown-list {
-        background-color: #16161b;
-        border-color: #272730;
-        box-shadow: 0 16px 40px -8px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3);
+        background-color: #111116 !important;
+        border-color: #272730 !important;
+        box-shadow: 0 16px 40px -8px rgba(0,0,0,0.6), 0 4px 12px rgba(0,0,0,0.4);
       }
       .custom-dropdown-wrapper.open .custom-dropdown-list {
-        max-height: 300px;
+        max-height: 280px;
         opacity: 1;
         pointer-events: all;
         transform: translateY(0) scale(1);
-      }
-      .custom-dropdown-list.dropup {
-        top: auto;
-        bottom: calc(100% + 6px);
       }
       .custom-dropdown-list::-webkit-scrollbar { width: 5px; }
       .custom-dropdown-list::-webkit-scrollbar-track { background: transparent; }
@@ -460,7 +449,7 @@
         cursor: pointer;
         transition: background-color 0.14s ease, color 0.14s ease;
       }
-      .dark .custom-dropdown-option { color: #e4e4e7; }
+      .dark .custom-dropdown-option { color: #f4f4f5; }
       .custom-dropdown-option:hover, .custom-dropdown-option.hovered {
         background-color: rgba(255, 51, 102, 0.08);
         color: #ff3366;
@@ -1715,12 +1704,13 @@
                 <button data-filter="active" class="todo-filter-btn px-3 py-1.5 rounded-xl text-xs font-black transition-all ${this.todoFilter === 'active' ? 'bg-solaire-500 text-white shadow-xs' : 'bg-creme-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-ink'}">À faire</button>
                 <button data-filter="completed" class="todo-filter-btn px-3 py-1.5 rounded-xl text-xs font-black transition-all ${this.todoFilter === 'completed' ? 'bg-emerald-500 text-white shadow-xs' : 'bg-creme-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-ink'}">Faites</button>
                 
-                <div class="w-44 inline-block">
+                <div class="w-48 inline-block">
                   <select id="todo-category-filter-select" class="custom-select text-xs font-black">
                     <option value="all_categories" ${!availableTags.includes(this.todoFilter) ? 'selected' : ''}>Catégories...</option>
-                    ${availableTags.map(tag => `
-                      <option value="${tag}" ${this.todoFilter === tag ? 'selected' : ''}>${tag}</option>
-                    `).join('')}
+                    ${availableTags.map(tag => {
+                      const cat = getCategoryColor(tag);
+                      return `<option value="${tag}" data-color="${cat.hex}" ${this.todoFilter === tag ? 'selected' : ''}>${tag}</option>`;
+                    }).join('')}
                   </select>
                 </div>
               </div>
