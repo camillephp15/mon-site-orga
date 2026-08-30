@@ -1950,7 +1950,8 @@
           this.render(container);
         });
       });
-    };
+    }
+  };
 
   // ==========================================================================
   // 10. VUE MATIÈRES (STICKER MARGUERITE ROSE & ACCORDÉONS)
