@@ -7310,14 +7310,15 @@
     {
       "id": "ics_dxvye8e_1787759806947",
       "calendarId": "cal_1787759806939",
-      "title": "[RESA_RENTREE]Réservation - Rentrée [NR]FRANKART Cécile",
+      "title": "[RESA_RENTREE]Réservation - Rentrée [NR]",
       "date": "2026-09-01",
       "day": "tue",
       "startTime": "13:30",
       "duration": 90,
       "room": "MTPL-113 (39),MTPL-111 (39)",
       "type": "tp",
-      "completed": false
+      "completed": false,
+      "teacher": "FRANKART Cécile"
     },
     {
       "id": "ics_r1697nq_1787759806947",
