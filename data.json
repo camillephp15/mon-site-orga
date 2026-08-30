@@ -10984,7 +10984,7 @@
       {
         "id": "maths_ch_1787766631685",
         "title": "améliorations site",
-        "exosTodo": "- ajouter possibilité récurrence tous les jours, mois ...",
+        "exosTodo": "- ajouter possibilité récurrence tous les jours, mois ...\n- mettre les cours dans l'edt princ sous forme : \nmatière\nprof \nhoraire\nsalle ",
         "exosHard": "",
         "methods": ""
       }
