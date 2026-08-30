@@ -1975,6 +1975,7 @@
     },
 
     // GLISSER-DÉPOSER FLUIDE SUR L'EDT (Desktop drag + Mobile touch hold 2s)
+    // INTERACTIVITÉ GLISSER/ÉTIRER SUR LA GRILLE (Ancien style propre avec encadré pointillé)
     _initDragToCreateEvents(container) {
       const HOUR_HEIGHT = 56;
       const START_HOUR = 5;
@@ -2003,16 +2004,19 @@
           return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
         };
 
-        // --- 1. SOURIS SUR PC : Encadré rose pointillé temps réel ---
-        col.addEventListener('mousedown', (e) => {
+        let startY = 0;
+        let startMin = 0;
+        let isDragging = false;
+        let selectionEl = null;
+
+        const startSelection = (e) => {
           if (e.target.closest('.timetable-event')) return;
-          if (e.button !== 0) return;
 
-          const startY = getYFromEvent(e);
-          const startMin = yToMinutes(startY);
-          let isDragging = true;
+          startY = getYFromEvent(e);
+          startMin = yToMinutes(startY);
+          isDragging = true;
 
-          const selectionEl = document.createElement('div');
+          selectionEl = document.createElement('div');
           selectionEl.className = 'timetable-drag-selection';
           selectionEl.style.top = `${((startMin - (START_HOUR * 60)) / 60) * HOUR_HEIGHT}px`;
           selectionEl.style.height = `20px`;
@@ -2020,7 +2024,7 @@
           col.appendChild(selectionEl);
 
           const moveHandler = (ev) => {
-            if (!isDragging) return;
+            if (!isDragging || !selectionEl) return;
             const currentY = getYFromEvent(ev);
             const currentMin = yToMinutes(currentY);
 
@@ -2028,15 +2032,18 @@
             const eMin = Math.max(startMin, currentMin) + 15;
             const duration = eMin - sMin;
 
-            selectionEl.style.top = `${((sMin - (START_HOUR * 60)) / 60) * HOUR_HEIGHT}px`;
-            selectionEl.style.height = `${Math.max(24, (duration / 60) * HOUR_HEIGHT)}px`;
+            const topPx = ((sMin - (START_HOUR * 60)) / 60) * HOUR_HEIGHT;
+            const heightPx = Math.max(24, (duration / 60) * HOUR_HEIGHT);
 
-            const durH = Math.floor(duration / 60);
-            const durM = duration % 60;
-            const durLbl = durH > 0 ? `${durH}h${durM > 0 ? String(durM).padStart(2, '0') : ''}` : `${durM}min`;
+            selectionEl.style.top = `${topPx}px`;
+            selectionEl.style.height = `${heightPx}px`;
+
+            const durHours = Math.floor(duration / 60);
+            const durMins = duration % 60;
+            const durLabel = durHours > 0 ? `${durHours}h${durMins > 0 ? String(durMins).padStart(2, '0') : ''}` : `${durMins}min`;
 
             selectionEl.innerHTML = `
-              <span class="timetable-drag-badge">${formatMinToTime(sMin)} - ${formatMinToTime(eMin)} (${durLbl})</span>
+              <span class="timetable-drag-badge">${formatMinToTime(sMin)} - ${formatMinToTime(eMin)} (${durLabel})</span>
               <span class="text-[9px] font-bold text-solaire-700 dark:text-solaire-300 self-end opacity-90 select-none">Relâcher pour créer</span>
             `;
           };
@@ -2046,16 +2053,22 @@
             isDragging = false;
             window.removeEventListener('mousemove', moveHandler);
             window.removeEventListener('mouseup', upHandler);
+            window.removeEventListener('touchmove', moveHandler);
+            window.removeEventListener('touchend', upHandler);
 
             const currentY = getYFromEvent(ev);
             const currentMin = yToMinutes(currentY);
+
             const sMin = Math.min(startMin, currentMin);
             const eMin = Math.max(startMin, currentMin) + (Math.abs(currentMin - startMin) < 15 ? 120 : 15);
             const duration = Math.max(30, eMin - sMin);
 
-            selectionEl.remove();
+            if (selectionEl) {
+              selectionEl.remove();
+              selectionEl = null;
+            }
 
-            DashboardView._openCourseDrawer({
+            this._openCourseDrawer({
               date: dateStr,
               startTime: formatMinToTime(sMin),
               duration: duration
@@ -2064,97 +2077,12 @@
 
           window.addEventListener('mousemove', moveHandler);
           window.addEventListener('mouseup', upHandler);
-        });
+          window.addEventListener('touchmove', moveHandler, { passive: true });
+          window.addEventListener('touchend', upHandler);
+        };
 
-        // --- 2. TACTILE SUR MOBILE : Scroll fluide & appui long 2 secondes ---
-        let touchTimer = null;
-        let touchStartPos = { x: 0, y: 0 };
-        let isLongPressed = false;
-        let touchSelectionEl = null;
-        let touchStartMin = 0;
-
-        col.addEventListener('touchstart', (e) => {
-          if (e.target.closest('.timetable-event')) return;
-          if (e.touches.length > 1) return;
-
-          const touch = e.touches[0];
-          touchStartPos = { x: touch.clientX, y: touch.clientY };
-          isLongPressed = false;
-
-          touchTimer = setTimeout(() => {
-            isLongPressed = true;
-            if (navigator.vibrate) navigator.vibrate(60);
-
-            const startY = getYFromEvent(e);
-            touchStartMin = yToMinutes(startY);
-
-            touchSelectionEl = document.createElement('div');
-            touchSelectionEl.className = 'timetable-drag-selection touch-hold-indicator';
-            touchSelectionEl.style.top = `${((touchStartMin - (START_HOUR * 60)) / 60) * HOUR_HEIGHT}px`;
-            touchSelectionEl.style.height = `28px`;
-            touchSelectionEl.innerHTML = `<span class="timetable-drag-badge">${formatMinToTime(touchStartMin)} (Glissez pour étirer)</span>`;
-            col.appendChild(touchSelectionEl);
-          }, 2000);
-        }, { passive: true });
-
-        col.addEventListener('touchmove', (e) => {
-          const touch = e.touches[0];
-          const dist = Math.hypot(touch.clientX - touchStartPos.x, touch.clientY - touchStartPos.y);
-
-          if (!isLongPressed) {
-            if (dist > 10 && touchTimer) {
-              clearTimeout(touchTimer);
-              touchTimer = null;
-            }
-            return;
-          }
-
-          e.preventDefault();
-          const currentY = getYFromEvent(e);
-          const currentMin = yToMinutes(currentY);
-
-          const sMin = Math.min(touchStartMin, currentMin);
-          const eMin = Math.max(touchStartMin, currentMin) + 15;
-          const duration = eMin - sMin;
-
-          touchSelectionEl.style.top = `${((sMin - (START_HOUR * 60)) / 60) * HOUR_HEIGHT}px`;
-          touchSelectionEl.style.height = `${Math.max(28, (duration / 60) * HOUR_HEIGHT)}px`;
-
-          const durH = Math.floor(duration / 60);
-          const durM = duration % 60;
-          const durLbl = durH > 0 ? `${durH}h${durM > 0 ? String(durM).padStart(2, '0') : ''}` : `${durM}min`;
-
-          touchSelectionEl.innerHTML = `
-            <span class="timetable-drag-badge">${formatMinToTime(sMin)} - ${formatMinToTime(eMin)} (${durLbl})</span>
-            <span class="text-[9px] font-bold text-solaire-700 dark:text-solaire-300 self-end opacity-90 select-none">Relâchez pour créer</span>
-          `;
-        }, { passive: false });
-
-        col.addEventListener('touchend', (e) => {
-          if (touchTimer) {
-            clearTimeout(touchTimer);
-            touchTimer = null;
-          }
-
-          if (isLongPressed && touchSelectionEl) {
-            isLongPressed = false;
-            const topPx = parseFloat(touchSelectionEl.style.top);
-            const heightPx = parseFloat(touchSelectionEl.style.height);
-
-            const sMin = Math.round(((topPx / HOUR_HEIGHT) * 60) + (START_HOUR * 60));
-            const duration = Math.max(30, Math.round((heightPx / HOUR_HEIGHT) * 60));
-
-            touchSelectionEl.remove();
-            touchSelectionEl = null;
-
-            DashboardView._openCourseDrawer({
-              date: dateStr,
-              startTime: formatMinToTime(sMin),
-              duration: duration
-            });
-          }
-        });
-
+        col.addEventListener('mousedown', startSelection);
+        col.addEventListener('touchstart', startSelection, { passive: true });
       });
     },
 
