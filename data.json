@@ -10928,7 +10928,7 @@
     {
       "id": "td_1787766348881",
       "text": "changer : taille calendrier",
-      "completed": false,
+      "completed": true,
       "priority": "normal",
       "tag": "Maths",
       "createdAt": "2026-08-26T17:45:48.881Z"
