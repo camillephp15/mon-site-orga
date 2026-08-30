@@ -7346,14 +7346,15 @@
     {
       "id": "ics_rn3jptz_1787759806947",
       "calendarId": "cal_1787759806939",
-      "title": "[MMIAIT--0126]Atelier Outils digitaux [CMo]",
+      "title": "Atelier Outils digitaux",
       "date": "2026-09-02",
       "day": "wed",
       "startTime": "17:00",
       "duration": 90,
       "room": "ZOOM",
       "type": "course",
-      "completed": false
+      "completed": false,
+      "teacher": ""
     },
     {
       "id": "ics_8zqm9n9_1787759806947",
