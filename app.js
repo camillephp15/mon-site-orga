@@ -1462,8 +1462,7 @@
       }
     }
   };
-
-  // ==========================================================================
+// ==========================================================================
   // 9. VUE ACCUEIL / DASHBOARD (EDT À GAUCHE, CALENDRIER À DROITE, TO-DO EN DESSOUS)
   // ==========================================================================
   const DashboardView = {
@@ -1527,6 +1526,8 @@
       }
 
       const dailyTodos = store.getDailyTodos();
+      const availableTags = ['Maths', 'Physique', 'Info', 'Autres cours', 'Maison', 'Sport'];
+      
       const filteredTodos = dailyTodos.filter(t => {
         if (this.todoFilter === 'active') return !t.completed;
         if (this.todoFilter === 'completed') return t.completed;
@@ -1535,7 +1536,6 @@
       });
       const completedTodosCount = dailyTodos.filter(t => t.completed).length;
       const progressPercent = dailyTodos.length > 0 ? Math.round((completedTodosCount / dailyTodos.length) * 100) : 0;
-      const availableTags = ['Maths', 'Physique', 'Info', 'Autres cours', 'Maison', 'Sport'];
 
       container.innerHTML = `
         <div class="space-y-6 flex-1 flex flex-col">
@@ -1543,7 +1543,7 @@
           <!-- HAUT : GRILLE 2 COLONNES (EDT À GAUCHE + MINI-CALENDRIER À DROITE) -->
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             
-            <!-- COLONNE GAUCHE (EDT) : lg:col-span-8 xl:col-span-9 -->
+            <!-- COLONNE GAUCHE (EDT) -->
             <div class="lg:col-span-8 xl:col-span-9 space-y-3.5 flex flex-col">
               
               <!-- Barre de navigation semaine de l'EDT -->
@@ -1579,32 +1579,31 @@
                 </div>
               </div>
 
-              <!-- Sélecteur de vue mobile (1j, 2j, 3j, 4j, 5j, 7j) -->
+              <!-- Sélecteur de vue mobile -->
               <div class="lg:hidden space-y-2.5">
                 <div class="bg-white dark:bg-ink-darkcard p-2.5 rounded-2xl border border-creme-300 dark:border-ink-border shadow-sm flex items-center justify-between gap-2.5">
                   <div class="flex items-center gap-2 flex-1 min-w-0">
                     <span class="text-[10px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest flex-shrink-0">Vue</span>
                     <select id="mobile-view-select" class="custom-select w-full text-xs px-3 py-2 rounded-xl font-black">
-                      <option value="1" ${this.mobileViewDays === 1 ? 'selected' : ''}>1 jour (Vue quotidienne)</option>
+                      <option value="1" ${this.mobileViewDays === 1 ? 'selected' : ''}>1 jour</option>
                       <option value="2" ${this.mobileViewDays === 2 ? 'selected' : ''}>2 jours</option>
                       <option value="3" ${this.mobileViewDays === 3 ? 'selected' : ''}>3 jours</option>
                       <option value="4" ${this.mobileViewDays === 4 ? 'selected' : ''}>4 jours</option>
-                      <option value="5" ${this.mobileViewDays === 5 ? 'selected' : ''}>5 jours (Semaine cours)</option>
-                      <option value="7" ${this.mobileViewDays === 7 ? 'selected' : ''}>7 jours (Semaine complète)</option>
+                      <option value="5" ${this.mobileViewDays === 5 ? 'selected' : ''}>5 jours</option>
+                      <option value="7" ${this.mobileViewDays === 7 ? 'selected' : ''}>7 jours</option>
                     </select>
                   </div>
                   <div class="flex items-center gap-1 pl-2 border-l border-creme-200 dark:border-zinc-700 flex-shrink-0">
-                    <button id="mobile-prev-btn" title="Jours précédents" class="p-2 rounded-xl hover:bg-creme-200 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 transition-all">
+                    <button id="mobile-prev-btn" title="Jours précédents" class="p-2 rounded-xl hover:bg-creme-200 dark:hover:bg-zinc-800 text-zinc-500 transition-all">
                       <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                     </button>
-                    <button id="mobile-today-btn" class="px-2.5 py-1.5 rounded-xl text-xs font-black text-solaire-600 dark:text-solaire-400 bg-solaire-500/10 hover:bg-solaire-500/20 transition-all">Auj.</button>
-                    <button id="mobile-next-btn" title="Jours suivants" class="p-2 rounded-xl hover:bg-creme-200 dark:hover:bg-zinc-800 text-zinc-500 dark:text-zinc-400 transition-all">
+                    <button id="mobile-today-btn" class="px-2.5 py-1.5 rounded-xl text-xs font-black text-solaire-600 dark:text-solaire-400 bg-solaire-500/10 transition-all">Auj.</button>
+                    <button id="mobile-next-btn" title="Jours suivants" class="p-2 rounded-xl hover:bg-creme-200 dark:hover:bg-zinc-800 text-zinc-500 transition-all">
                       <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                     </button>
                   </div>
                 </div>
 
-                <!-- En-têtes des jours visibles dans la vue mobile -->
                 <div class="bg-white dark:bg-ink-darkcard px-2 py-1.5 rounded-2xl border border-creme-300 dark:border-ink-border shadow-sm grid" style="grid-template-columns: repeat(${Math.min(this.mobileViewDays, weekDays.slice(this.activeDayMobileIndex).length)}, 1fr)">
                   ${weekDays.slice(this.activeDayMobileIndex, this.activeDayMobileIndex + this.mobileViewDays).map(d => {
                     const isToday = d.dateStr === todayStr;
@@ -1618,12 +1617,9 @@
 
               <!-- Grille de l'Emploi du Temps -->
               <div class="bg-white dark:bg-ink-darkcard rounded-3xl border border-creme-300 dark:border-ink-border shadow-sm overflow-hidden flex flex-col min-h-[580px]">
-                
-                <!-- En-têtes des colonnes Desktop -->
                 <div class="hidden lg:grid border-b border-creme-200 dark:border-ink-border bg-creme-100/70 dark:bg-ink-darkbg/70 text-xs font-extrabold text-ink dark:text-zinc-300 select-none flex-shrink-0"
                      style="grid-template-columns: 54px repeat(7, 1fr);">
                   <div class="py-2.5 text-center text-zinc-400 text-[11px] border-r border-creme-200 dark:border-ink-border font-mono">Heure</div>
-                  
                   ${weekDays.map(d => {
                     const isToday = d.dateStr === todayStr;
                     return `
@@ -1635,11 +1631,8 @@
                   }).join('')}
                 </div>
 
-                <!-- Grille horaire 5h00 - 00h00 -->
                 <div class="relative overflow-y-auto flex-1 timetable-grid" id="timetable-scroll-area" style="min-height: 520px;">
-                  <!-- Desktop : 7 colonnes fixes -->
-                  <div class="hidden lg:grid relative" style="grid-template-columns: 54px repeat(7, 1fr); height: calc(19 * var(--hour-height));">
-                    
+                  <div class="hidden lg:grid relative" style="grid-template-columns: 54px repeat(7, 1fr); height: 1064px;">
                     <div class="relative border-r border-creme-200 dark:border-ink-border select-none text-[11px] text-zinc-400 font-mono text-center">
                       ${Array.from({ length: 19 }, (_, i) => i + 5).map(hour => `
                         <div class="absolute left-0 right-0 flex items-center justify-center -translate-y-2.5" style="top: ${(hour - 5) * 56}px;">
@@ -1647,17 +1640,13 @@
                         </div>
                       `).join('')}
                     </div>
-
                     ${weekDays.map(d => `
                       <div data-col-datestr="${d.dateStr}" class="timetable-column relative border-r border-creme-200/60 dark:border-ink-border/60 last:border-r-0 ${d.dateStr === todayStr ? 'bg-solaire-500/[0.03]' : ''}"></div>
                     `).join('')}
-
                     <div id="current-time-indicator" class="current-time-line hidden"></div>
                   </div>
 
-                  <!-- Mobile : N colonnes selon mobileViewDays -->
-                  <div class="lg:hidden relative" id="mobile-timetable-grid" style="grid-template-columns: 48px repeat(${this.mobileViewDays}, 1fr); height: calc(19 * var(--hour-height)); display: grid;">
-                    
+                  <div class="lg:hidden relative" id="mobile-timetable-grid" style="grid-template-columns: 48px repeat(${this.mobileViewDays}, 1fr); height: 1064px; display: grid;">
                     <div class="relative border-r border-creme-200 dark:border-ink-border select-none text-[11px] text-zinc-400 font-mono text-center">
                       ${Array.from({ length: 19 }, (_, i) => i + 5).map(hour => `
                         <div class="absolute left-0 right-0 flex items-center justify-center -translate-y-2.5" style="top: ${(hour - 5) * 56}px;">
@@ -1665,23 +1654,17 @@
                         </div>
                       `).join('')}
                     </div>
-
                     ${weekDays.slice(this.activeDayMobileIndex, this.activeDayMobileIndex + this.mobileViewDays).map(d => `
                       <div data-col-datestr="${d.dateStr}" class="timetable-column relative border-r border-creme-200/60 dark:border-ink-border/60 last:border-r-0 ${d.dateStr === todayStr ? 'bg-solaire-500/[0.03]' : ''}"></div>
                     `).join('')}
-
                     <div id="current-time-indicator-mobile" class="current-time-line hidden"></div>
                   </div>
                 </div>
-
               </div>
-
             </div>
 
-            <!-- COLONNE DROITE (CALENDRIER MENSUEL & ÉVÉNEMENTS) : lg:col-span-4 xl:col-span-3 -->
+            <!-- COLONNE DROITE (CALENDRIER MENSUEL & ÉVÉNEMENTS) -->
             <div class="lg:col-span-4 xl:col-span-3 space-y-4">
-              
-              <!-- Mini-Calendrier Mensuel -->
               <div class="bg-white dark:bg-ink-darkcard rounded-3xl border border-creme-300 dark:border-ink-border shadow-sm p-5 space-y-4">
                 <div class="flex items-center justify-between">
                   <h3 class="text-xs font-black text-ink dark:text-white uppercase tracking-wider flex items-center gap-1.5" id="mini-cal-title">Août 2026</h3>
@@ -1691,15 +1674,12 @@
                     <button id="mini-cal-next" class="p-1.5 rounded-xl hover:bg-creme-200 dark:hover:bg-zinc-800 text-zinc-500"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
                   </div>
                 </div>
-
                 <div class="grid grid-cols-7 text-center text-[10px] font-black text-zinc-400">
                   <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
                 </div>
-
                 <div id="mini-cal-grid" class="grid grid-cols-7 gap-1.5"></div>
               </div>
 
-              <!-- Événements personnels manuels -->
               <div class="bg-white dark:bg-ink-darkcard rounded-3xl border border-creme-300 dark:border-ink-border shadow-sm p-5 space-y-3.5">
                 <div class="flex items-center justify-between">
                   <h3 class="text-xs font-black text-ink dark:text-white uppercase tracking-wider flex items-center gap-1.5">
@@ -1711,17 +1691,13 @@
                     <span>Ajouter</span>
                   </button>
                 </div>
-
                 <div id="important-dates-list" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
               </div>
-
             </div>
-
           </div>
 
-          <!-- BAS : TO-DO LIST DU JOUR (PLEINE LARGEUR ET EN DESSOUS) -->
+          <!-- BAS : TO-DO LIST DU JOUR (AVEC LE MENU DÉROULANT DES CATÉGORIES) -->
           <div class="bg-white dark:bg-ink-darkcard rounded-3xl border border-creme-300 dark:border-ink-border shadow-sm p-6 sm:p-7 space-y-6">
-            
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-creme-200 dark:border-ink-border">
               <div class="flex items-center gap-3.5">
                 <div class="p-2.5 rounded-2xl bg-emerald-500/10 text-emerald-500">
@@ -1733,22 +1709,26 @@
                 </div>
               </div>
 
-              <div class="flex items-center gap-1.5 flex-wrap">
+              <!-- FILTRES SIMPLIFIÉS + MENU DÉROULANT DES CATÉGORIES -->
+              <div class="flex items-center gap-2 flex-wrap">
                 <button data-filter="all" class="todo-filter-btn px-3 py-1.5 rounded-xl text-xs font-black transition-all ${this.todoFilter === 'all' ? 'bg-ink text-white dark:bg-white dark:text-ink shadow-xs' : 'bg-creme-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-ink'}">Toutes</button>
                 <button data-filter="active" class="todo-filter-btn px-3 py-1.5 rounded-xl text-xs font-black transition-all ${this.todoFilter === 'active' ? 'bg-solaire-500 text-white shadow-xs' : 'bg-creme-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-ink'}">À faire</button>
                 <button data-filter="completed" class="todo-filter-btn px-3 py-1.5 rounded-xl text-xs font-black transition-all ${this.todoFilter === 'completed' ? 'bg-emerald-500 text-white shadow-xs' : 'bg-creme-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-ink'}">Faites</button>
                 
-                ${availableTags.map(tag => `
-                  <button data-filter="${tag}" class="todo-filter-btn hidden sm:inline-block px-3 py-1.5 rounded-xl text-xs font-black transition-all ${this.todoFilter === tag ? 'bg-orangePop-500 text-white shadow-xs' : 'bg-creme-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-ink'}">${tag}</button>
-                `).join('')}
+                <div class="w-44 inline-block">
+                  <select id="todo-category-filter-select" class="custom-select text-xs font-black">
+                    <option value="all_categories" ${!availableTags.includes(this.todoFilter) ? 'selected' : ''}>Catégories...</option>
+                    ${availableTags.map(tag => `
+                      <option value="${tag}" ${this.todoFilter === tag ? 'selected' : ''}>${tag}</option>
+                    `).join('')}
+                  </select>
+                </div>
               </div>
             </div>
 
-            <!-- Formulaire d'ajout rapide avec sélection de catégorie -->
             <form id="add-daily-todo-form" class="p-4 sm:p-5 rounded-2xl bg-creme-100/80 dark:bg-ink-darkbg/80 border border-creme-300 dark:border-zinc-800 space-y-3.5">
               <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <input type="text" id="daily-todo-text" required placeholder="Ajouter une tâche pour aujourd'hui (Entrée)..." class="custom-input flex-1 text-xs px-4 py-3 rounded-2xl bg-white dark:bg-ink-darkcard border border-creme-300 dark:border-zinc-700 font-bold text-ink dark:text-white shadow-2xs">
-                
+                <input type="text" id="daily-todo-text" required placeholder="Ajouter une tâche pour aujourd'hui (Entrée)..." class="custom-input flex-1 text-xs px-4 py-3 rounded-2xl font-bold">
                 <button type="submit" class="px-6 py-3 bg-solaire-500 hover:bg-solaire-600 text-white rounded-2xl text-xs font-black shadow-md shadow-solaire-500/25 transition-all flex items-center justify-center gap-2 flex-shrink-0">
                   <i data-lucide="plus" class="w-4 h-4"></i>
                   <span>Ajouter la tâche</span>
@@ -1769,7 +1749,6 @@
               </div>
             </form>
 
-            <!-- Liste des tâches de la journée -->
             <div id="daily-todos-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
               ${filteredTodos.length === 0 ? `
                 <div class="col-span-full p-8 text-center bg-creme-100/50 dark:bg-ink-darkbg/50 rounded-2xl border border-dashed border-creme-300 dark:border-zinc-800">
@@ -1801,10 +1780,7 @@
       `;
 
       if (window.lucide) window.lucide.createIcons();
-
-      // Initialiser les CustomDropdowns sur le conteneur principal
       CustomDropdown._autoInitPanel(container);
-
       this._bindEvents(container);
       this._renderTimetableEvents();
       this._initDragToCreateEvents(container);
@@ -1823,267 +1799,6 @@
           });
         }
       }
-    },
-
-    _bindEvents(container) {
-      container.querySelector('#week-prev-btn').addEventListener('click', () => {
-        const d = new Date(this.activeMonday);
-        d.setDate(d.getDate() - 7);
-        this.activeMonday = d;
-        this.render(container);
-      });
-
-      container.querySelector('#week-next-btn').addEventListener('click', () => {
-        const d = new Date(this.activeMonday);
-        d.setDate(d.getDate() + 7);
-        this.activeMonday = d;
-        this.render(container);
-      });
-
-      container.querySelector('#week-today-btn').addEventListener('click', () => {
-        this.activeMonday = getMondayOfDate(new Date());
-        this.render(container);
-      });
-
-      // Sélecteur déroulant de vue mobile (1, 2, 3, 4, 5, 7 jours)
-      const mobileViewSelect = container.querySelector('#mobile-view-select');
-      if (mobileViewSelect) {
-        mobileViewSelect.addEventListener('change', () => {
-          this.mobileViewDays = parseInt(mobileViewSelect.value, 10);
-          const weekDays = this._getWeekDates(this.activeMonday);
-          this.activeDayMobileIndex = Math.min(this.activeDayMobileIndex, Math.max(0, weekDays.length - this.mobileViewDays));
-          this.render(container);
-        });
-      }
-
-      const mobilePrevBtn = container.querySelector('#mobile-prev-btn');
-      const mobileNextBtn = container.querySelector('#mobile-next-btn');
-      const mobileTodayBtn = container.querySelector('#mobile-today-btn');
-
-      if (mobilePrevBtn) {
-        mobilePrevBtn.addEventListener('click', () => {
-          const weekDays = this._getWeekDates(this.activeMonday);
-          const step = this.mobileViewDays;
-          const newIdx = this.activeDayMobileIndex - step;
-          if (newIdx >= 0) {
-            this.activeDayMobileIndex = newIdx;
-            this.render(container);
-          } else {
-            const d = new Date(this.activeMonday);
-            d.setDate(d.getDate() - 7);
-            this.activeMonday = d;
-            this.activeDayMobileIndex = Math.max(0, 7 - step);
-            this.render(container);
-          }
-        });
-      }
-
-      if (mobileNextBtn) {
-        mobileNextBtn.addEventListener('click', () => {
-          const weekDays = this._getWeekDates(this.activeMonday);
-          const step = this.mobileViewDays;
-          const newIdx = this.activeDayMobileIndex + step;
-          if (newIdx + this.mobileViewDays <= weekDays.length) {
-            this.activeDayMobileIndex = newIdx;
-            this.render(container);
-          } else {
-            const d = new Date(this.activeMonday);
-            d.setDate(d.getDate() + 7);
-            this.activeMonday = d;
-            this.activeDayMobileIndex = 0;
-            this.render(container);
-          }
-        });
-      }
-
-      if (mobileTodayBtn) {
-        mobileTodayBtn.addEventListener('click', () => {
-          this.activeMonday = getMondayOfDate(new Date());
-          const todayStr = new Date().toISOString().split('T')[0];
-          const weekDays = this._getWeekDates(this.activeMonday);
-          const idx = weekDays.findIndex(w => w.dateStr === todayStr);
-          this.activeDayMobileIndex = idx !== -1 ? idx : 0;
-          this.render(container);
-        });
-      }
-
-      container.querySelector('#add-event-btn').addEventListener('click', () => this._openCourseDrawer());
-      container.querySelector('#manage-calendars-btn').addEventListener('click', () => this._openManageCalendarsDrawer(container));
-      container.querySelector('#add-important-date-btn').addEventListener('click', () => this._openAddImportantDateDrawer(container));
-
-      container.querySelector('#mini-cal-prev').addEventListener('click', () => {
-        this.miniCalDate.setMonth(this.miniCalDate.getMonth() - 1);
-        this._renderMiniCalendar();
-      });
-      container.querySelector('#mini-cal-next').addEventListener('click', () => {
-        this.miniCalDate.setMonth(this.miniCalDate.getMonth() + 1);
-        this._renderMiniCalendar();
-      });
-      container.querySelector('#mini-cal-today-btn').addEventListener('click', () => {
-        this.miniCalDate = new Date();
-        this._renderMiniCalendar();
-      });
-
-      // Filtres To-Do
-      container.querySelectorAll('.todo-filter-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          this.todoFilter = btn.dataset.filter;
-          this.render(container);
-        });
-      });
-
-      // Choix de tag pour nouvelle tâche
-      container.querySelectorAll('[data-tag-select]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          this.selectedTagForNewTodo = btn.dataset.tagSelect;
-          container.querySelectorAll('[data-tag-select]').forEach(b => {
-            const cat = getCategoryColor(b.dataset.tagSelect);
-            const isSel = b.dataset.tagSelect === this.selectedTagForNewTodo;
-            b.className = `tag-pill-btn px-3 py-1 rounded-xl text-xs font-black border transition-all ${isSel ? `${cat.bg} ring-2 ring-solaire-500 shadow-xs scale-105` : 'bg-white dark:bg-ink-darkcard border-creme-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-solaire-400'}`;
-          });
-        });
-      });
-
-      // Formulaire ajout To-Do
-      const todoForm = container.querySelector('#add-daily-todo-form');
-      if (todoForm) {
-        todoForm.addEventListener('submit', (e) => {
-          e.preventDefault();
-          const input = container.querySelector('#daily-todo-text');
-          const text = input.value.trim();
-          if (text) {
-            store.addDailyTodo(text, 'normal', this.selectedTagForNewTodo);
-            input.value = '';
-            this.render(container);
-          }
-        });
-      }
-
-      container.querySelectorAll('[data-todo-id]').forEach(chk => {
-        chk.addEventListener('change', () => {
-          store.toggleDailyTodo(chk.dataset.todoId);
-          this.render(container);
-        });
-      });
-
-      container.querySelectorAll('[data-delete-todo]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          store.deleteDailyTodo(btn.dataset.deleteTodo);
-          this.render(container);
-        });
-      });
-    },
-
-    // GLISSER-DÉPOSER FLUIDE SUR L'EDT (Desktop drag + Mobile touch hold 2s)
-    // INTERACTIVITÉ GLISSER/ÉTIRER SUR LA GRILLE (Ancien style propre avec encadré pointillé)
-    _initDragToCreateEvents(container) {
-      const HOUR_HEIGHT = 56;
-      const START_HOUR = 5;
-
-      const columns = container.querySelectorAll('.timetable-column');
-
-      columns.forEach(col => {
-        const dateStr = col.dataset.colDatestr;
-        if (!dateStr) return;
-
-        const getYFromEvent = (e) => {
-          const rect = col.getBoundingClientRect();
-          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-          return Math.max(0, Math.min(rect.height, clientY - rect.top));
-        };
-
-        const yToMinutes = (y) => {
-          const totalHours = y / HOUR_HEIGHT;
-          const totalMin = (START_HOUR * 60) + Math.round((totalHours * 60) / 15) * 15;
-          return Math.max(5 * 60, Math.min(23 * 60 + 45, totalMin));
-        };
-
-        const formatMinToTime = (min) => {
-          const h = Math.floor(min / 60);
-          const m = min % 60;
-          return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-        };
-
-        let startY = 0;
-        let startMin = 0;
-        let isDragging = false;
-        let selectionEl = null;
-
-        const startSelection = (e) => {
-          if (e.target.closest('.timetable-event')) return;
-
-          startY = getYFromEvent(e);
-          startMin = yToMinutes(startY);
-          isDragging = true;
-
-          selectionEl = document.createElement('div');
-          selectionEl.className = 'timetable-drag-selection';
-          selectionEl.style.top = `${((startMin - (START_HOUR * 60)) / 60) * HOUR_HEIGHT}px`;
-          selectionEl.style.height = `20px`;
-          selectionEl.innerHTML = `<span class="timetable-drag-badge">${formatMinToTime(startMin)}</span>`;
-          col.appendChild(selectionEl);
-
-          const moveHandler = (ev) => {
-            if (!isDragging || !selectionEl) return;
-            const currentY = getYFromEvent(ev);
-            const currentMin = yToMinutes(currentY);
-
-            const sMin = Math.min(startMin, currentMin);
-            const eMin = Math.max(startMin, currentMin) + 15;
-            const duration = eMin - sMin;
-
-            const topPx = ((sMin - (START_HOUR * 60)) / 60) * HOUR_HEIGHT;
-            const heightPx = Math.max(24, (duration / 60) * HOUR_HEIGHT);
-
-            selectionEl.style.top = `${topPx}px`;
-            selectionEl.style.height = `${heightPx}px`;
-
-            const durHours = Math.floor(duration / 60);
-            const durMins = duration % 60;
-            const durLabel = durHours > 0 ? `${durHours}h${durMins > 0 ? String(durMins).padStart(2, '0') : ''}` : `${durMins}min`;
-
-            selectionEl.innerHTML = `
-              <span class="timetable-drag-badge">${formatMinToTime(sMin)} - ${formatMinToTime(eMin)} (${durLabel})</span>
-              <span class="text-[9px] font-bold text-solaire-700 dark:text-solaire-300 self-end opacity-90 select-none">Relâcher pour créer</span>
-            `;
-          };
-
-          const upHandler = (ev) => {
-            if (!isDragging) return;
-            isDragging = false;
-            window.removeEventListener('mousemove', moveHandler);
-            window.removeEventListener('mouseup', upHandler);
-            window.removeEventListener('touchmove', moveHandler);
-            window.removeEventListener('touchend', upHandler);
-
-            const currentY = getYFromEvent(ev);
-            const currentMin = yToMinutes(currentY);
-
-            const sMin = Math.min(startMin, currentMin);
-            const eMin = Math.max(startMin, currentMin) + (Math.abs(currentMin - startMin) < 15 ? 120 : 15);
-            const duration = Math.max(30, eMin - sMin);
-
-            if (selectionEl) {
-              selectionEl.remove();
-              selectionEl = null;
-            }
-
-            this._openCourseDrawer({
-              date: dateStr,
-              startTime: formatMinToTime(sMin),
-              duration: duration
-            });
-          };
-
-          window.addEventListener('mousemove', moveHandler);
-          window.addEventListener('mouseup', upHandler);
-          window.addEventListener('touchmove', moveHandler, { passive: true });
-          window.addEventListener('touchend', upHandler);
-        };
-
-        col.addEventListener('mousedown', startSelection);
-        col.addEventListener('touchstart', startSelection, { passive: true });
-      });
     },
 
     _renderTimetableEvents() {
@@ -2673,11 +2388,11 @@
         icon: '<i data-lucide="bookmark" class="w-5 h-5 text-orangePop-500"></i>',
         content,
         footer: `
-          <button id="cancel-imp-btn" class="px-4 py-2.5 rounded-2xl text-xs font-bold text-zinc-500">Annuler</button>
+          <button id="imp-cancel-btn" class="px-4 py-2.5 rounded-2xl text-xs font-bold text-zinc-500">Annuler</button>
           <button id="save-imp-btn" class="px-6 py-2.5 bg-solaire-500 hover:bg-solaire-600 text-white rounded-2xl text-xs font-black shadow-sm transition-all">Enregistrer</button>
         `,
         onOpen: (panelEl) => {
-          panelEl.querySelector('#cancel-imp-btn').addEventListener('click', () => Drawer.close());
+          panelEl.querySelector('#imp-cancel-btn').addEventListener('click', () => Drawer.close());
           panelEl.querySelector('#save-imp-btn').addEventListener('click', () => {
             const title = panelEl.querySelector('#imp-title').value.trim();
             const date = panelEl.querySelector('#imp-date').value;
@@ -2690,6 +2405,274 @@
             this._renderImportantDates();
           });
         }
+      });
+    },
+
+    // INTERACTIVITÉ GLISSER/ÉTIRER SUR LA GRILLE
+    _initDragToCreateEvents(container) {
+      const HOUR_HEIGHT = 56;
+      const START_HOUR = 5;
+
+      const columns = container.querySelectorAll('.timetable-column');
+
+      columns.forEach(col => {
+        const dateStr = col.dataset.colDatestr;
+        if (!dateStr) return;
+
+        const getYFromEvent = (e) => {
+          const rect = col.getBoundingClientRect();
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          return Math.max(0, Math.min(rect.height, clientY - rect.top));
+        };
+
+        const yToMinutes = (y) => {
+          const totalHours = y / HOUR_HEIGHT;
+          const totalMin = (START_HOUR * 60) + Math.round((totalHours * 60) / 15) * 15;
+          return Math.max(5 * 60, Math.min(23 * 60 + 45, totalMin));
+        };
+
+        const formatMinToTime = (min) => {
+          const h = Math.floor(min / 60);
+          const m = min % 60;
+          return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        };
+
+        let startY = 0;
+        let startMin = 0;
+        let isDragging = false;
+        let selectionEl = null;
+
+        const startSelection = (e) => {
+          if (e.target.closest('.timetable-event')) return;
+
+          startY = getYFromEvent(e);
+          startMin = yToMinutes(startY);
+          isDragging = true;
+
+          selectionEl = document.createElement('div');
+          selectionEl.className = 'timetable-drag-selection';
+          selectionEl.style.top = `${((startMin - (START_HOUR * 60)) / 60) * HOUR_HEIGHT}px`;
+          selectionEl.style.height = `20px`;
+          selectionEl.innerHTML = `<span class="timetable-drag-badge">${formatMinToTime(startMin)}</span>`;
+          col.appendChild(selectionEl);
+
+          const moveHandler = (ev) => {
+            if (!isDragging || !selectionEl) return;
+            const currentY = getYFromEvent(ev);
+            const currentMin = yToMinutes(currentY);
+
+            const sMin = Math.min(startMin, currentMin);
+            const eMin = Math.max(startMin, currentMin) + 15;
+            const duration = eMin - sMin;
+
+            const topPx = ((sMin - (START_HOUR * 60)) / 60) * HOUR_HEIGHT;
+            const heightPx = Math.max(24, (duration / 60) * HOUR_HEIGHT);
+
+            selectionEl.style.top = `${topPx}px`;
+            selectionEl.style.height = `${heightPx}px`;
+
+            const durHours = Math.floor(duration / 60);
+            const durMins = duration % 60;
+            const durLabel = durHours > 0 ? `${durHours}h${durMins > 0 ? String(durMins).padStart(2, '0' ) : ''}` : `${durMins}min`;
+
+            selectionEl.innerHTML = `
+              <span class="timetable-drag-badge">${formatMinToTime(sMin)} - ${formatMinToTime(eMin)} (${durLabel})</span>
+              <span class="text-[9px] font-bold text-solaire-700 dark:text-solaire-300 self-end opacity-90 select-none">Relâcher pour créer</span>
+            `;
+          };
+
+          const upHandler = (ev) => {
+            if (!isDragging) return;
+            isDragging = false;
+            window.removeEventListener('mousemove', moveHandler);
+            window.removeEventListener('mouseup', upHandler);
+            window.removeEventListener('touchmove', moveHandler);
+            window.removeEventListener('touchend', upHandler);
+
+            const currentY = getYFromEvent(ev);
+            const currentMin = yToMinutes(currentY);
+
+            const sMin = Math.min(startMin, currentMin);
+            const eMin = Math.max(startMin, currentMin) + (Math.abs(currentMin - startMin) < 15 ? 120 : 15);
+            const duration = Math.max(30, eMin - sMin);
+
+            if (selectionEl) {
+              selectionEl.remove();
+              selectionEl = null;
+            }
+
+            this._openCourseDrawer({
+              date: dateStr,
+              startTime: formatMinToTime(sMin),
+              duration: duration
+            });
+          };
+
+          window.addEventListener('mousemove', moveHandler);
+          window.addEventListener('mouseup', upHandler);
+          window.addEventListener('touchmove', moveHandler, { passive: true });
+          window.addEventListener('touchend', upHandler);
+        };
+
+        col.addEventListener('mousedown', startSelection);
+        col.addEventListener('touchstart', startSelection, { passive: true });
+      });
+    },
+
+    _bindEvents(container) {
+      container.querySelector('#week-prev-btn').addEventListener('click', () => {
+        const d = new Date(this.activeMonday);
+        d.setDate(d.getDate() - 7);
+        this.activeMonday = d;
+        this.render(container);
+      });
+
+      container.querySelector('#week-next-btn').addEventListener('click', () => {
+        const d = new Date(this.activeMonday);
+        d.setDate(d.getDate() + 7);
+        this.activeMonday = d;
+        this.render(container);
+      });
+
+      container.querySelector('#week-today-btn').addEventListener('click', () => {
+        this.activeMonday = getMondayOfDate(new Date());
+        this.render(container);
+      });
+
+      const mobileViewSelect = container.querySelector('#mobile-view-select');
+      if (mobileViewSelect) {
+        mobileViewSelect.addEventListener('change', () => {
+          this.mobileViewDays = parseInt(mobileViewSelect.value, 10);
+          const weekDays = this._getWeekDates(this.activeMonday);
+          this.activeDayMobileIndex = Math.min(this.activeDayMobileIndex, Math.max(0, weekDays.length - this.mobileViewDays));
+          this.render(container);
+        });
+      }
+
+      const mobilePrevBtn = container.querySelector('#mobile-prev-btn');
+      const mobileNextBtn = container.querySelector('#mobile-next-btn');
+      const mobileTodayBtn = container.querySelector('#mobile-today-btn');
+
+      if (mobilePrevBtn) {
+        mobilePrevBtn.addEventListener('click', () => {
+          const weekDays = this._getWeekDates(this.activeMonday);
+          const step = this.mobileViewDays;
+          const newIdx = this.activeDayMobileIndex - step;
+          if (newIdx >= 0) {
+            this.activeDayMobileIndex = newIdx;
+            this.render(container);
+          } else {
+            const d = new Date(this.activeMonday);
+            d.setDate(d.getDate() - 7);
+            this.activeMonday = d;
+            this.activeDayMobileIndex = Math.max(0, 7 - step);
+            this.render(container);
+          }
+        });
+      }
+
+      if (mobileNextBtn) {
+        mobileNextBtn.addEventListener('click', () => {
+          const weekDays = this._getWeekDates(this.activeMonday);
+          const step = this.mobileViewDays;
+          const newIdx = this.activeDayMobileIndex + step;
+          if (newIdx + this.mobileViewDays <= weekDays.length) {
+            this.activeDayMobileIndex = newIdx;
+            this.render(container);
+          } else {
+            const d = new Date(this.activeMonday);
+            d.setDate(d.getDate() + 7);
+            this.activeMonday = d;
+            this.activeDayMobileIndex = 0;
+            this.render(container);
+          }
+        });
+      }
+
+      if (mobileTodayBtn) {
+        mobileTodayBtn.addEventListener('click', () => {
+          this.activeMonday = getMondayOfDate(new Date());
+          const todayStr = new Date().toISOString().split('T')[0];
+          const weekDays = this._getWeekDates(this.activeMonday);
+          const idx = weekDays.findIndex(w => w.dateStr === todayStr);
+          this.activeDayMobileIndex = idx !== -1 ? idx : 0;
+          this.render(container);
+        });
+      }
+
+      container.querySelector('#add-event-btn').addEventListener('click', () => this._openCourseDrawer());
+      container.querySelector('#manage-calendars-btn').addEventListener('click', () => this._openManageCalendarsDrawer(container));
+      container.querySelector('#add-important-date-btn').addEventListener('click', () => this._openAddImportantDateDrawer(container));
+
+      container.querySelector('#mini-cal-prev').addEventListener('click', () => {
+        this.miniCalDate.setMonth(this.miniCalDate.getMonth() - 1);
+        this._renderMiniCalendar();
+      });
+      container.querySelector('#mini-cal-next').addEventListener('click', () => {
+        this.miniCalDate.setMonth(this.miniCalDate.getMonth() + 1);
+        this._renderMiniCalendar();
+      });
+      container.querySelector('#mini-cal-today-btn').addEventListener('click', () => {
+        this.miniCalDate = new Date();
+        this._renderMiniCalendar();
+      });
+
+      // Filtres To-Do (boutons standard)
+      container.querySelectorAll('.todo-filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          this.todoFilter = btn.dataset.filter;
+          this.render(container);
+        });
+      });
+
+      // Écouteur pour le nouveau menu déroulant de catégories To-Do
+      const todoCatSelect = container.querySelector('#todo-category-filter-select');
+      if (todoCatSelect) {
+        todoCatSelect.addEventListener('change', () => {
+          const val = todoCatSelect.value;
+          this.todoFilter = val === 'all_categories' ? 'all' : val;
+          this.render(container);
+        });
+      }
+
+      // Choix de tag pour nouvelle tâche
+      container.querySelectorAll('[data-tag-select]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          this.selectedTagForNewTodo = btn.dataset.tagSelect;
+          container.querySelectorAll('[data-tag-select]').forEach(b => {
+            const cat = getCategoryColor(b.dataset.tagSelect);
+            const isSel = b.dataset.tagSelect === this.selectedTagForNewTodo;
+            b.className = `tag-pill-btn px-3 py-1 rounded-xl text-xs font-black border transition-all ${isSel ? `${cat.bg} ring-2 ring-solaire-500 shadow-xs scale-105` : 'bg-white dark:bg-ink-darkcard border-creme-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-solaire-400'}`;
+          });
+        });
+      });
+
+      const todoForm = container.querySelector('#add-daily-todo-form');
+      if (todoForm) {
+        todoForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const input = container.querySelector('#daily-todo-text');
+          const text = input.value.trim();
+          if (text) {
+            store.addDailyTodo(text, 'normal', this.selectedTagForNewTodo);
+            input.value = '';
+            this.render(container);
+          }
+        });
+      }
+
+      container.querySelectorAll('[data-todo-id]').forEach(chk => {
+        chk.addEventListener('change', () => {
+          store.toggleDailyTodo(chk.dataset.todoId);
+          this.render(container);
+        });
+      });
+
+      container.querySelectorAll('[data-delete-todo]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          store.deleteDailyTodo(btn.dataset.deleteTodo);
+          this.render(container);
+        });
       });
     }
   };
