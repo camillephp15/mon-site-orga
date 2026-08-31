@@ -113,26 +113,25 @@
   }
 
   function extractAndFormatRoom(rawRoom, rawTitle, rawDesc) {
-    const combined = `${rawRoom || ''} ${rawDesc || ''} ${rawTitle || ''}`.trim();
+    const rSource = (rawRoom || '').trim();
+    const dSource = (rawDesc || '').trim();
+    const tSource = (rawTitle || '').trim();
+    const combined = `${rSource} ${dSource} ${tSource}`.trim();
     if (!combined) return '';
 
-    // 1. Cas "Salles de cours" ou "Salles mobiles" -> "pas encore dispo"
-    if (/salles?\s+de\s+cours/i.test(combined) || /salles?\s+mobiles?/i.test(combined)) {
-      return 'pas encore dispo';
-    }
-
-    // 2. Cas "ZOOM"
-    if (/\bzoom\b/i.test(combined)) {
+    // 1. Détection de ZOOM
+    if (/\bzoom\b/i.test(rSource) || /\bzoom\b/i.test(dSource) || /\bzoom\b/i.test(tSource)) {
       return 'ZOOM';
     }
 
-    // 3. Liste de salles numériques précises : 111, 113, 214, 221, 126, 207, 211, 213, 314 (Labo)
+    // 2. Recherche souple des numéros de salles officiels (111, 113, 214, 221, 126, 207, 211, 213, 314)
+    // Fonctionne avec n'importe quel préfixe ou suffixe : MTPL-214 (40), Salle 214, 214, MTPL-314 (30), etc.
     const TARGET_ROOMS = ['111', '113', '214', '221', '126', '207', '211', '213', '314'];
     const matchedRooms = [];
 
     TARGET_ROOMS.forEach(rNum => {
-      const reg = new RegExp(`(?:\\b|[-_])${rNum}(?:\\b|[-_\\s(])`, 'i');
-      if (reg.test(combined)) {
+      const reg = new RegExp(`(?:^|[^0-9])${rNum}(?:[^0-9]|$)`, 'i');
+      if (reg.test(rSource) || reg.test(dSource) || reg.test(tSource)) {
         if (rNum === '314') {
           matchedRooms.push('314 (Labo)');
         } else {
@@ -145,19 +144,30 @@
       return Array.from(new Set(matchedRooms)).join(', ');
     }
 
-    // 4. Fallback si pas dans la liste officielle
-    let fallback = (rawRoom || '').trim();
-    if (!fallback && rawDesc) {
-      const m = rawDesc.match(/(?:Salle|Lieu|Local)\s*:\s*([^\n\r,;]+)/i);
+    // 3. Cas Salles de cours / Salles mobiles -> "Non affiché"
+    if (/salles?\s+de\s+cours/i.test(combined) || /salles?\s+mobiles?/i.test(combined) || /salle\s+de\s+cours/i.test(combined) || /salle\s+mobile/i.test(combined)) {
+      return 'Non affiché';
+    }
+
+    // 4. Nettoyage intelligent et fallback pour les autres formats de salles
+    let fallback = rSource;
+    if (!fallback && dSource) {
+      const m = dSource.match(/(?:Salle|Lieu|Local|Emplacement)\s*:\s*([^\n\r,;]+)/i);
       if (m) fallback = m[1].trim();
     }
 
     if (fallback) {
-      fallback = fallback.replace(/\s*\(\d+\)\s*/g, '').trim();
-      fallback = fallback.replace(/^(?:MTPL|PARIS|BAT|SALLE|AMP|SITE)[-_]/i, '').trim();
-      fallback = fallback.replace(/^salle\s+(\d+[A-Z]?)$/i, '$1').trim();
+      // Supprimer les parenthèses et leur contenu (ex: (40), (39), (120))
+      fallback = fallback.replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+      // Supprimer les préfixes d'établissement (MTPL-, PARIS-, BAT-, SITE-, etc.)
+      fallback = fallback.replace(/^(?:MTPL|PARIS|BAT|SALLE|AMP|SITE|CAMPUS)[-_]/i, '').trim();
+      // Supprimer le mot "Salle " ou "Salles " initial
+      fallback = fallback.replace(/^salles?\s+/i, '').trim();
 
       if (/^(salles?(\s+de\s+cours)?|salles?\s+mobiles?|non\s+pr[ée]cis[ée]e?|inconnue?|[aà]\s+d[ée]finir|salle)$/i.test(fallback)) {
+        if (/salles?\s+de\s+cours/i.test(fallback) || /salles?\s+mobiles?/i.test(fallback)) {
+          return 'Non affiché';
+        }
         return '';
       }
       return fallback;
