@@ -10901,6 +10901,20 @@
       "room": "",
       "completed": false,
       "id": "ev_1787764301873"
+    },
+    {
+      "calendarId": "cal_1787764123477",
+      "title": "Bosser site",
+      "teacher": "",
+      "date": "2026-09-01",
+      "day": "tue",
+      "startTime": "16:00",
+      "duration": 60,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1788191203642"
     }
   ],
   "importantDates": [
