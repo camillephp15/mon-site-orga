@@ -112,57 +112,37 @@
     return { subject: fallback || 'Cours', hasExam, matchedRule: null, remainingTitle: remaining };
   }
 
-  function cleanSingleRoom(roomStr) {
-    if (!roomStr) return '';
-    let str = roomStr.trim();
+  function formatRoom(rawRoom) {
+    if (!rawRoom || typeof rawRoom !== 'string') return '';
+    let source = rawRoom.trim();
+    if (!source) return '';
 
-    // 1. Supprimer le contenu entre parenthèses ex: (40), (39), (120)
-    str = str.replace(/\s*\([^)]*\)/g, '').trim();
-
-    // 2. Supprimer les préfixes d'établissement ou de campus (MTPL-, PARIS-, BAT-, SITE-, etc.)
-    str = str.replace(/^(?:MTPL|PARIS|BAT|SALLE|AMP|SITE|CAMPUS)[-_]/i, '').trim();
-
-    // 3. Supprimer le mot "Salle " ou "Salles " initial
-    str = str.replace(/^salles?\s+/i, '').trim();
-
-    // 4. Cas particuliers
-    if (/zoom/i.test(str)) {
+    // Si distanciel ou zoom
+    if (/zoom|distanciel/i.test(source)) {
       return 'ZOOM';
     }
-    if (/salles?\s+de\s+cours/i.test(str) || /salles?\s+mobiles?/i.test(str) || /salle\s+de\s+cours/i.test(str) || /salle\s+mobile/i.test(str)) {
-      return 'Non affiché';
-    }
-    if (str === '314') {
-      return '314 (Labo)';
-    }
 
-    // 5. Termes génériques à masquer (laisser vide)
-    if (/^(salles?(\s+de\s+cours)?|salles?\s+mobiles?|non\s+pr[ée]cis[ée]e?|inconnue?|[aà]\s+d[ée]finir|salle)$/i.test(str)) {
+    // Filtrer les valeurs génériques
+    if (/salles?\s+de\s+cours|salles?\s+mobiles?|salle|non\s+pr[ée]cis[ée]|inconnue?|[aà]\s+d[ée]finir/i.test(source)) {
       return '';
     }
 
-    return str;
-  }
+    // Séparer les salles (si virgule) et nettoyer chaque salle
+    const parts = source.split(',').map(part => {
+      let p = part.trim();
+      // a) Retirer tous les préfixes de campus (ex: "MTPL-", "PARIS-", "BAT-", etc.)
+      p = p.replace(/^[A-Z0-9]+[-_]/i, '').trim();
+      // b) Supprimer tout ce qui se trouve entre parenthèses avec l'espace (ex: " (39)", " (40)")
+      p = p.replace(/\s*\([^)]*\)/g, '').trim();
+      // c) Retirer le mot "Salle" ou "Salles" initial
+      p = p.replace(/^salles?\s+/i, '').trim();
 
-  function extractAndFormatRoom(rawRoom, rawTitle, rawDesc) {
-    let source = (rawRoom || '').trim();
-
-    // Si rawRoom est vide, chercher dans la description
-    if (!source && rawDesc) {
-      const m = rawDesc.match(/(?:Salle|Lieu|Local|Emplacement)\s*:\s*([^\n\r,;]+)/i);
-      if (m) source = m[1].trim();
-    }
-
-    // Si toujours vide, chercher dans le titre
-    if (!source && rawTitle) {
-      const m = rawTitle.match(/(?:salle|lieu|zoom|mtpl)[-\s:]([^\n\r,;\]\)]+)/i);
-      if (m) source = m[1].trim();
-    }
-
-    if (!source) return '';
-
-    // Découper par les virgules pour traiter 1 salle ou plusieurs salles avec la même logique
-    const parts = source.split(',').map(p => cleanSingleRoom(p)).filter(Boolean);
+      if (p === '314') return '314 (Labo)';
+      if (/salles?\s+de\s+cours|salles?\s+mobiles?|salle|non\s+pr[ée]cis[ée]|inconnue?|[aà]\s+d[ée]finir/i.test(p)) {
+        return '';
+      }
+      return p;
+    }).filter(Boolean);
 
     if (parts.length === 0) return '';
     return Array.from(new Set(parts)).join(', ');
@@ -172,25 +152,17 @@
   // PARSEUR ET FORMATTEUR INTELLIGENT DE COURS (Hiérarchie 4 lignes)
   // L1: Matière, L2: Professeur, L3: Horaire, L4: Salle
   // ==========================================================================
-  function parseEventDetails(rawTitle, rawRoom, evTeacher, rawDescription) {
+  function parseEventDetails(rawTitle, rawRoom, evTeacher) {
     const rawTitleStr = (rawTitle || '').trim();
-    const rawDesc = (rawDescription || '').trim();
 
     // 1. Extraction de la Matière (via liste de référence S1)
     const { subject, remainingTitle } = extractAndFormatSubject(rawTitleStr);
 
-    // 2. Extraction de la Salle (via liste de référence)
-    const room = extractAndFormatRoom(rawRoom, rawTitleStr, rawDesc);
+    // 2. Extraction STRICTE de la Salle depuis le champ dédié ev.room / rawRoom
+    const room = formatRoom(rawRoom);
 
     // 3. Extraction du Professeur
     let teacher = (evTeacher || '').trim();
-
-    if (!teacher && rawDesc) {
-      const descTeacherMatch = rawDesc.match(/(?:Enseignant|Professeur|Intervenant|Prof|Jury|Responsable)\s*:\s*([^\n\r,;]+)/i);
-      if (descTeacherMatch) {
-        teacher = descTeacherMatch[1].trim();
-      }
-    }
 
     if (!teacher) {
       const typeTeacherMatch = rawTitleStr.match(/\[(CM|TD|TP|DS|Colle|Khôlle|Examen|Partiel|PROJET|CONF|SEMINAIRE|CONFÉRENCE|SOUTENANCE|COURS)\]\s*([^\[\]]+)$/i);
@@ -218,6 +190,13 @@
           if (w.includes('-')) {
             return w.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join('-');
           }
+          return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+        }).join(' ');
+      }
+    }
+
+    return { subject, teacher, room };
+  }
           return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
         }).join(' ');
       }
@@ -1533,7 +1512,7 @@
       const startTime = `${startHours}:${startMinutes}`;
 
       const { type } = this._detectSubjectInfo(summary, location);
-      const parsed = parseEventDetails(summary, location, '', description);
+      const parsed = parseEventDetails(summary, location, '');
 
       const daysMap = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
       const dayKey = daysMap[startDate.getDay()];
@@ -2079,7 +2058,7 @@
           eventEl.style.borderLeftColor = ev.color;
           eventEl.style.color = ev.color;
 
-          const parsed = parseEventDetails(ev.title, ev.room, ev.teacher, ev.description);
+          const parsed = parseEventDetails(ev.title, ev.room, ev.teacher);
 
           const startH = parseInt(ev.startTime.split(':')[0], 10);
           const startM = parseInt(ev.startTime.split(':')[1], 10);
@@ -2090,6 +2069,9 @@
           const endFormatted = `${String(endH).padStart(2, '0')}h${endMinStr !== '00' ? endMinStr : '00'}`;
 
           const isCompact = heightPx < 52 || ev.duration <= 45;
+          const isTitleTwoLines = (parsed.subject || '').length > 18;
+          // Si le titre prend 2 lignes ou créneau court, supprimer entièrement la ligne du professeur
+          const showTeacher = Boolean(parsed.teacher && !isTitleTwoLines && !isCompact && heightPx >= 65);
 
           if (isCompact) {
             eventEl.innerHTML = `
@@ -2100,7 +2082,7 @@
                   <span class="event-title font-extrabold text-ink dark:text-zinc-100 text-xs sm:text-[11.5px] leading-tight truncate" title="${parsed.subject}">${parsed.subject}</span>
                 </div>
 
-                <!-- Salle seulement en cas de manque de place -->
+                <!-- Salle seulement si présente -->
                 ${parsed.room ? `
                   <div class="flex items-center mt-auto">
                     <span class="inline-flex items-center gap-1 text-[9px] font-black font-mono px-1.5 py-0.5 rounded-md bg-black/10 dark:bg-white/15 text-ink dark:text-white border border-black/5 dark:border-white/10 truncate max-w-full shadow-xs" title="Salle : ${parsed.room}">
@@ -2115,14 +2097,14 @@
             eventEl.innerHTML = `
               <div class="flex flex-col h-full justify-between overflow-hidden select-none w-full">
                 <div class="space-y-0.5 overflow-hidden w-full">
-                  <!-- Ligne 1 : Matière (passe à la ligne proprement si besoin) -->
+                  <!-- Ligne 1 : Matière (sur 2 lignes sans superposition) -->
                   <div class="flex items-start gap-1.5 min-w-0 w-full pointer-events-auto">
                     <span class="event-checkbox ${ev.completed ? 'checked' : ''} flex-shrink-0 mt-0.5" title="Cocher le cours"></span>
                     <span class="event-title font-extrabold text-ink dark:text-zinc-100 text-xs sm:text-[12px] leading-snug break-words" title="${parsed.subject}">${parsed.subject}</span>
                   </div>
 
-                  <!-- Ligne 2 : Professeur (si présent) -->
-                  ${parsed.teacher ? `
+                  <!-- Ligne 2 : Professeur (masqué si le titre prend 2 lignes pour laisser place nette) -->
+                  ${showTeacher ? `
                     <div class="text-[10px] font-semibold text-zinc-600 dark:text-zinc-300 truncate leading-tight flex items-center gap-1 opacity-90 pl-0.5" title="Professeur : ${parsed.teacher}">
                       <svg class="w-3 h-3 flex-shrink-0 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                       <span class="truncate">${parsed.teacher}</span>
@@ -2137,7 +2119,7 @@
                     <span>${startFormatted}-${endFormatted}</span>
                   </div>
 
-                  <!-- Ligne 4 : Salle (ex: 111, 113 ou ZOOM dans encadré clair) -->
+                  <!-- Ligne 4 : Salle (affichée uniquement si non vide) -->
                   ${parsed.room ? `
                     <div class="flex items-center">
                       <span class="inline-flex items-center gap-1 text-[9px] font-black font-mono px-1.5 py-0.5 rounded-md bg-black/10 dark:bg-white/15 text-ink dark:text-white border border-black/5 dark:border-white/10 truncate max-w-full shadow-xs" title="Salle : ${parsed.room}">
