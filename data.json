@@ -10936,6 +10936,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1788191281510"
+    },
+    {
+      "calendarId": "cal_1787764123477",
+      "title": "Lire cours Méca des fluides",
+      "teacher": "",
+      "date": "2026-09-02",
+      "day": "wed",
+      "startTime": "09:00",
+      "duration": 120,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1788191318667"
     }
   ],
   "importantDates": [
