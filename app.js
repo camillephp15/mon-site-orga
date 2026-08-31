@@ -112,68 +112,60 @@
     return { subject: fallback || 'Cours', hasExam, matchedRule: null, remainingTitle: remaining };
   }
 
-  function extractAndFormatRoom(rawRoom, rawTitle, rawDesc) {
-    const rSource = (rawRoom || '').trim();
-    const dSource = (rawDesc || '').trim();
-    const tSource = (rawTitle || '').trim();
-    const combined = `${rSource} ${dSource} ${tSource}`.trim();
-    if (!combined) return '';
+  function cleanSingleRoom(roomStr) {
+    if (!roomStr) return '';
+    let str = roomStr.trim();
 
-    // 1. Détection de ZOOM
-    if (/\bzoom\b/i.test(rSource) || /\bzoom\b/i.test(dSource) || /\bzoom\b/i.test(tSource)) {
+    // 1. Supprimer le contenu entre parenthèses ex: (40), (39), (120)
+    str = str.replace(/\s*\([^)]*\)/g, '').trim();
+
+    // 2. Supprimer les préfixes d'établissement ou de campus (MTPL-, PARIS-, BAT-, SITE-, etc.)
+    str = str.replace(/^(?:MTPL|PARIS|BAT|SALLE|AMP|SITE|CAMPUS)[-_]/i, '').trim();
+
+    // 3. Supprimer le mot "Salle " ou "Salles " initial
+    str = str.replace(/^salles?\s+/i, '').trim();
+
+    // 4. Cas particuliers
+    if (/zoom/i.test(str)) {
       return 'ZOOM';
     }
-
-    // 2. Recherche souple des numéros de salles officiels (111, 113, 214, 221, 126, 207, 211, 213, 314)
-    // Fonctionne avec n'importe quel préfixe ou suffixe : MTPL-214 (40), Salle 214, 214, MTPL-314 (30), etc.
-    const TARGET_ROOMS = ['111', '113', '214', '221', '126', '207', '211', '213', '314'];
-    const matchedRooms = [];
-
-    TARGET_ROOMS.forEach(rNum => {
-      const reg = new RegExp(`(?:^|[^0-9])${rNum}(?:[^0-9]|$)`, 'i');
-      if (reg.test(rSource) || reg.test(dSource) || reg.test(tSource)) {
-        if (rNum === '314') {
-          matchedRooms.push('314 (Labo)');
-        } else {
-          matchedRooms.push(rNum);
-        }
-      }
-    });
-
-    if (matchedRooms.length > 0) {
-      return Array.from(new Set(matchedRooms)).join(', ');
-    }
-
-    // 3. Cas Salles de cours / Salles mobiles -> "Non affiché"
-    if (/salles?\s+de\s+cours/i.test(combined) || /salles?\s+mobiles?/i.test(combined) || /salle\s+de\s+cours/i.test(combined) || /salle\s+mobile/i.test(combined)) {
+    if (/salles?\s+de\s+cours/i.test(str) || /salles?\s+mobiles?/i.test(str) || /salle\s+de\s+cours/i.test(str) || /salle\s+mobile/i.test(str)) {
       return 'Non affiché';
     }
-
-    // 4. Nettoyage intelligent et fallback pour les autres formats de salles
-    let fallback = rSource;
-    if (!fallback && dSource) {
-      const m = dSource.match(/(?:Salle|Lieu|Local|Emplacement)\s*:\s*([^\n\r,;]+)/i);
-      if (m) fallback = m[1].trim();
+    if (str === '314') {
+      return '314 (Labo)';
     }
 
-    if (fallback) {
-      // Supprimer les parenthèses et leur contenu (ex: (40), (39), (120))
-      fallback = fallback.replace(/\s*\([^)]*\)\s*/g, ' ').trim();
-      // Supprimer les préfixes d'établissement (MTPL-, PARIS-, BAT-, SITE-, etc.)
-      fallback = fallback.replace(/^(?:MTPL|PARIS|BAT|SALLE|AMP|SITE|CAMPUS)[-_]/i, '').trim();
-      // Supprimer le mot "Salle " ou "Salles " initial
-      fallback = fallback.replace(/^salles?\s+/i, '').trim();
-
-      if (/^(salles?(\s+de\s+cours)?|salles?\s+mobiles?|non\s+pr[ée]cis[ée]e?|inconnue?|[aà]\s+d[ée]finir|salle)$/i.test(fallback)) {
-        if (/salles?\s+de\s+cours/i.test(fallback) || /salles?\s+mobiles?/i.test(fallback)) {
-          return 'Non affiché';
-        }
-        return '';
-      }
-      return fallback;
+    // 5. Termes génériques à masquer (laisser vide)
+    if (/^(salles?(\s+de\s+cours)?|salles?\s+mobiles?|non\s+pr[ée]cis[ée]e?|inconnue?|[aà]\s+d[ée]finir|salle)$/i.test(str)) {
+      return '';
     }
 
-    return '';
+    return str;
+  }
+
+  function extractAndFormatRoom(rawRoom, rawTitle, rawDesc) {
+    let source = (rawRoom || '').trim();
+
+    // Si rawRoom est vide, chercher dans la description
+    if (!source && rawDesc) {
+      const m = rawDesc.match(/(?:Salle|Lieu|Local|Emplacement)\s*:\s*([^\n\r,;]+)/i);
+      if (m) source = m[1].trim();
+    }
+
+    // Si toujours vide, chercher dans le titre
+    if (!source && rawTitle) {
+      const m = rawTitle.match(/(?:salle|lieu|zoom|mtpl)[-\s:]([^\n\r,;\]\)]+)/i);
+      if (m) source = m[1].trim();
+    }
+
+    if (!source) return '';
+
+    // Découper par les virgules pour traiter 1 salle ou plusieurs salles avec la même logique
+    const parts = source.split(',').map(p => cleanSingleRoom(p)).filter(Boolean);
+
+    if (parts.length === 0) return '';
+    return Array.from(new Set(parts)).join(', ');
   }
 
   // ==========================================================================
