@@ -113,46 +113,57 @@
   }
 
   function formatRoom(rawRoom) {
-    if (!rawRoom || typeof rawRoom !== 'string') return '';
-    let source = rawRoom.trim();
-    if (!source) return '';
-
-    // Si distanciel ou zoom
-    if (/zoom|distanciel/i.test(source)) {
-      return 'ZOOM';
-    }
-
-    // Filtrer les valeurs génériques
-    if (/salles?\s+de\s+cours|salles?\s+mobiles?|salle|non\s+pr[ée]cis[ée]|inconnue?|[aà]\s+d[ée]finir/i.test(source)) {
+    if (!rawRoom) return '';
+    let roomStr = String(rawRoom).trim();
+    if (!roomStr || roomStr.toLowerCase() === 'undefined' || roomStr.toLowerCase() === 'null') {
       return '';
     }
 
-    // Séparer les salles (si virgule) et nettoyer chaque salle
-    const parts = source.split(',').map(part => {
+    // 1. Si le texte contient "zoom", "visio", "teams" ou "distanciel" -> "ZOOM"
+    if (/zoom|distanciel|visio|teams/i.test(roomStr)) {
+      return 'ZOOM';
+    }
+
+    // 2. Adresses externes (stages, entreprises...) : un code postal français
+    //    (5 chiffres) est un signal fiable qu'il ne s'agit pas d'une salle de campus.
+    if (/\b\d{5}\b/.test(roomStr)) {
+      return '';
+    }
+
+    const NO_ROOM_RE = /^(salles?(\s+de\s+cours)?|salles?\s+mobiles?|sans\s+salle|sur\s+campus|non\s+pr[ée]cis[ée]e?|inconnue?|[aà]\s+d[ée]finir|-*)$/i;
+
+    // 3. Découper par les virgules (multi-salles ou salle unique)
+    const parts = roomStr.split(',');
+    const cleanedRooms = parts.map(part => {
       let p = part.trim();
-      // a) Retirer tous les préfixes de campus (ex: "MTPL-", "PARIS-", "BAT-", etc.)
-      p = p.replace(/^[A-Z0-9]+[-_]/i, '').trim();
-      // b) Supprimer tout ce qui se trouve entre parenthèses avec l'espace (ex: " (39)", " (40)")
-      p = p.replace(/\s*\([^)]*\)/g, '').trim();
-      // c) Retirer le mot "Salle" ou "Salles" initial
+      // Supprimer le préfixe de bâtiment (ex: "MTPL-", "MTP1-", "PÔLE-", "NCHA  - "),
+      // accents inclus, avec ou sans espaces autour du tiret
+      p = p.replace(/^[^\s-]+\s*-\s*/, '').trim();
+      // Nettoyer un tiret résiduel (ex: double tiret "NCHA--101", ou juste "-")
+      p = p.replace(/^-+\s*/, '').trim();
+      // Supprimer tout ce qui se trouve entre parenthèses (ex: capacité " (39)", "(40)")
+      p = p.replace(/\s*\(.*?\)/g, '').trim();
+
+      if (!p || NO_ROOM_RE.test(p)) return '';
+
+      // Ne garder que le premier "mot" : élimine les mentions parasites du type
+      // "314 Labo physique" ou "E209 SC" pour ne garder que le numéro/code de salle
+      p = p.split(/\s+/)[0];
+      // Supprimer le mot "Salle" ou "Salles" initial si présent
       p = p.replace(/^salles?\s+/i, '').trim();
 
-      if (p === '314') return '314 (Labo)';
-      if (/salles?\s+de\s+cours|salles?\s+mobiles?|salle|non\s+pr[ée]cis[ée]|inconnue?|[aà]\s+d[ée]finir/i.test(p)) {
-        return '';
-      }
-      return p;
+      return NO_ROOM_RE.test(p) ? '' : p;
     }).filter(Boolean);
 
-    if (parts.length === 0) return '';
-    return Array.from(new Set(parts)).join(', ');
+    if (cleanedRooms.length === 0) return '';
+    return Array.from(new Set(cleanedRooms)).join(', ');
   }
 
   // ==========================================================================
   // PARSEUR ET FORMATTEUR INTELLIGENT DE COURS (Hiérarchie 4 lignes)
   // L1: Matière, L2: Professeur, L3: Horaire, L4: Salle
   // ==========================================================================
-  function parseEventDetails(rawTitle, rawRoom, evTeacher) {
+function parseEventDetails(rawTitle, rawRoom, evTeacher) {
     const rawTitleStr = (rawTitle || '').trim();
 
     // 1. Extraction de la Matière (via liste de référence S1)
@@ -190,13 +201,6 @@
           if (w.includes('-')) {
             return w.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join('-');
           }
-          return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
-        }).join(' ');
-      }
-    }
-
-    return { subject, teacher, room };
-  }
           return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
         }).join(' ');
       }
