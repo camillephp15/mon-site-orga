@@ -2062,7 +2062,15 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
           eventEl.style.borderLeftColor = ev.color;
           eventEl.style.color = ev.color;
 
-          const parsed = parseEventDetails(ev.title, ev.room, ev.teacher);
+          // ev.title / ev.room / ev.teacher sont déjà nettoyés au moment de l'import ICS
+          // (voir ICSParser._processVEvent -> parseEventDetails). On les réutilise tels quels
+          // ici plutôt que de les repasser dans formatRoom()/extractAndFormatSubject() une
+          // deuxième fois : ça évite tout risque de perte d'info sur un second passage.
+          const parsed = {
+            subject: ev.title || 'Cours',
+            teacher: (ev.teacher || '').trim(),
+            room: ev.room || ''
+          };
 
           const startH = parseInt(ev.startTime.split(':')[0], 10);
           const startM = parseInt(ev.startTime.split(':')[1], 10);
