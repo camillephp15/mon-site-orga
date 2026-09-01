@@ -20,6 +20,13 @@
       "color": "#0284c7",
       "feedUrl": "",
       "lastSync": null
+    },
+    {
+      "id": "cal_1788292430327",
+      "name": "EDT École",
+      "color": "#ff3366",
+      "feedUrl": "https://ical.devinci.me/ical_student/2159fdf3ed4407fa16cb21f38289e911",
+      "lastSync": "2026-09-01T19:53:50.327Z"
     }
   ],
   "events": [
