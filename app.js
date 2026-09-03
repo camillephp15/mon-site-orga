@@ -1290,7 +1290,12 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       const deduped = [];
       let foundDupes = false;
       for (const e of events) {
-        const key = [e.date, e.startTime, (e.title || '').trim().toLowerCase(), (e.room || '').trim().toLowerCase()].join('|');
+        // Clé basée uniquement sur date + heure de début + durée : ce sont les seules
+        // valeurs qui viennent directement et sans transformation du fichier ICS (DTSTART/DTEND),
+        // donc stables même si le titre ou la salle ont été nettoyés différemment selon
+        // le moment de l'import. Vérifié sur le fichier ICS réel : deux cours différents
+        // n'ont jamais exactement le même horodatage de début/fin.
+        const key = [e.date, e.startTime, e.duration].join('|');
         if (seen.has(key)) { foundDupes = true; continue; }
         seen.add(key);
         deduped.push(e);
