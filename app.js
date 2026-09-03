@@ -1666,31 +1666,31 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
     async fetchFromUrl(url, calendarId) {
       let targetUrl = (url || '').trim();
       if (!targetUrl) throw new Error('URL de flux manquante.');
+
+      // Conversion webcal:// -> https://
       if (targetUrl.startsWith('webcal://')) {
         targetUrl = targetUrl.replace(/^webcal:\/\//i, 'https://');
+      } else if (targetUrl.startsWith('http://')) {
+        targetUrl = targetUrl.replace(/^http:\/\//i, 'https://');
       }
 
-      // 1. Cache-busting systématique : timestamp unique dans l'URL pour forcer un re-téléchargement frais
-      const sep = targetUrl.includes('?') ? '&' : '?';
-      const freshUrl = `${targetUrl}${sep}_t=${Date.now()}`;
-
       const isValidIcs = (text) => {
-        return typeof text === 'string' && (text.includes('BEGIN:VCALENDAR') || text.includes('BEGIN:VEVENT'));
+        if (!text || typeof text !== 'string') return false;
+        const trimmed = text.trim();
+        if (trimmed.startsWith('<!DOCTYPE') || trimmed.startsWith('<html') || trimmed.startsWith('{"error"')) {
+          return false;
+        }
+        return trimmed.includes('BEGIN:VCALENDAR') || trimmed.includes('BEGIN:VEVENT');
       };
 
-      const fetchWithTimeout = async (fetchUrl, options = {}, timeoutMs = 4000) => {
+      // Requête simple sans headers custom pour éviter tout échec preflight OPTIONS
+      const fetchWithTimeout = async (fetchUrl, timeoutMs = 3500) => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
         try {
           const resp = await fetch(fetchUrl, {
-            ...options,
             signal: controller.signal,
-            cache: 'no-store',
-            headers: {
-              'Cache-Control': 'no-cache, no-store, must-revalidate',
-              'Pragma': 'no-cache',
-              ...(options.headers || {})
-            }
+            cache: 'no-store'
           });
           clearTimeout(timeoutId);
           return resp;
@@ -1700,41 +1700,64 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
         }
       };
 
-      // Tentative 2 : Proxys CORS rapides avec secours et validation de contenu
-      const encodedTarget = encodeURIComponent(freshUrl);
+      const encodedTarget = encodeURIComponent(targetUrl);
+      const timestamp = Date.now();
+
+      // Liste ordonnée de proxys CORS publics avec méthodes d'extraction adaptées
       const proxies = [
         {
-          name: 'corsproxy.io',
-          url: `https://corsproxy.io/?${encodedTarget}`,
-          getText: async (r) => r.text()
+          name: 'AllOrigins (JSON)',
+          url: `https://api.allorigins.win/get?url=${encodedTarget}&_cb=${timestamp}`,
+          getText: async (resp) => {
+            const data = await resp.json();
+            return data && data.contents ? data.contents : '';
+          }
         },
         {
-          name: 'allorigins-raw',
-          url: `https://api.allorigins.win/raw?url=${encodedTarget}&_cb=${Date.now()}`,
-          getText: async (r) => r.text()
-        },
-        {
-          name: 'codetabs',
+          name: 'CodeTabs',
           url: `https://api.codetabs.com/v1/proxy?quest=${encodedTarget}`,
-          getText: async (r) => r.text()
+          getText: async (resp) => resp.text()
+        },
+        {
+          name: 'Corsproxy.io',
+          url: `https://corsproxy.io/?url=${encodedTarget}`,
+          getText: async (resp) => resp.text()
+        },
+        {
+          name: 'CORS.lol',
+          url: `https://api.cors.lol/?url=${encodedTarget}`,
+          getText: async (resp) => resp.text()
+        },
+        {
+          name: 'AllOrigins (Raw)',
+          url: `https://api.allorigins.win/raw?url=${encodedTarget}&_cb=${timestamp}`,
+          getText: async (resp) => resp.text()
         }
       ];
 
+      // Boucle propre avec timeout court (3.5s) par proxy : bascule rapide au suivant en cas de lenteur
       for (const proxy of proxies) {
         try {
-          const respProxy = await fetchWithTimeout(proxy.url, {}, 8000);
-          if (respProxy.ok) {
-            const text = await proxy.getText(respProxy);
-            if (isValidIcs(text)) {
-              return this.parse(text, calendarId);
-            }
+          console.log(`[ICSParser] Tentative via ${proxy.name}...`);
+          const resp = await fetchWithTimeout(proxy.url, 3500);
+          if (!resp.ok) {
+            console.warn(`[ICSParser] ${proxy.name} statut HTTP ${resp.status}`);
+            continue;
           }
-        } catch (proxyErr) {
+          const text = await proxy.getText(resp);
+          if (isValidIcs(text)) {
+            console.log(`[ICSParser] Succès : flux iCal validé via ${proxy.name}`);
+            return this.parse(text, calendarId);
+          } else {
+            console.warn(`[ICSParser] ${proxy.name} réponse invalide (non-iCal)`);
+          }
+        } catch (err) {
+          console.warn(`[ICSParser] ${proxy.name} échoué :`, err.name === 'AbortError' ? 'Délai dépassé (3.5s)' : err.message);
           continue;
         }
       }
 
-      throw new Error("Impossible de charger le flux en ligne. Vérifiez votre connexion ou l'URL du calendrier.");
+      throw new Error("Impossible de récupérer l'emploi du temps via les proxys. Vérifiez l'URL de votre flux.");
     }
   };
 // ==========================================================================
@@ -1843,6 +1866,11 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
                 </div>
 
                 <div class="flex items-center gap-2">
+                  <button id="refresh-edt-btn" title="Actualiser l'EDT (re-télécharger le flux ICS)" class="px-3.5 py-2 rounded-xl text-xs font-black bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 transition-all flex items-center gap-1.5 shadow-xs cursor-pointer active:scale-95">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5 flex-shrink-0"></i>
+                    <span id="refresh-edt-label">Actualiser</span>
+                  </button>
+
                   <button id="manage-calendars-btn" class="px-3.5 py-2 rounded-xl text-xs font-black bg-creme-200 hover:bg-creme-300 dark:bg-ink-darkbg dark:hover:bg-zinc-800 text-ink dark:text-zinc-200 border border-creme-300 dark:border-ink-border transition-all flex items-center gap-1.5 shadow-xs">
                     <i data-lucide="layers" class="w-3.5 h-3.5 text-solaire-500"></i>
                     <span class="hidden sm:inline">Calendriers</span>
@@ -3194,6 +3222,13 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
           const idx = weekDays.findIndex(w => w.dateStr === todayStr);
           this.activeDayMobileIndex = idx !== -1 ? idx : 0;
           this.render(container);
+        });
+      }
+
+      const refreshEdtBtn = container.querySelector('#refresh-edt-btn');
+      if (refreshEdtBtn) {
+        refreshEdtBtn.addEventListener('click', () => {
+          this.refreshEDT(true);
         });
       }
 
