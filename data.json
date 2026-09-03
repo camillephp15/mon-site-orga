@@ -9913,13 +9913,7 @@
       }
     ]
   },
-  "longtermCategories": [
-    {
-      "id": "cat_1788103791499",
-      "name": "physique",
-      "color": "coral"
-    }
-  ],
+  "longtermCategories": [],
   "longtermTodos": [],
   "flashcards": [
     {
