@@ -75,88 +75,57 @@
 
   function extractAndFormatSubject(rawTitle) {
     if (!rawTitle) return { subject: 'Cours', hasExam: false, matchedRule: null, remainingTitle: '' };
-    const str = rawTitle.trim();
+    let str = String(rawTitle).trim();
 
     // Vérifier si [EXAM] est présent dans le texte brut
     const hasExam = /\[(?:EXAM|EXAMEN|DS|PARTIEL)\]/i.test(str) || /\b(?:EXAM|EXAMEN|DS|PARTIEL)\b/i.test(str);
 
-    // 1. Recherche prioritaire dans la liste officielle des matières
+    // Supprimer TOUS les préfixes/codes techniques entre crochets : [MESISK230226], [RESA_REUNION], [CM], [TD], [TP], etc.
+    // Tout ce qui est entre crochets est retiré (sauf la mention [EXAM])
+    let cleanStr = str.replace(/\[(?!EXAM|EXAMEN|DS|PARTIEL)[^\]]*\]/gi, ' ').trim();
+    cleanStr = cleanStr.replace(/^[-:\s]+/, '').trim();
+
+    // 1. Recherche dans la liste officielle des matières (sur le texte épuré et sur le texte brut)
     for (const item of KNOWN_SUBJECTS_S1) {
       for (const pattern of item.patterns) {
-        const match = str.match(pattern);
-        if (match) {
+        if (pattern.test(cleanStr) || pattern.test(str)) {
           let canonicalName = item.canonical;
           if (hasExam) canonicalName += ' [EXAM]';
           // Isoler le reste du texte (pour extraire le professeur)
-          const remaining = str.replace(pattern, '').trim();
+          const remaining = cleanStr.replace(pattern, '').replace(/^[-:\s]+/, '').trim();
           return { subject: canonicalName, hasExam, matchedRule: item, remainingTitle: remaining };
         }
       }
     }
 
     // 2. Fallback si non trouvé dans la liste officielle
-    let fallback = str;
-    // Supprimer les codes type [MESISI...] et balises
-    fallback = fallback.replace(/^(?:\[[^\]]+\]\s*)+/, '').trim();
-    fallback = fallback.replace(/\s*\[(CM|TD|TP|DS|Colle|Khôlle|Examen|Partiel|PROJET|CONF|SEMINAIRE|CONFÉRENCE|SOUTENANCE|COURS)\]\s*/gi, ' ').trim();
-    fallback = fallback.replace(/\[[A-Z0-9_-]{4,}\]/gi, '').trim();
-
+    let fallback = cleanStr;
     let remaining = '';
+
     const dashMatch = fallback.match(/^(.+?)\s+-\s+(.+)$/);
     if (dashMatch) {
       fallback = dashMatch[1].trim();
       remaining = dashMatch[2].trim();
     }
 
+    // Nettoyer d'éventuels crochets ou résidus
+    fallback = fallback.replace(/\[(?!EXAM|EXAMEN)[^\]]*\]/gi, '').trim();
+    fallback = fallback.replace(/^[-:\s]+/, '').trim();
+
     if (hasExam && !fallback.includes('[EXAM]')) fallback += ' [EXAM]';
     return { subject: fallback || 'Cours', hasExam, matchedRule: null, remainingTitle: remaining };
   }
 
   function formatRoom(rawRoom) {
+    // Affichage brut : on ne reformate plus le nom de la salle, on renvoie tel quel
+    // ce qui est reçu du flux ICS (champ LOCATION), en ne filtrant que les valeurs
+    // vides ou clairement invalides.
     if (!rawRoom) return '';
-    let roomStr = String(rawRoom).trim();
+    const roomStr = String(rawRoom).trim();
     if (!roomStr || roomStr.toLowerCase() === 'undefined' || roomStr.toLowerCase() === 'null') {
       return '';
     }
-
-    // 1. Si le texte contient "zoom", "visio", "teams" ou "distanciel" -> "ZOOM"
-    if (/zoom|distanciel|visio|teams/i.test(roomStr)) {
-      return 'ZOOM';
-    }
-
-    // 2. Adresses externes (stages, entreprises...) : un code postal français
-    //    (5 chiffres) est un signal fiable qu'il ne s'agit pas d'une salle de campus.
-    if (/\b\d{5}\b/.test(roomStr)) {
-      return '';
-    }
-
-    const NO_ROOM_RE = /^(salles?(\s+de\s+cours)?|salles?\s+mobiles?|sans\s+salle|sur\s+campus|non\s+pr[ée]cis[ée]e?|inconnue?|[aà]\s+d[ée]finir|-*)$/i;
-
-    // 3. Découper par les virgules (multi-salles ou salle unique)
-    const parts = roomStr.split(',');
-    const cleanedRooms = parts.map(part => {
-      let p = part.trim();
-      // Supprimer le préfixe de bâtiment (ex: "MTPL-", "MTP1-", "PÔLE-", "NCHA  - "),
-      // accents inclus, avec ou sans espaces autour du tiret
-      p = p.replace(/^[^\s-]+\s*-\s*/, '').trim();
-      // Nettoyer un tiret résiduel (ex: double tiret "NCHA--101", ou juste "-")
-      p = p.replace(/^-+\s*/, '').trim();
-      // Supprimer tout ce qui se trouve entre parenthèses (ex: capacité " (39)", "(40)")
-      p = p.replace(/\s*\(.*?\)/g, '').trim();
-
-      if (!p || NO_ROOM_RE.test(p)) return '';
-
-      // Ne garder que le premier "mot" : élimine les mentions parasites du type
-      // "314 Labo physique" ou "E209 SC" pour ne garder que le numéro/code de salle
-      p = p.split(/\s+/)[0];
-      // Supprimer le mot "Salle" ou "Salles" initial si présent
-      p = p.replace(/^salles?\s+/i, '').trim();
-
-      return NO_ROOM_RE.test(p) ? '' : p;
-    }).filter(Boolean);
-
-    if (cleanedRooms.length === 0) return '';
-    return Array.from(new Set(cleanedRooms)).join(', ');
+    return roomStr;
   }
 
   // ==========================================================================
@@ -1643,7 +1612,7 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
         return typeof text === 'string' && (text.includes('BEGIN:VCALENDAR') || text.includes('BEGIN:VEVENT'));
       };
 
-      const fetchWithTimeout = async (fetchUrl, options = {}, timeoutMs = 8000) => {
+      const fetchWithTimeout = async (fetchUrl, options = {}, timeoutMs = 4000) => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
         try {
@@ -1667,7 +1636,7 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
 
       // Tentative 1 : Accès direct (si le serveur autorise CORS)
       try {
-        const resp = await fetchWithTimeout(freshUrl);
+        const resp = await fetchWithTimeout(freshUrl, {}, 3000);
         if (resp.ok) {
           const text = await resp.text();
           if (isValidIcs(text)) {
@@ -1678,14 +1647,9 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
         // Erreur CORS ou réseau -> passage aux proxys
       }
 
-      // Tentative 2 : Proxys CORS avec secours en cascade et validation de contenu
+      // Tentative 2 : Proxys CORS rapides avec secours et validation de contenu
       const encodedTarget = encodeURIComponent(freshUrl);
       const proxies = [
-        {
-          name: 'allorigins-raw',
-          url: `https://api.allorigins.win/raw?url=${encodedTarget}&_cb=${Date.now()}`,
-          getText: async (r) => r.text()
-        },
         {
           name: 'allorigins-json',
           url: `https://api.allorigins.win/get?url=${encodedTarget}&_cb=${Date.now()}`,
@@ -1700,20 +1664,15 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
           getText: async (r) => r.text()
         },
         {
-          name: 'corsproxy',
-          url: `https://corsproxy.io/?url=${encodedTarget}`,
-          getText: async (r) => r.text()
-        },
-        {
-          name: 'thingproxy',
-          url: `https://thingproxy.freeboard.io/fetch/${freshUrl}`,
+          name: 'allorigins-raw',
+          url: `https://api.allorigins.win/raw?url=${encodedTarget}&_cb=${Date.now()}`,
           getText: async (r) => r.text()
         }
       ];
 
       for (const proxy of proxies) {
         try {
-          const respProxy = await fetchWithTimeout(proxy.url, {}, 8000);
+          const respProxy = await fetchWithTimeout(proxy.url, {}, 4000);
           if (respProxy.ok) {
             const text = await proxy.getText(respProxy);
             if (isValidIcs(text)) {
@@ -1738,7 +1697,8 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
     miniCalDate: new Date(),
     todoFilter: 'all',
     selectedTagForNewTodo: 'Maths',
-    _autoSynced: false,
+    _hasAutoRefreshedOnLoad: false,
+    _isSyncing: false,
 
     _getWeekDates(monday) {
       const days = [];
@@ -1833,11 +1793,6 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
                 </div>
 
                 <div class="flex items-center gap-2">
-                  <button id="refresh-edt-btn" title="Actualiser l'EDT (re-télécharger les dernières données du flux ICS)" class="px-3.5 py-2 rounded-xl text-xs font-black bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 transition-all flex items-center gap-1.5 shadow-xs cursor-pointer">
-                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                    <span id="refresh-edt-label">Actualiser l'EDT</span>
-                  </button>
-
                   <button id="manage-calendars-btn" class="px-3.5 py-2 rounded-xl text-xs font-black bg-creme-200 hover:bg-creme-300 dark:bg-ink-darkbg dark:hover:bg-zinc-800 text-ink dark:text-zinc-200 border border-creme-300 dark:border-ink-border transition-all flex items-center gap-1.5 shadow-xs">
                     <i data-lucide="layers" class="w-3.5 h-3.5 text-solaire-500"></i>
                     <span class="hidden sm:inline">Calendriers</span>
@@ -2068,14 +2023,18 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       this._renderImportantDates();
       this._updateCurrentTimeIndicator();
 
-      // Actualisation automatique systématique au premier affichage
+      // Actualisation automatique en arrière-plan (une seule fois au démarrage, non bloquante)
       if (!this._hasAutoRefreshedOnLoad) {
         this._hasAutoRefreshedOnLoad = true;
-        this.refreshEDT(false);
+        setTimeout(() => {
+          this.refreshEDT(false);
+        }, 400);
       }
     },
 
     async refreshEDT(isManual = false) {
+      if (this._isSyncing) return 0; // Empêche toute exécution concurrente ou boucle infinie
+
       const calsWithUrl = store.getCalendars().filter(c => !!c.feedUrl);
       const refreshBtn = document.getElementById('refresh-edt-btn');
       const icon = refreshBtn ? refreshBtn.querySelector('svg, i') : null;
@@ -2089,6 +2048,7 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
         return 0;
       }
 
+      this._isSyncing = true;
       if (refreshBtn) refreshBtn.disabled = true;
       if (icon) icon.classList.add('animate-spin');
       if (label) label.textContent = isManual ? 'Actualisation...' : 'Sync...';
@@ -2104,10 +2064,10 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
           if (count > 0) {
             Toast.success(`Emploi du temps actualisé ! (${count} cours synchronisés)`);
           } else {
-            Toast.info("Emploi du temps déjà à jour (aucun nouveau cours).");
+            Toast.info("Emploi du temps déjà à jour.");
           }
         } else if (count > 0) {
-          Toast.success(`Emploi du temps actualisé (${count} cours synchronisés)`);
+          Toast.success(`Emploi du temps actualisé (${count} cours à jour)`);
         }
         return count;
       } catch (err) {
@@ -2117,8 +2077,9 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
         }
         return 0;
       } finally {
+        this._isSyncing = false;
         if (icon) icon.classList.remove('animate-spin');
-        if (label) label.textContent = "Actualiser l'EDT";
+        if (label) label.textContent = "Actualiser";
         if (refreshBtn) refreshBtn.disabled = false;
         if (window.lucide) window.lucide.createIcons();
       }
@@ -2216,14 +2177,13 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
           eventEl.style.borderLeftColor = ev.color;
           eventEl.style.color = ev.color;
 
-          // ev.title / ev.room / ev.teacher sont déjà nettoyés au moment de l'import ICS
-          // (voir ICSParser._processVEvent -> parseEventDetails). On les réutilise tels quels
-          // ici plutôt que de les repasser dans formatRoom()/extractAndFormatSubject() une
-          // deuxième fois : ça évite tout risque de perte d'info sur un second passage.
+          // Nettoyage systématique du titre (pour éliminer les codes du type [MESISK230226] ou [RESA_REUNION])
+          // et de la salle pour un affichage parfait sur chaque carte
+          const subjectCleaned = extractAndFormatSubject(ev.title || 'Cours').subject;
           const parsed = {
-            subject: ev.title || 'Cours',
+            subject: subjectCleaned,
             teacher: (ev.teacher || '').trim(),
-            room: ev.room || ''
+            room: formatRoom(ev.room)
           };
 
           const startH = parseInt(ev.startTime.split(':')[0], 10);
@@ -3184,13 +3144,6 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
           const idx = weekDays.findIndex(w => w.dateStr === todayStr);
           this.activeDayMobileIndex = idx !== -1 ? idx : 0;
           this.render(container);
-        });
-      }
-
-      const refreshEdtBtn = container.querySelector('#refresh-edt-btn');
-      if (refreshEdtBtn) {
-        refreshEdtBtn.addEventListener('click', () => {
-          this.refreshEDT(true);
         });
       }
 
@@ -4597,9 +4550,6 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       } else {
         GitHubSync._updateStatus('unconfigured');
       }
-
-      // Re-téléchargement automatique systématique du flux ICS à chaque ouverture / rechargement de page
-      DashboardView.refreshEDT(false);
     }
 
     _initTheme() {
