@@ -9832,6 +9832,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1788445180107"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "Exos Méca",
+      "teacher": "",
+      "date": "2026-09-04",
+      "day": "fri",
+      "startTime": "13:00",
+      "duration": 90,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1788445241491"
     }
   ],
   "importantDates": [
