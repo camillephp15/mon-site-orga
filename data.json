@@ -9545,6 +9545,20 @@
       "duration": 255,
       "type": "tp",
       "completed": false
+    },
+    {
+      "calendarId": "cal_1787764123477",
+      "title": "Bosser piano",
+      "teacher": "",
+      "date": "2026-09-03",
+      "day": "thu",
+      "startTime": "17:00",
+      "duration": 60,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1788443621669"
     }
   ],
   "importantDates": [
