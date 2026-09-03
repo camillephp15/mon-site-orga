@@ -1651,6 +1651,14 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       const encodedTarget = encodeURIComponent(freshUrl);
       const proxies = [
         {
+          // Corsfix : nécessite d'avoir ajouté le domaine du site (ex: tonpseudo.github.io)
+          // sur https://corsfix.com (compte gratuit, sans carte bancaire, ~2 min).
+          // Pas de limite de requêtes une fois le domaine autorisé.
+          name: 'corsfix',
+          url: `https://proxy.corsfix.com/?${freshUrl}`,
+          getText: async (r) => r.text()
+        },
+        {
           name: 'allorigins-json',
           url: `https://api.allorigins.win/get?url=${encodedTarget}&_cb=${Date.now()}`,
           getText: async (r) => {
@@ -1672,7 +1680,7 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
 
       for (const proxy of proxies) {
         try {
-          const respProxy = await fetchWithTimeout(proxy.url, {}, 4000);
+          const respProxy = await fetchWithTimeout(proxy.url, {}, 8000);
           if (respProxy.ok) {
             const text = await proxy.getText(respProxy);
             if (isValidIcs(text)) {
