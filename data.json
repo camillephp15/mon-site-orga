@@ -9900,16 +9900,16 @@
         "methods": "• Principes SOLID.\n• Encapsulation : attributs privés + getters/setters."
       },
       {
-        "id": "info-ch2",
-        "title": "Structures de données",
-        "exosTodo": "• Arbres binaires de recherche (ABR) et arbres AVL\n• Tas binaires et files de priorité",
-        "methods": "• Recherche dans un ABR équilibré : O(log n).\n• Parcours : infixe (trié), préfixe, postfixe."
-      },
-      {
         "id": "info-ch3",
         "title": "Conception base de données",
         "exosTodo": "• Modèle Entité-Association vers Modèle Relationnel\n• Formes normales (1NF, 2NF, 3NF, BCNF)",
         "methods": "• Règle de passage 1:N : la clé primaire devient clé étrangère côté N."
+      },
+      {
+        "id": "info-ch2",
+        "title": "Structures de données",
+        "exosTodo": "• Arbres binaires de recherche (ABR) et arbres AVL\n• Tas binaires et files de priorité",
+        "methods": "• Recherche dans un ABR équilibré : O(log n).\n• Parcours : infixe (trié), préfixe, postfixe."
       }
     ]
   },
