@@ -9585,7 +9585,7 @@
       "room": "",
       "recurrence": "none",
       "groupId": null,
-      "completed": false,
+      "completed": true,
       "id": "ev_1788443693972"
     },
     {
