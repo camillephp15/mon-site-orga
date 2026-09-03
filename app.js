@@ -210,11 +210,10 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
   }
 
   // ==========================================================================
-  // 3. TOAST NOTIFICATIONS (Succès silencieux pour création/mise à jour)
+  // 3. TOAST NOTIFICATIONS (Alertes et retours visuels interactifs)
   // ==========================================================================
   const Toast = {
     show(message, type = 'info', duration = 3500) {
-      if (type === 'success' || type === 'info') return; // Silence des toasts de succès/info demandés
       const container = document.getElementById('toast-container');
       if (!container) return;
 
@@ -226,7 +225,7 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       toast.innerHTML = `
         <div class="flex-shrink-0">${icon}</div>
         <div class="flex-1">${message}</div>
-        <button class="toast-close text-current opacity-60 hover:opacity-100 p-0.5 rounded-lg">
+        <button class="toast-close text-current opacity-60 hover:opacity-100 p-0.5 rounded-lg cursor-pointer">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       `;
@@ -247,21 +246,21 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       if (duration > 0) setTimeout(removeToast, duration);
     },
 
-    success(msg, duration) {
-      // Silence total des pop-ups de succès lors de la création / modification
-    },
-    info(msg, duration) {
-      // Silence des notifications informatives intempestives
-    },
+    success(msg, duration) { this.show(msg, 'success', duration || 3500); },
+    info(msg, duration) { this.show(msg, 'info', duration || 3000); },
     error(msg, duration) { this.show(msg, 'error', duration || 5000); },
-    warning(msg, duration) { this.show(msg, 'warning', duration); },
+    warning(msg, duration) { this.show(msg, 'warning', duration || 4000); },
 
     _getStyle(type) {
       switch (type) {
+        case 'success':
+          return 'bg-emerald-500 text-white border-emerald-600 shadow-emerald-500/20';
         case 'error':
           return 'bg-rose-500 text-white border-rose-600 shadow-rose-500/20';
         case 'warning':
           return 'bg-orangePop-500 text-white border-orangePop-600 shadow-orangePop-500/20';
+        case 'info':
+          return 'bg-sky-500 text-white border-sky-600 shadow-sky-500/20';
         default:
           return 'bg-ink text-white dark:bg-white dark:text-ink border-creme-300 dark:border-ink-border';
       }
@@ -269,6 +268,10 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
 
     _getIcon(type) {
       switch (type) {
+        case 'success':
+          return '<svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        case 'info':
+          return '<svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>';
         case 'error':
           return '<svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
         case 'warning':
@@ -1239,7 +1242,14 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       try {
         const events = await ICSParser.fetchFromUrl(cal.feedUrl, cal.id);
         if (events && events.length) {
-          this.data.events = (this.data.events || []).filter(e => e.calendarId !== cal.id);
+          this.data.events = (this.data.events || []).filter(e => {
+            if (e.calendarId === cal.id) return false;
+            // Nettoyer également les vieux événements ICS orphelins si c'est le calendrier par défaut
+            if (cal.isDefault && (!e.calendarId || e.calendarId === 'cal-default') && String(e.id).startsWith('ics_')) {
+              return false;
+            }
+            return true;
+          });
           this.data.events.push(...events);
           cal.lastSync = new Date().toISOString();
           this.save();
@@ -1247,6 +1257,7 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
         }
       } catch (err) {
         console.warn(`Échec mise à jour flux calendrier ${cal.name}:`, err);
+        throw err;
       }
       return 0;
     }
@@ -1256,10 +1267,22 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       if (!calsWithUrl.length) return 0;
 
       let totalUpdated = 0;
+      let lastError = null;
+
       for (const cal of calsWithUrl) {
-        const count = await this.refreshCalendarFeed(cal.id);
-        totalUpdated += count;
+        try {
+          const count = await this.refreshCalendarFeed(cal.id);
+          totalUpdated += count;
+        } catch (err) {
+          lastError = err;
+          console.warn(`Erreur sync pour ${cal.name}:`, err);
+        }
       }
+
+      if (totalUpdated === 0 && lastError) {
+        throw lastError;
+      }
+
       return totalUpdated;
     }
 
@@ -1606,20 +1629,103 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
     },
 
     async fetchFromUrl(url, calendarId) {
-      let targetUrl = url.trim();
-      if (targetUrl.startsWith('webcal://')) targetUrl = targetUrl.replace('webcal://', 'https://');
-      try {
-        const resp = await fetch(targetUrl);
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const text = await resp.text();
-        return this.parse(text, calendarId);
-      } catch (e) {
-        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
-        const respProxy = await fetch(proxyUrl);
-        if (!respProxy.ok) throw new Error('Erreur de chargement du flux.');
-        const text = await respProxy.text();
-        return this.parse(text, calendarId);
+      let targetUrl = (url || '').trim();
+      if (!targetUrl) throw new Error('URL de flux manquante.');
+      if (targetUrl.startsWith('webcal://')) {
+        targetUrl = targetUrl.replace(/^webcal:\/\//i, 'https://');
       }
+
+      // 1. Cache-busting systématique : timestamp unique dans l'URL pour forcer un re-téléchargement frais
+      const sep = targetUrl.includes('?') ? '&' : '?';
+      const freshUrl = `${targetUrl}${sep}_t=${Date.now()}`;
+
+      const isValidIcs = (text) => {
+        return typeof text === 'string' && (text.includes('BEGIN:VCALENDAR') || text.includes('BEGIN:VEVENT'));
+      };
+
+      const fetchWithTimeout = async (fetchUrl, options = {}, timeoutMs = 8000) => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+          const resp = await fetch(fetchUrl, {
+            ...options,
+            signal: controller.signal,
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+              ...(options.headers || {})
+            }
+          });
+          clearTimeout(timeoutId);
+          return resp;
+        } catch (err) {
+          clearTimeout(timeoutId);
+          throw err;
+        }
+      };
+
+      // Tentative 1 : Accès direct (si le serveur autorise CORS)
+      try {
+        const resp = await fetchWithTimeout(freshUrl);
+        if (resp.ok) {
+          const text = await resp.text();
+          if (isValidIcs(text)) {
+            return this.parse(text, calendarId);
+          }
+        }
+      } catch (e) {
+        // Erreur CORS ou réseau -> passage aux proxys
+      }
+
+      // Tentative 2 : Proxys CORS avec secours en cascade et validation de contenu
+      const encodedTarget = encodeURIComponent(freshUrl);
+      const proxies = [
+        {
+          name: 'allorigins-raw',
+          url: `https://api.allorigins.win/raw?url=${encodedTarget}&_cb=${Date.now()}`,
+          getText: async (r) => r.text()
+        },
+        {
+          name: 'allorigins-json',
+          url: `https://api.allorigins.win/get?url=${encodedTarget}&_cb=${Date.now()}`,
+          getText: async (r) => {
+            const json = await r.json();
+            return json.contents || '';
+          }
+        },
+        {
+          name: 'codetabs',
+          url: `https://api.codetabs.com/v1/proxy?quest=${encodedTarget}`,
+          getText: async (r) => r.text()
+        },
+        {
+          name: 'corsproxy',
+          url: `https://corsproxy.io/?url=${encodedTarget}`,
+          getText: async (r) => r.text()
+        },
+        {
+          name: 'thingproxy',
+          url: `https://thingproxy.freeboard.io/fetch/${freshUrl}`,
+          getText: async (r) => r.text()
+        }
+      ];
+
+      for (const proxy of proxies) {
+        try {
+          const respProxy = await fetchWithTimeout(proxy.url, {}, 8000);
+          if (respProxy.ok) {
+            const text = await proxy.getText(respProxy);
+            if (isValidIcs(text)) {
+              return this.parse(text, calendarId);
+            }
+          }
+        } catch (proxyErr) {
+          continue;
+        }
+      }
+
+      throw new Error("Impossible de charger le flux en ligne. Vérifiez votre connexion ou l'URL du calendrier.");
     }
   };
 // ==========================================================================
@@ -1727,6 +1833,11 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
                 </div>
 
                 <div class="flex items-center gap-2">
+                  <button id="refresh-edt-btn" title="Actualiser l'EDT (re-télécharger les dernières données du flux ICS)" class="px-3.5 py-2 rounded-xl text-xs font-black bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 transition-all flex items-center gap-1.5 shadow-xs cursor-pointer">
+                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                    <span id="refresh-edt-label">Actualiser l'EDT</span>
+                  </button>
+
                   <button id="manage-calendars-btn" class="px-3.5 py-2 rounded-xl text-xs font-black bg-creme-200 hover:bg-creme-300 dark:bg-ink-darkbg dark:hover:bg-zinc-800 text-ink dark:text-zinc-200 border border-creme-300 dark:border-ink-border transition-all flex items-center gap-1.5 shadow-xs">
                     <i data-lucide="layers" class="w-3.5 h-3.5 text-solaire-500"></i>
                     <span class="hidden sm:inline">Calendriers</span>
@@ -1957,16 +2068,59 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       this._renderImportantDates();
       this._updateCurrentTimeIndicator();
 
-      if (!this._autoSynced) {
-        this._autoSynced = true;
-        const calsWithUrl = store.getCalendars().filter(c => !!c.feedUrl);
-        if (calsWithUrl.length) {
-          store.refreshAllFeeds().then(count => {
-            if (count > 0) {
-              this._renderTimetableEvents();
-            }
-          });
+      // Actualisation automatique systématique au premier affichage
+      if (!this._hasAutoRefreshedOnLoad) {
+        this._hasAutoRefreshedOnLoad = true;
+        this.refreshEDT(false);
+      }
+    },
+
+    async refreshEDT(isManual = false) {
+      const calsWithUrl = store.getCalendars().filter(c => !!c.feedUrl);
+      const refreshBtn = document.getElementById('refresh-edt-btn');
+      const icon = refreshBtn ? refreshBtn.querySelector('svg, i') : null;
+      const label = refreshBtn ? refreshBtn.querySelector('#refresh-edt-label') : null;
+
+      if (!calsWithUrl.length) {
+        if (isManual) {
+          Toast.warning("Aucun flux ICS configuré. Cliquez sur 'Calendriers' pour renseigner l'URL de votre EDT.");
+          this._openManageCalendarsDrawer(document.getElementById('view-dashboard') || document.body);
         }
+        return 0;
+      }
+
+      if (refreshBtn) refreshBtn.disabled = true;
+      if (icon) icon.classList.add('animate-spin');
+      if (label) label.textContent = isManual ? 'Actualisation...' : 'Sync...';
+
+      if (isManual) {
+        Toast.info("Téléchargement du flux ICS en cours...");
+      }
+
+      try {
+        const count = await store.refreshAllFeeds();
+        this._renderTimetableEvents();
+        if (isManual) {
+          if (count > 0) {
+            Toast.success(`Emploi du temps actualisé ! (${count} cours synchronisés)`);
+          } else {
+            Toast.info("Emploi du temps déjà à jour (aucun nouveau cours).");
+          }
+        } else if (count > 0) {
+          Toast.success(`Emploi du temps actualisé (${count} cours synchronisés)`);
+        }
+        return count;
+      } catch (err) {
+        console.warn("Erreur actualisation flux:", err);
+        if (isManual) {
+          Toast.error("Échec de l'actualisation : " + (err.message || "Vérifiez l'URL ou la connexion"));
+        }
+        return 0;
+      } finally {
+        if (icon) icon.classList.remove('animate-spin');
+        if (label) label.textContent = "Actualiser l'EDT";
+        if (refreshBtn) refreshBtn.disabled = false;
+        if (window.lucide) window.lucide.createIcons();
       }
     },
 
@@ -2614,7 +2768,7 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
           <div class="p-5 rounded-3xl bg-creme-100/70 dark:bg-ink-darkbg/70 border border-creme-300 dark:border-zinc-800 space-y-3.5">
             <h4 class="text-xs font-black uppercase tracking-wider text-zinc-700 dark:text-zinc-300 flex items-center gap-1.5">
               <i data-lucide="download-cloud" class="w-4 h-4 text-orangePop-500"></i>
-              Ou Synchroniser un flux iCal / Webcal
+              Ou Synchroniser un flux iCal / Webcal (URL)
             </h4>
 
             <div>
@@ -2626,10 +2780,15 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
               <label class="block text-[11px] font-black text-ink dark:text-zinc-300 mb-1">Lien URL permanent</label>
               <div class="flex gap-2">
                 <input type="text" id="ics-cal-url" placeholder="https://... ou webcal://..." class="custom-input w-full text-xs px-3 py-2 rounded-xl font-mono">
-                <button id="btn-import-ics-url" class="px-4 py-2 bg-orangePop-500 hover:bg-orangePop-600 text-white rounded-xl text-xs font-black flex-shrink-0 flex items-center gap-1 shadow-sm">
+                <button id="btn-import-ics-url" class="px-4 py-2 bg-orangePop-500 hover:bg-orangePop-600 text-white rounded-xl text-xs font-black flex-shrink-0 flex items-center gap-1 shadow-sm cursor-pointer">
                   <span>Sync</span>
                 </button>
               </div>
+            </div>
+
+            <div class="pt-2 border-t border-creme-200 dark:border-zinc-800">
+              <label class="block text-[11px] font-black text-ink dark:text-zinc-300 mb-1">Ou importer un fichier .ics depuis votre appareil</label>
+              <input type="file" id="ics-file-input" accept=".ics,text/calendar" class="w-full text-xs text-zinc-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-creme-200 file:text-ink hover:file:bg-creme-300 cursor-pointer">
             </div>
           </div>
 
@@ -2641,19 +2800,28 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
             <div class="space-y-3 max-h-60 overflow-y-auto pr-1">
               ${calendars.map(cal => {
                 const count = allEvents.filter(e => e.calendarId === cal.id).length;
+                const syncTimeStr = cal.lastSync ? new Date(cal.lastSync).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
                 return `
                   <div class="p-4 rounded-2xl bg-white dark:bg-ink-darkcard border border-creme-300 dark:border-ink-border flex items-center justify-between gap-3 shadow-xs">
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
                       <span class="w-4 h-4 rounded-full flex-shrink-0 shadow-xs" style="background-color: ${cal.color};"></span>
-                      <div>
-                        <h5 class="text-xs font-black text-ink dark:text-white">${cal.name}</h5>
-                        <p class="text-[10px] text-zinc-500 font-bold">${count} cours associés</p>
+                      <div class="min-w-0 flex-1">
+                        <h5 class="text-xs font-black text-ink dark:text-white truncate">${cal.name}</h5>
+                        <p class="text-[10px] text-zinc-500 font-bold">${count} cours associés ${syncTimeStr ? `• Sync : ${syncTimeStr}` : ''}</p>
+                        ${cal.feedUrl ? `<p class="text-[9.5px] text-emerald-600 dark:text-emerald-400 font-mono truncate max-w-[240px]" title="${cal.feedUrl}">🔗 ${cal.feedUrl}</p>` : ''}
                       </div>
                     </div>
 
-                    <button data-delete-cal="${cal.id}" title="Supprimer ce calendrier" class="p-1.5 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors">
-                      <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
+                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                      ${cal.feedUrl ? `
+                        <button data-refresh-cal="${cal.id}" title="Actualiser ce flux ICS" class="p-1.5 rounded-xl text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors cursor-pointer">
+                          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                        </button>
+                      ` : ''}
+                      <button data-delete-cal="${cal.id}" title="Supprimer ce calendrier" class="p-1.5 rounded-xl text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                      </button>
+                    </div>
                   </div>
                 `;
               }).join('')}
@@ -2684,15 +2852,81 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
             const url = panelEl.querySelector('#ics-cal-url').value.trim();
             if (!url) { Toast.warning('Veuillez renseigner une URL de flux.'); return; }
 
+            const syncBtn = panelEl.querySelector('#btn-import-ics-url');
+            syncBtn.disabled = true;
+            syncBtn.innerHTML = '<span>Sync...</span>';
+
             try {
               const newCal = store.addCalendar(name, '#ff3366', url);
               const events = await ICSParser.fetchFromUrl(url, newCal.id);
-              events.forEach(e => store.addEvent(e));
+              if (events && events.length) {
+                store.data.events = (store.data.events || []).filter(e => e.calendarId !== newCal.id);
+                store.data.events.push(...events);
+                newCal.lastSync = new Date().toISOString();
+                store.save();
+                Toast.success(`Flux synchronisé avec succès ! (${events.length} cours)`);
+              } else {
+                Toast.warning('Calendrier ajouté, mais aucun cours détecté dans le flux.');
+              }
               Drawer.close();
               this.render(container);
             } catch (err) {
               Toast.error(err.message || 'Erreur lors de l\'import.');
+            } finally {
+              syncBtn.disabled = false;
+              syncBtn.innerHTML = '<span>Sync</span>';
             }
+          });
+
+          const fileInput = panelEl.querySelector('#ics-file-input');
+          if (fileInput) {
+            fileInput.addEventListener('change', (e) => {
+              const file = e.target.files[0];
+              if (!file) return;
+              const name = file.name.replace(/\.[^/.]+$/, '') || 'EDT Importé';
+              const reader = new FileReader();
+              reader.onload = (ev) => {
+                try {
+                  const icsContent = ev.target.result;
+                  const newCal = store.addCalendar(name, '#ff3366', '');
+                  const events = ICSParser.parse(icsContent, newCal.id);
+                  if (events && events.length) {
+                    store.data.events = (store.data.events || []).filter(e => e.calendarId !== newCal.id);
+                    store.data.events.push(...events);
+                    newCal.lastSync = new Date().toISOString();
+                    store.save();
+                    Toast.success(`Fichier .ics importé avec succès ! (${events.length} cours ajoutés)`);
+                  } else {
+                    Toast.warning('Aucun cours détecté dans ce fichier .ics.');
+                  }
+                  Drawer.close();
+                  this.render(container);
+                } catch (err) {
+                  Toast.error("Erreur lors de l'analyse du fichier .ics : " + err.message);
+                }
+              };
+              reader.readAsText(file);
+            });
+          }
+
+          panelEl.querySelectorAll('[data-refresh-cal]').forEach(btn => {
+            btn.addEventListener('click', async () => {
+              const calId = btn.dataset.refreshCal;
+              btn.disabled = true;
+              const icon = btn.querySelector('svg, i');
+              if (icon) icon.classList.add('animate-spin');
+              try {
+                const count = await store.refreshCalendarFeed(calId);
+                this.render(container);
+                Toast.success(`Calendrier synchronisé ! (${count} cours)`);
+                this._openManageCalendarsDrawer(container);
+              } catch (err) {
+                Toast.error('Échec actualisation : ' + err.message);
+              } finally {
+                btn.disabled = false;
+                if (icon) icon.classList.remove('animate-spin');
+              }
+            });
           });
 
           panelEl.querySelectorAll('[data-delete-cal]').forEach(btn => {
@@ -2950,6 +3184,13 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
           const idx = weekDays.findIndex(w => w.dateStr === todayStr);
           this.activeDayMobileIndex = idx !== -1 ? idx : 0;
           this.render(container);
+        });
+      }
+
+      const refreshEdtBtn = container.querySelector('#refresh-edt-btn');
+      if (refreshEdtBtn) {
+        refreshEdtBtn.addEventListener('click', () => {
+          this.refreshEDT(true);
         });
       }
 
@@ -4356,6 +4597,9 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       } else {
         GitHubSync._updateStatus('unconfigured');
       }
+
+      // Re-téléchargement automatique systématique du flux ICS à chaque ouverture / rechargement de page
+      DashboardView.refreshEDT(false);
     }
 
     _initTheme() {
