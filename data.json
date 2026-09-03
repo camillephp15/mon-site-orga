@@ -9566,6 +9566,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1788443621669"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "Récap cours Méca",
+      "teacher": "",
+      "date": "2026-09-03",
+      "day": "thu",
+      "startTime": "18:00",
+      "duration": 60,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1788443693972"
     }
   ],
   "importantDates": [
