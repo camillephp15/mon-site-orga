@@ -9895,6 +9895,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1788446390854"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "Ecrire cours stat",
+      "teacher": "",
+      "date": "2026-09-07",
+      "day": "mon",
+      "startTime": "18:00",
+      "duration": 60,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1788446488656"
     }
   ],
   "importantDates": [
