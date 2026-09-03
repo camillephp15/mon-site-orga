@@ -9948,44 +9948,7 @@
       "color": "coral"
     }
   ],
-  "longtermTodos": [
-    {
-      "title": "Finir week 0",
-      "categoryId": "cat_1788445261779",
-      "priority": "normal",
-      "deadline": "2026-10-03",
-      "notes": "",
-      "status": "todo",
-      "id": "lt_1788445283684"
-    },
-    {
-      "title": "Finir week 1",
-      "categoryId": "cat_1788445261779",
-      "priority": "normal",
-      "deadline": "2026-10-03",
-      "notes": "",
-      "status": "todo",
-      "id": "lt_1788445288876"
-    },
-    {
-      "title": "Finir week 2",
-      "categoryId": "cat_1788445261779",
-      "priority": "normal",
-      "deadline": "2026-10-03",
-      "notes": "",
-      "status": "todo",
-      "id": "lt_1788445293508"
-    },
-    {
-      "title": "Finir week 3",
-      "categoryId": "cat_1788445261779",
-      "priority": "normal",
-      "deadline": "2026-10-03",
-      "notes": "",
-      "status": "todo",
-      "id": "lt_1788445299453"
-    }
-  ],
+  "longtermTodos": [],
   "flashcards": [],
   "gradesData": {
     "blocks": [
