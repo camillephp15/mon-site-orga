@@ -1700,46 +1700,22 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
         }
       };
 
-      // Tentative 1 : Accès direct (si le serveur autorise CORS)
-      try {
-        const resp = await fetchWithTimeout(freshUrl, {}, 3000);
-        if (resp.ok) {
-          const text = await resp.text();
-          if (isValidIcs(text)) {
-            return this.parse(text, calendarId);
-          }
-        }
-      } catch (e) {
-        // Erreur CORS ou réseau -> passage aux proxys
-      }
-
       // Tentative 2 : Proxys CORS rapides avec secours et validation de contenu
       const encodedTarget = encodeURIComponent(freshUrl);
       const proxies = [
         {
-          // Corsfix : nécessite d'avoir ajouté le domaine du site (ex: tonpseudo.github.io)
-          // sur https://corsfix.com (compte gratuit, sans carte bancaire, ~2 min).
-          // Pas de limite de requêtes une fois le domaine autorisé.
-          name: 'corsfix',
-          url: `https://proxy.corsfix.com/?${freshUrl}`,
-          getText: async (r) => r.text()
-        },
-        {
-          name: 'allorigins-json',
-          url: `https://api.allorigins.win/get?url=${encodedTarget}&_cb=${Date.now()}`,
-          getText: async (r) => {
-            const json = await r.json();
-            return json.contents || '';
-          }
-        },
-        {
-          name: 'codetabs',
-          url: `https://api.codetabs.com/v1/proxy?quest=${encodedTarget}`,
+          name: 'corsproxy.io',
+          url: `https://corsproxy.io/?${encodedTarget}`,
           getText: async (r) => r.text()
         },
         {
           name: 'allorigins-raw',
           url: `https://api.allorigins.win/raw?url=${encodedTarget}&_cb=${Date.now()}`,
+          getText: async (r) => r.text()
+        },
+        {
+          name: 'codetabs',
+          url: `https://api.codetabs.com/v1/proxy?quest=${encodedTarget}`,
           getText: async (r) => r.text()
         }
       ];
