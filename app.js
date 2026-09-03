@@ -1173,7 +1173,36 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       }
     }
 
-    getCalendars() { return this.data.calendars || []; }
+    getCalendars() {
+      const all = this.data.calendars || [];
+      // Fusion défensive des doublons de calendrier pointant vers le même flux iCal
+      // (peut arriver si un flux a été ajouté plusieurs fois lors de tests précédents) :
+      // on ne garde que le premier de chaque feedUrl, et on migre les événements
+      // des doublons vers celui qu'on conserve pour ne rien perdre au passage.
+      const seenUrls = new Map();
+      const toRemove = [];
+      for (const cal of all) {
+        if (!cal.feedUrl) continue;
+        const key = cal.feedUrl.trim().toLowerCase();
+        if (seenUrls.has(key)) {
+          toRemove.push({ dupId: cal.id, keepId: seenUrls.get(key) });
+        } else {
+          seenUrls.set(key, cal.id);
+        }
+      }
+      if (toRemove.length) {
+        toRemove.forEach(({ dupId, keepId }) => {
+          (this.data.events || []).forEach(e => {
+            if (e.calendarId === dupId) e.calendarId = keepId;
+          });
+        });
+        const dupIds = new Set(toRemove.map(r => r.dupId));
+        this.data.calendars = all.filter(c => !dupIds.has(c.id));
+        this.save();
+        return this.data.calendars;
+      }
+      return all;
+    }
     getCalendar(id) { return (this.data.calendars || []).find(c => c.id === id); }
     
     addCalendar(name, color = '#ff3366', feedUrl = '') {
@@ -1255,7 +1284,25 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       return totalUpdated;
     }
 
-    getEvents() { return this.data.events || []; }
+    getEvents() {
+      const events = this.data.events || [];
+      const seen = new Set();
+      const deduped = [];
+      let foundDupes = false;
+      for (const e of events) {
+        const key = [e.date, e.startTime, (e.title || '').trim().toLowerCase(), (e.room || '').trim().toLowerCase()].join('|');
+        if (seen.has(key)) { foundDupes = true; continue; }
+        seen.add(key);
+        deduped.push(e);
+      }
+      if (foundDupes) {
+        // On persiste le nettoyage une bonne fois pour toutes, pour ne pas garder
+        // des doublons qui grossissent indéfiniment le stockage local.
+        this.data.events = deduped;
+        this.save();
+      }
+      return deduped;
+    }
     addEvent(ev) {
       if (!ev.id) ev.id = 'ev_' + Date.now();
       if (!ev.calendarId) {
