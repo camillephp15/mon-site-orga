@@ -20,6 +20,13 @@
       "color": "#ff3366",
       "feedUrl": "https://ical.devinci.me/ical_student/2159fdf3ed4407fa16cb21f38289e911",
       "lastSync": "2026-09-03T12:16:51.199Z"
+    },
+    {
+      "id": "cal_1788443555880",
+      "name": "Travail Maison",
+      "color": "#f97316",
+      "feedUrl": "",
+      "lastSync": null
     }
   ],
   "events": [
