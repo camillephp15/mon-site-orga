@@ -9966,6 +9966,15 @@
       "notes": "",
       "status": "todo",
       "id": "lt_1788445353601"
+    },
+    {
+      "title": "Finir week 6",
+      "categoryId": "cat_1788445261779",
+      "priority": "normal",
+      "deadline": "2026-10-03",
+      "notes": "",
+      "status": "todo",
+      "id": "lt_1788445361201"
     }
   ],
   "flashcards": [],
