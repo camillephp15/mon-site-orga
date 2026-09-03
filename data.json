@@ -9844,13 +9844,6 @@
   "subjectsData": {
     "maths": [
       {
-        "id": "maths_ch_1788437022665",
-        "title": "Séries",
-        "exosTodo": "",
-        "exosHard": "",
-        "methods": ""
-      },
-      {
         "id": "maths_ch_1788437045747",
         "title": "Algèbre linéaire",
         "exosTodo": "",
@@ -9860,6 +9853,13 @@
       {
         "id": "maths_ch_1788437054547",
         "title": "Intro aux statistiques",
+        "exosTodo": "",
+        "exosHard": "",
+        "methods": ""
+      },
+      {
+        "id": "maths_ch_1788437022665",
+        "title": "Séries",
         "exosTodo": "",
         "exosHard": "",
         "methods": ""
