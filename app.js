@@ -1,5 +1,5 @@
 /**
- * StudyFlow - Application Web d'Organisation (Prépa / Ingénieur)
+ * Organisation personnelle
  * 
  * FONCTIONNALITÉS & AJUSTEMENTS :
  * 1. EDT immersif à gauche & Calendrier mensuel étendu à droite, To-Do List spacieuse en dessous.
@@ -1416,6 +1416,11 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
         this.data.subjectsData[subjectKey] = this.data.subjectsData[subjectKey].filter(c => c.id !== chapterId);
         this.save();
       }
+    }
+    reorderSubjectChapters(subjectKey, newChapters) {
+      if (!this.data.subjectsData) this.data.subjectsData = {};
+      this.data.subjectsData[subjectKey] = newChapters;
+      this.save();
     }
 
     getLongtermCategories() { return this.data.longtermCategories || []; }
@@ -2851,6 +2856,9 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
                     </div>
 
                     <div class="flex items-center gap-1.5 flex-shrink-0">
+                      <button data-edit-cal="${cal.id}" title="Modifier le calendrier" class="p-1.5 rounded-xl text-zinc-400 hover:text-solaire-600 hover:bg-solaire-50 dark:hover:bg-solaire-950/40 transition-colors cursor-pointer">
+                        <i data-lucide="edit-3" class="w-4 h-4"></i>
+                      </button>
                       ${cal.feedUrl ? `
                         <button data-refresh-cal="${cal.id}" title="Actualiser ce flux ICS" class="p-1.5 rounded-xl text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition-colors cursor-pointer">
                           <i data-lucide="refresh-cw" class="w-4 h-4"></i>
@@ -2977,6 +2985,76 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
                 this.render(container);
               }
             });
+          });
+
+          panelEl.querySelectorAll('[data-edit-cal]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const calId = btn.dataset.editCal;
+              this._openEditCalendarDrawer(calId, container);
+            });
+          });
+        }
+      });
+    },
+
+    // TIROIR MODIFICATION D'UN CALENDRIER (Nom, Couleur & Flux)
+    _openEditCalendarDrawer(calId, container) {
+      const cal = store.getCalendar(calId);
+      if (!cal) return;
+
+      const content = `
+        <form id="edit-cal-form" class="space-y-4">
+          <div>
+            <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Nom du calendrier *</label>
+            <input type="text" id="edit-cal-name" required value="${cal.name}" class="custom-input w-full text-xs px-4 py-3 rounded-2xl font-bold">
+          </div>
+
+          <div>
+            <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Couleur associée *</label>
+            <select id="edit-cal-color" class="custom-select w-full text-xs px-4 py-3 rounded-2xl font-bold">
+              ${CALENDAR_COLORS.map(c => `<option value="${c.hex}" data-color="${c.hex}" ${cal.color === c.hex ? 'selected' : ''}>${c.name}</option>`).join('')}
+            </select>
+          </div>
+
+          ${cal.feedUrl !== undefined && cal.feedUrl !== '' ? `
+            <div>
+              <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Lien URL permanent du flux</label>
+              <input type="text" id="edit-cal-url" value="${cal.feedUrl || ''}" placeholder="https://..." class="custom-input w-full text-xs px-4 py-2.5 rounded-2xl font-mono">
+            </div>
+          ` : ''}
+        </form>
+      `;
+
+      Drawer.open({
+        title: 'Modifier le calendrier',
+        icon: '<i data-lucide="edit-3" class="w-5 h-5 text-solaire-500"></i>',
+        content,
+        footer: `
+          <button id="cancel-edit-cal-btn" class="px-4 py-2.5 rounded-2xl text-xs font-bold text-zinc-500 hover:text-ink">Annuler</button>
+          <button id="save-edit-cal-btn" class="px-6 py-2.5 bg-solaire-500 hover:bg-solaire-600 text-white rounded-2xl text-xs font-black shadow-md shadow-solaire-500/25 transition-all">Enregistrer</button>
+        `,
+        onOpen: (panelEl) => {
+          panelEl.querySelector('#cancel-edit-cal-btn').addEventListener('click', () => {
+            Drawer.close();
+            this._openManageCalendarsDrawer(container);
+          });
+
+          panelEl.querySelector('#save-edit-cal-btn').addEventListener('click', () => {
+            const name = panelEl.querySelector('#edit-cal-name').value.trim();
+            const color = panelEl.querySelector('#edit-cal-color').value;
+            const urlInput = panelEl.querySelector('#edit-cal-url');
+            const feedUrl = urlInput ? urlInput.value.trim() : (cal.feedUrl || '');
+
+            if (!name) {
+              Toast.warning('Veuillez renseigner un nom pour le calendrier.');
+              return;
+            }
+
+            store.updateCalendar(calId, { name, color, feedUrl });
+            Toast.success('Calendrier mis à jour !');
+            Drawer.close();
+            this.render(container);
+            this._openManageCalendarsDrawer(container);
           });
         }
       });
@@ -3321,9 +3399,9 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       dotClass: 'bg-solaire-500',
       iconClass: 'text-solaire-500',
       categories: [
-        { key: 'exosTodo', label: 'Exos à faire', icon: 'list-todo' },
         { key: 'exosHard', label: 'Exos durs / typiques à revoir', icon: 'flame' },
-        { key: 'methods', label: 'Méthodes et formules', icon: 'sparkles' }
+        { key: 'methods', label: 'Méthodes et formules', icon: 'sparkles' },
+        { key: 'notes', label: 'Infos / Notes', icon: 'file-text' }
       ]
     },
     physique: {
@@ -3332,8 +3410,8 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       dotClass: 'bg-orangePop-500',
       iconClass: 'text-orangePop-500',
       categories: [
-        { key: 'exosTodo', label: 'Exos à faire', icon: 'list-todo' },
-        { key: 'methods', label: 'Méthodes et formules', icon: 'sparkles' }
+        { key: 'methods', label: 'Méthodes et formules', icon: 'sparkles' },
+        { key: 'notes', label: 'Infos / Notes', icon: 'file-text' }
       ]
     },
     info: {
@@ -3342,8 +3420,8 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       dotClass: 'bg-purple-600',
       iconClass: 'text-purple-600',
       categories: [
-        { key: 'exosTodo', label: 'Exos à faire', icon: 'list-todo' },
-        { key: 'methods', label: 'Méthodes et formules', icon: 'sparkles' }
+        { key: 'methods', label: 'Méthodes et formules', icon: 'sparkles' },
+        { key: 'notes', label: 'Infos / Notes', icon: 'file-text' }
       ]
     }
   };
@@ -3392,19 +3470,36 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
               <div class="p-12 text-center bg-white dark:bg-ink-darkcard rounded-3xl border border-creme-300 dark:border-ink-border">
                 <p class="text-xs text-zinc-400 font-bold">Aucune sous-matière pour le moment.<br><span class="text-[11px] text-zinc-500">Cliquez sur "+ Ajouter une sous-matière" pour créer votre premier chapitre.</span></p>
               </div>
-            ` : chapters.map(ch => {
+            ` : chapters.map((ch, chIdx) => {
               const isOpen = accordionState[ch.id] === true;
               return `
-                <div class="bg-white dark:bg-ink-darkcard rounded-3xl border border-creme-300 dark:border-ink-border shadow-sm overflow-hidden" data-chapter-box="${ch.id}">
-                  <div class="accordion-header px-6 py-4 flex items-center justify-between bg-creme-100/50 hover:bg-creme-200/50 dark:bg-ink-darkbg/50 dark:hover:bg-zinc-800/40 transition-colors" data-toggle-ch="${ch.id}">
-                    <div class="flex items-center gap-3">
-                      <span class="w-2.5 h-2.5 rounded-full ${theme.dotClass}"></span>
-                      <h3 class="text-sm font-extrabold text-ink dark:text-white">${ch.title}</h3>
+                <div class="bg-white dark:bg-ink-darkcard rounded-3xl border border-creme-300 dark:border-ink-border shadow-sm overflow-hidden transition-all" data-chapter-box="${ch.id}">
+                  <div class="accordion-header px-4 sm:px-6 py-4 flex items-center justify-between bg-creme-100/50 hover:bg-creme-200/50 dark:bg-ink-darkbg/50 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer select-none" data-toggle-ch="${ch.id}">
+                    <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                      <!-- Poignée de glisser-déposer (Drag Handle) -->
+                      <div class="chapter-drag-handle p-1 -ml-1 text-zinc-400 hover:text-solaire-500 cursor-grab active:cursor-grabbing rounded-lg hover:bg-creme-200 dark:hover:bg-zinc-800 transition-all flex items-center justify-center flex-shrink-0" title="Maintenir et glisser pour réordonner" data-drag-ch="${ch.id}">
+                        <i data-lucide="grip-vertical" class="w-4 h-4"></i>
+                      </div>
+
+                      <span class="w-2.5 h-2.5 rounded-full ${theme.dotClass} flex-shrink-0"></span>
+                      <h3 class="text-sm font-extrabold text-ink dark:text-white truncate">${ch.title}</h3>
                     </div>
-                    <div class="flex items-center gap-3">
-                      <button data-delete-ch="${ch.id}" title="Supprimer" class="text-zinc-400 hover:text-rose-500 p-1 rounded-lg">
+
+                    <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                      <!-- Boutons monter / descendre rapides -->
+                      <div class="flex items-center gap-0.5">
+                        <button data-move-ch="up" data-ch-id="${ch.id}" title="Monter" class="p-1 rounded-lg text-zinc-400 hover:text-ink dark:hover:text-white hover:bg-creme-200 dark:hover:bg-zinc-800 transition-colors ${chIdx === 0 ? 'opacity-30 pointer-events-none' : ''}">
+                          <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button data-move-ch="down" data-ch-id="${ch.id}" title="Descendre" class="p-1 rounded-lg text-zinc-400 hover:text-ink dark:hover:text-white hover:bg-creme-200 dark:hover:bg-zinc-800 transition-colors ${chIdx === chapters.length - 1 ? 'opacity-30 pointer-events-none' : ''}">
+                          <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
+                        </button>
+                      </div>
+
+                      <button data-delete-ch="${ch.id}" title="Supprimer" class="text-zinc-400 hover:text-rose-500 p-1 rounded-lg transition-colors">
                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                       </button>
+
                       <div class="p-1.5 rounded-xl bg-creme-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 transform transition-transform ${isOpen ? 'rotate-180' : ''}" id="acc-chevron-${ch.id}">
                         <i data-lucide="chevron-down" class="w-4 h-4"></i>
                       </div>
@@ -3448,7 +3543,7 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
 
       container.querySelectorAll('[data-toggle-ch]').forEach(header => {
         header.addEventListener('click', (e) => {
-          if (e.target.closest('[data-delete-ch]')) return;
+          if (e.target.closest('[data-delete-ch]') || e.target.closest('[data-drag-ch]') || e.target.closest('[data-move-ch]')) return;
           const chId = header.dataset.toggleCh;
           const content = container.querySelector(`#acc-content-${chId}`);
           const chevron = container.querySelector(`#acc-chevron-${chId}`);
@@ -3457,6 +3552,97 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
             content.classList.toggle('open', !isOpen);
             if (chevron) chevron.classList.toggle('rotate-180', !isOpen);
             this._saveAccordionState(chId, !isOpen);
+          }
+        });
+      });
+
+      // Drag & Drop pour réordonner les chapitres à la souris
+      let draggedId = null;
+
+      container.querySelectorAll('[data-drag-ch]').forEach(handle => {
+        const cardBox = handle.closest('[data-chapter-box]');
+        if (!cardBox) return;
+
+        handle.addEventListener('mousedown', () => {
+          cardBox.setAttribute('draggable', 'true');
+        });
+
+        handle.addEventListener('mouseup', () => {
+          cardBox.removeAttribute('draggable');
+        });
+
+        handle.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+      });
+
+      container.querySelectorAll('[data-chapter-box]').forEach(cardBox => {
+        cardBox.addEventListener('dragstart', (e) => {
+          draggedId = cardBox.dataset.chapterBox;
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', draggedId);
+          setTimeout(() => cardBox.classList.add('opacity-40'), 0);
+        });
+
+        cardBox.addEventListener('dragend', () => {
+          cardBox.classList.remove('opacity-40');
+          cardBox.removeAttribute('draggable');
+          container.querySelectorAll('[data-chapter-box]').forEach(el => {
+            el.classList.remove('border-solaire-500', 'ring-2', 'ring-solaire-500');
+          });
+        });
+
+        cardBox.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          cardBox.classList.add('border-solaire-500', 'ring-2', 'ring-solaire-500');
+        });
+
+        cardBox.addEventListener('dragleave', () => {
+          cardBox.classList.remove('border-solaire-500', 'ring-2', 'ring-solaire-500');
+        });
+
+        cardBox.addEventListener('drop', (e) => {
+          e.preventDefault();
+          cardBox.classList.remove('border-solaire-500', 'ring-2', 'ring-solaire-500');
+          const targetId = cardBox.dataset.chapterBox;
+          if (!draggedId || draggedId === targetId) return;
+
+          const chapters = store.getSubjectData(this.currentSubject);
+          const fromIdx = chapters.findIndex(c => c.id === draggedId);
+          const toIdx = chapters.findIndex(c => c.id === targetId);
+
+          if (fromIdx !== -1 && toIdx !== -1) {
+            const [movedItem] = chapters.splice(fromIdx, 1);
+            chapters.splice(toIdx, 0, movedItem);
+            store.reorderSubjectChapters(this.currentSubject, chapters);
+            this.render(container);
+          }
+        });
+      });
+
+      // Boutons monter / descendre rapides
+      container.querySelectorAll('[data-move-ch]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const dir = btn.dataset.moveCh;
+          const chId = btn.dataset.chId;
+          const chapters = store.getSubjectData(this.currentSubject);
+          const idx = chapters.findIndex(c => c.id === chId);
+          if (idx === -1) return;
+
+          if (dir === 'up' && idx > 0) {
+            const temp = chapters[idx - 1];
+            chapters[idx - 1] = chapters[idx];
+            chapters[idx] = temp;
+            store.reorderSubjectChapters(this.currentSubject, chapters);
+            this.render(container);
+          } else if (dir === 'down' && idx < chapters.length - 1) {
+            const temp = chapters[idx + 1];
+            chapters[idx + 1] = chapters[idx];
+            chapters[idx] = temp;
+            store.reorderSubjectChapters(this.currentSubject, chapters);
+            this.render(container);
           }
         });
       });
@@ -3505,7 +3691,7 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
           panelEl.querySelector('#save-ch-btn').addEventListener('click', () => {
             const title = panelEl.querySelector('#ch-title-input').value.trim();
             if (!title) return;
-            const newChapter = { id: `${this.currentSubject}_ch_${Date.now()}`, title, exosTodo: '', exosHard: '', methods: '' };
+            const newChapter = { id: `${this.currentSubject}_ch_${Date.now()}`, title, exosHard: '', methods: '', notes: '' };
             store.addSubjectChapter(this.currentSubject, newChapter);
             this._saveAccordionState(newChapter.id, true);
             Drawer.close();
