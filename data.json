@@ -162,20 +162,6 @@
   "subjectsData": {
     "maths": [
       {
-        "id": "maths-ch1",
-        "title": "Algèbre linéaire & Réduction",
-        "exosTodo": "",
-        "exosHard": "",
-        "methods": ""
-      },
-      {
-        "id": "maths-ch2",
-        "title": "Séries numériques & Séries entières",
-        "exosTodo": "• Étudier la convergence de sum (-1)^n ln(n)/sqrt(n)\n• Rayon de convergence de sum (n!/n^n) x^n",
-        "exosHard": "• Formule de Stirling via intégrales de Wallis\n• Théorème d'Abel angulaire",
-        "methods": "• Règle de d'Alembert : si lim |u_{n+1}/u_n| = l < 1, la série converge.\n• CSSA : si (|u_n|) décroît vers 0 avec signe alterné, |R_n| <= |u_{n+1}|."
-      },
-      {
         "id": "maths-ch3",
         "title": "Intro aux statistiques",
         "exosTodo": "• Calcul des estimateurs sans biais de la moyenne et variance\n• Tests d'hypothèse (Student et Chi-2)",
