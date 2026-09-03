@@ -34,6 +34,13 @@
       "color": "#8b5cf6",
       "feedUrl": "",
       "lastSync": null
+    },
+    {
+      "id": "cal_1788446200874",
+      "name": "CS50x",
+      "color": "#f59e0b",
+      "feedUrl": "",
+      "lastSync": null
     }
   ],
   "events": [
