@@ -9844,13 +9844,6 @@
   "subjectsData": {
     "maths": [
       {
-        "id": "maths_ch_1787766631685",
-        "title": "améliorations site",
-        "exosTodo": "dans matière : rajouter un cadre \"infos/notes\" dans chaque matière.\n\ndans matière : permettre de modifier l'ordre des matières (un petit truc a gauche de chaque matière quon sélectionne avec le curseur et on glisse pour la monter ou descendre ",
-        "exosHard": "",
-        "methods": ""
-      },
-      {
         "id": "maths_ch_1788437022665",
         "title": "Séries",
         "exosTodo": "",
@@ -9868,6 +9861,13 @@
         "id": "maths_ch_1788437054547",
         "title": "Intro aux statistiques",
         "exosTodo": "",
+        "exosHard": "",
+        "methods": ""
+      },
+      {
+        "id": "maths_ch_1787766631685",
+        "title": "améliorations site",
+        "exosTodo": "dans matière : rajouter un cadre \"infos/notes\" dans chaque matière.\n\ndans matière : permettre de modifier l'ordre des matières (un petit truc a gauche de chaque matière quon sélectionne avec le curseur et on glisse pour la monter ou descendre ",
         "exosHard": "",
         "methods": ""
       },
