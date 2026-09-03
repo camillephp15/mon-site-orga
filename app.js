@@ -1055,7 +1055,21 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
     constructor() {
       this._purgeLegacyStorage();
       this.data = this._loadLocalCache();
+      this._migrateCleanIcsEvents();
       this.listeners = new Map();
+    }
+
+    // Migration ponctuelle (une seule fois) : supprime tous les événements importés
+    // depuis le flux ICS (id commençant par "ics_"), qui peuvent contenir des doublons
+    // accumulés par des versions précédentes du code pendant les réglages du CORS/parsing.
+    // Les événements ajoutés à la main (id "ev_...") ne sont pas touchés.
+    // La resynchro automatique au chargement recharge ensuite tout proprement en une
+    // seule copie cohérente.
+    _migrateCleanIcsEvents() {
+      if (this.data._icsCleanupV1) return;
+      this.data.events = (this.data.events || []).filter(e => !String(e.id || '').startsWith('ics_'));
+      this.data._icsCleanupV1 = true;
+      this.save();
     }
 
     _purgeLegacyStorage() {
