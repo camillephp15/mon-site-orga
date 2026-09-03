@@ -9554,56 +9554,7 @@
       "id": "imp_1787764006392"
     }
   ],
-  "dailyTodos": [
-    {
-      "id": "td_1787766409317",
-      "text": "ajouter des transitio",
-      "completed": false,
-      "priority": "normal",
-      "tag": "Maison",
-      "createdAt": "2026-08-26T17:46:49.317Z"
-    },
-    {
-      "id": "td_1787766368498",
-      "text": "changer modif calendrier",
-      "completed": true,
-      "priority": "normal",
-      "tag": "Maison",
-      "createdAt": "2026-08-26T17:46:08.498Z"
-    },
-    {
-      "id": "td_1787766348881",
-      "text": "changer : taille calendrier",
-      "completed": true,
-      "priority": "normal",
-      "tag": "Maths",
-      "createdAt": "2026-08-26T17:45:48.881Z"
-    },
-    {
-      "id": "td_1787761482490",
-      "text": "Terminer site web",
-      "completed": false,
-      "priority": "normal",
-      "tag": "Autres cours",
-      "createdAt": "2026-08-26T16:24:42.490Z"
-    },
-    {
-      "id": "td_1787761465834",
-      "text": "Travailler CS50",
-      "completed": true,
-      "priority": "normal",
-      "tag": "Maison",
-      "createdAt": "2026-08-26T16:24:25.834Z"
-    },
-    {
-      "id": "td_1787761446289",
-      "text": "Faire une séance de sport",
-      "completed": true,
-      "priority": "normal",
-      "tag": "Sport",
-      "createdAt": "2026-08-26T16:24:06.289Z"
-    }
-  ],
+  "dailyTodos": [],
   "subjectsData": {
     "maths": [
       {
