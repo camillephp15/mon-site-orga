@@ -9941,7 +9941,13 @@
       }
     ]
   },
-  "longtermCategories": [],
+  "longtermCategories": [
+    {
+      "id": "cat_1788445261779",
+      "name": "CS50x",
+      "color": "coral"
+    }
+  ],
   "longtermTodos": [],
   "flashcards": [],
   "gradesData": {
