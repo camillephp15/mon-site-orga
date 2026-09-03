@@ -9881,6 +9881,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1788446181923"
+    },
+    {
+      "calendarId": "cal_1787764281104",
+      "title": "Course",
+      "teacher": "",
+      "date": "2026-09-07",
+      "day": "mon",
+      "startTime": "07:00",
+      "duration": 60,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1788446390854"
     }
   ],
   "importantDates": [
