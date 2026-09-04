@@ -9855,20 +9855,6 @@
       "id": "ev_1788445241491"
     },
     {
-      "calendarId": "cal_1787764281104",
-      "title": "Course",
-      "teacher": "",
-      "date": "2026-09-04",
-      "day": "fri",
-      "startTime": "06:45",
-      "duration": 60,
-      "room": "",
-      "recurrence": "none",
-      "groupId": null,
-      "completed": false,
-      "id": "ev_1788446104250"
-    },
-    {
       "calendarId": "cal_1788446200874",
       "title": "Bosser CS50",
       "teacher": "",
