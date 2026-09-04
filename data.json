@@ -9917,7 +9917,16 @@
       "id": "imp_1788443601739"
     }
   ],
-  "dailyTodos": [],
+  "dailyTodos": [
+    {
+      "id": "td_1788501896864",
+      "text": "lancer machine",
+      "completed": false,
+      "priority": "normal",
+      "tag": "Maison",
+      "createdAt": "2026-09-04T06:04:56.864Z"
+    }
+  ],
   "subjectsData": {
     "maths": [
       {
