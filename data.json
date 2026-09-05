@@ -9936,6 +9936,20 @@
       "duration": 60,
       "type": "tp",
       "completed": false
+    },
+    {
+      "calendarId": "cal_1788446200874",
+      "title": "Bosser CS50",
+      "teacher": "",
+      "date": "2026-09-05",
+      "day": "sat",
+      "startTime": "10:45",
+      "duration": 30,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1788597952030"
     }
   ],
   "importantDates": [
