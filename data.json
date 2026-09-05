@@ -9923,6 +9923,19 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1788538442437"
+    },
+    {
+      "id": "ics_ukkfagj_1788597932964",
+      "calendarId": "cal_1788437811199",
+      "title": "Réservation - Réunion",
+      "teacher": "",
+      "room": "MTPL-207 (30)",
+      "date": "2026-09-29",
+      "day": "tue",
+      "startTime": "15:15",
+      "duration": 60,
+      "type": "tp",
+      "completed": false
     }
   ],
   "importantDates": [
