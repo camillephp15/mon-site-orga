@@ -10143,6 +10143,11 @@
       "id": "cat_1788445261779",
       "name": "CS50x",
       "color": "coral"
+    },
+    {
+      "id": "cat_1788794605558",
+      "name": "Perso",
+      "color": "coral"
     }
   ],
   "longtermTodos": [
