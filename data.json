@@ -9992,6 +9992,34 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1788768622040"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "Refaire exos algèbre",
+      "teacher": "",
+      "date": "2026-09-08",
+      "day": "tue",
+      "startTime": "11:15",
+      "duration": 60,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1788768974714"
+    },
+    {
+      "calendarId": "cal_1787764281104",
+      "title": "Course",
+      "teacher": "",
+      "date": "2026-09-10",
+      "day": "thu",
+      "startTime": "07:00",
+      "duration": 60,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1788769000059"
     }
   ],
   "importantDates": [
