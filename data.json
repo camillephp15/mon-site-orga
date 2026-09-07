@@ -9978,6 +9978,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1788768271606"
+    },
+    {
+      "calendarId": "cal_1787764123477",
+      "title": "bus 13h42-13h55",
+      "teacher": "",
+      "date": "2026-09-08",
+      "day": "tue",
+      "startTime": "13:45",
+      "duration": 30,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1788768622040"
     }
   ],
   "importantDates": [
