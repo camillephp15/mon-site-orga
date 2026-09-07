@@ -3770,32 +3770,42 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
                     </div>
                   </div>
 
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                     ${catTodos.length === 0 ? `
-                      <p class="text-xs text-zinc-400 italic py-2">Aucune tâche dans cette catégorie.</p>
+                      <p class="text-xs text-zinc-400 italic py-2 col-span-full">Aucune tâche dans cette catégorie.</p>
                     ` : catTodos.map(todo => {
                       const daysRemaining = this._computeDaysRemaining(todo.deadline);
                       return `
-                        <div class="p-4 rounded-2xl bg-creme-100/80 dark:bg-ink-darkbg/80 border border-creme-300/80 dark:border-zinc-800 flex flex-col justify-between space-y-3">
-                          <div>
-                            <div class="flex items-start justify-between gap-2 mb-1.5">
-                              <span class="text-[10px] font-black px-2.5 py-0.5 rounded-full ${todo.priority === 'urgent' ? 'bg-rose-500 text-white' : 'bg-creme-200 text-ink dark:bg-zinc-800 dark:text-zinc-300'}">${todo.priority === 'urgent' ? '🔥 Urgent' : 'Normal'}</span>
-                              <button data-delete-lt="${todo.id}" class="text-zinc-400 hover:text-rose-500 p-0.5"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                        <div class="p-3.5 rounded-2xl bg-creme-100/80 dark:bg-ink-darkbg/80 border border-creme-300/80 dark:border-zinc-800 flex flex-col justify-between space-y-2.5 shadow-xs hover:border-solaire-400 dark:hover:border-zinc-700 transition-all group">
+                          <div class="space-y-1.5 min-w-0">
+                            <div class="flex items-center justify-between gap-1.5">
+                              <span class="text-[9.5px] font-black px-2 py-0.5 rounded-md ${todo.priority === 'urgent' ? 'bg-rose-500 text-white' : 'bg-creme-200 text-ink dark:bg-zinc-800 dark:text-zinc-300'}">${todo.priority === 'urgent' ? '🔥 Urgent' : 'Normal'}</span>
+                              <div class="flex items-center gap-0.5">
+                                <button data-edit-lt="${todo.id}" title="Modifier la tâche" class="text-zinc-400 hover:text-solaire-600 hover:bg-creme-200 dark:hover:bg-zinc-800 p-1 rounded-lg transition-colors cursor-pointer">
+                                  <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <button data-delete-lt="${todo.id}" title="Supprimer" class="text-zinc-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 p-1 rounded-lg transition-colors cursor-pointer">
+                                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                              </div>
                             </div>
-                            <h4 class="text-sm font-black text-ink dark:text-white ${todo.status === 'done' ? 'line-through text-zinc-400' : ''}">${todo.title}</h4>
-                            ${todo.notes ? `<p class="text-xs text-zinc-600 dark:text-zinc-400 mt-1.5 leading-relaxed font-medium">${todo.notes}</p>` : ''}
+
+                            <h4 data-edit-lt="${todo.id}" class="text-xs font-black text-ink dark:text-white leading-snug line-clamp-2 cursor-pointer hover:text-solaire-600 transition-colors ${todo.status === 'done' ? 'line-through text-zinc-400' : ''}" title="Cliquer pour modifier">${todo.title}</h4>
+
+                            ${todo.notes ? `<p class="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-1 font-medium" title="${todo.notes}">${todo.notes}</p>` : ''}
                           </div>
 
-                          <div class="pt-2 border-t border-creme-200 dark:border-zinc-800 flex items-center justify-between text-xs">
-                            <div class="flex items-center gap-1.5 text-zinc-500 font-bold">
-                              <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                              <span>${todo.deadline || 'Sans date'}</span>
-                              ${daysRemaining !== null ? `<span class="font-black text-[10px] px-2 py-0.5 rounded-lg ${daysRemaining < 0 ? 'bg-rose-500 text-white' : 'bg-creme-300 text-ink dark:bg-zinc-700 dark:text-white'}">${daysRemaining < 0 ? 'Dépassé' : `J-${daysRemaining}`}</span>` : ''}
+                          <div class="pt-2 border-t border-creme-200 dark:border-zinc-800/80 flex items-center justify-between gap-1.5 text-xs">
+                            <div class="flex items-center gap-1 text-[10px] text-zinc-500 font-bold min-w-0">
+                              <i data-lucide="clock" class="w-3 h-3 flex-shrink-0"></i>
+                              <span class="truncate">${todo.deadline ? todo.deadline.slice(5) : 'Sans date'}</span>
+                              ${daysRemaining !== null ? `<span class="font-black text-[9px] px-1.5 py-0.5 rounded-md flex-shrink-0 ${daysRemaining < 0 ? 'bg-rose-500 text-white' : 'bg-creme-300 text-ink dark:bg-zinc-700 dark:text-white'}">${daysRemaining < 0 ? 'Dépassé' : `J-${daysRemaining}`}</span>` : ''}
                             </div>
-                            <select data-status-lt="${todo.id}" class="custom-select text-xs font-black px-2.5 py-1 rounded-xl">
+
+                            <select data-status-lt="${todo.id}" class="custom-select text-[10.5px] font-black px-2 py-0.5 rounded-lg flex-shrink-0">
                               <option value="todo" ${todo.status === 'todo' ? 'selected' : ''}>À faire</option>
                               <option value="in_progress" ${todo.status === 'in_progress' ? 'selected' : ''}>En cours</option>
-                              <option value="done" ${todo.status === 'done' ? 'selected' : ''}>Terminé ✓</option>
+                              <option value="done" ${todo.status === 'done' ? 'selected' : ''}>Fait ✓</option>
                             </select>
                           </div>
                         </div>
@@ -3844,6 +3854,14 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
         });
       });
 
+      container.querySelectorAll('[data-edit-lt]').forEach(el => {
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = el.dataset.editLt;
+          this._openEditGoalDrawer(id, container);
+        });
+      });
+
       container.querySelectorAll('[data-status-lt]').forEach(select => {
         select.addEventListener('change', () => {
           store.updateLongtermTodo(select.dataset.statusLt, { status: select.value });
@@ -3852,7 +3870,8 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       });
 
       container.querySelectorAll('[data-delete-lt]').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
           if (confirm('Supprimer cette tâche ?')) {
             store.deleteLongtermTodo(btn.dataset.deleteLt);
             this.render(container);
@@ -3956,6 +3975,108 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
             });
             Drawer.close();
             this.render(container);
+          });
+        }
+      });
+    },
+
+    _openEditGoalDrawer(todoId, container) {
+      const todos = store.getLongtermTodos();
+      const todo = todos.find(t => t.id === todoId);
+      if (!todo) return;
+      const categories = store.getLongtermCategories();
+
+      const content = `
+        <form id="edit-goal-form" class="space-y-4">
+          <div>
+            <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Titre de la tâche *</label>
+            <input type="text" id="edit-goal-title" required value="${todo.title}" class="custom-input w-full text-xs px-4 py-3 rounded-2xl font-bold">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3.5">
+            <div>
+              <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Catégorie *</label>
+              <select id="edit-goal-category" class="custom-select w-full text-xs px-4 py-3 rounded-2xl font-bold">
+                ${categories.map(c => `<option value="${c.id}" ${todo.categoryId === c.id ? 'selected' : ''}>${c.name}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Priorité</label>
+              <select id="edit-goal-priority" class="custom-select w-full text-xs px-4 py-3 rounded-2xl font-bold">
+                <option value="normal" ${todo.priority === 'normal' ? 'selected' : ''}>Normal</option>
+                <option value="urgent" ${todo.priority === 'urgent' ? 'selected' : ''}>🔥 Urgent</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3.5">
+            <div>
+              <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Date limite</label>
+              <input type="date" id="edit-goal-deadline" value="${todo.deadline || ''}" class="custom-input w-full text-xs px-4 py-2.5 rounded-2xl font-mono">
+            </div>
+            <div>
+              <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Statut</label>
+              <select id="edit-goal-status" class="custom-select w-full text-xs px-4 py-3 rounded-2xl font-bold">
+                <option value="todo" ${todo.status === 'todo' ? 'selected' : ''}>À faire</option>
+                <option value="in_progress" ${todo.status === 'in_progress' ? 'selected' : ''}>En cours</option>
+                <option value="done" ${todo.status === 'done' ? 'selected' : ''}>Terminé ✓</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-black text-ink dark:text-zinc-300 mb-1.5">Notes & détails</label>
+            <textarea id="edit-goal-notes" rows="3" placeholder="Détails, liens, consignes..." class="custom-textarea w-full text-xs px-4 py-2.5 rounded-2xl font-medium">${todo.notes || ''}</textarea>
+          </div>
+        </form>
+      `;
+
+      Drawer.open({
+        title: 'Modifier la tâche',
+        icon: '<i data-lucide="edit-3" class="w-5 h-5 text-solaire-500"></i>',
+        content,
+        footer: `
+          <button id="delete-lt-from-edit-btn" class="px-4 py-2.5 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-2xl text-xs font-black mr-auto transition-all cursor-pointer">Supprimer</button>
+          <button id="cancel-edit-goal-btn" class="px-4 py-2.5 rounded-2xl text-xs font-bold text-zinc-500 hover:text-ink">Annuler</button>
+          <button id="save-edit-goal-btn" class="px-6 py-2.5 bg-solaire-500 hover:bg-solaire-600 text-white rounded-2xl text-xs font-black shadow-md shadow-solaire-500/25">Enregistrer</button>
+        `,
+        onOpen: (panelEl) => {
+          panelEl.querySelector('#cancel-edit-goal-btn').addEventListener('click', () => Drawer.close());
+
+          panelEl.querySelector('#save-edit-goal-btn').addEventListener('click', () => {
+            const title = panelEl.querySelector('#edit-goal-title').value.trim();
+            const categoryId = panelEl.querySelector('#edit-goal-category').value;
+            const priority = panelEl.querySelector('#edit-goal-priority').value;
+            const deadline = panelEl.querySelector('#edit-goal-deadline').value;
+            const status = panelEl.querySelector('#edit-goal-status').value;
+            const notes = panelEl.querySelector('#edit-goal-notes').value.trim();
+
+            if (!title) {
+              Toast.warning('Veuillez renseigner un titre pour la tâche.');
+              return;
+            }
+
+            store.updateLongtermTodo(todoId, {
+              title,
+              categoryId,
+              priority,
+              deadline,
+              status,
+              notes
+            });
+
+            Toast.success('Tâche mise à jour !');
+            Drawer.close();
+            this.render(container);
+          });
+
+          panelEl.querySelector('#delete-lt-from-edit-btn').addEventListener('click', () => {
+            if (confirm(`Supprimer la tâche "${todo.title}" ?`)) {
+              store.deleteLongtermTodo(todoId);
+              Toast.info('Tâche supprimée.');
+              Drawer.close();
+              this.render(container);
+            }
           });
         }
       });
