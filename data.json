@@ -9950,6 +9950,20 @@
       "groupId": null,
       "completed": true,
       "id": "ev_1788597952030"
+    },
+    {
+      "calendarId": "cal_1788443635975",
+      "title": "Bosser musique",
+      "teacher": "",
+      "date": "2026-09-07",
+      "day": "mon",
+      "startTime": "19:00",
+      "duration": 60,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1788768250656"
     }
   ],
   "importantDates": [
