@@ -10023,19 +10023,6 @@
       "id": "ev_1788779413339"
     },
     {
-      "id": "ics_rwy3lc2_1788853995829",
-      "calendarId": "cal_1788437811199",
-      "title": "Réservation - Réunion",
-      "teacher": "",
-      "room": "MTPL-207 (30)",
-      "date": "2026-09-29",
-      "day": "tue",
-      "startTime": "15:15",
-      "duration": 60,
-      "type": "tp",
-      "completed": false
-    },
-    {
       "calendarId": "cal_1788446200874",
       "title": "Bosser CS50",
       "teacher": "",
@@ -10062,6 +10049,19 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1788952081147"
+    },
+    {
+      "id": "ics_6a6d5ha_1788955566236",
+      "calendarId": "cal_1788437811199",
+      "title": "Réservation - Réunion",
+      "teacher": "",
+      "room": "MTPL-207 (30)",
+      "date": "2026-09-29",
+      "day": "tue",
+      "startTime": "15:15",
+      "duration": 60,
+      "type": "tp",
+      "completed": false
     }
   ],
   "importantDates": [
