@@ -10048,6 +10048,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1788952021583"
+    },
+    {
+      "calendarId": "cal_1787764123477",
+      "title": "reprendre statistiques : cours + td",
+      "teacher": "",
+      "date": "2026-09-10",
+      "day": "thu",
+      "startTime": "09:00",
+      "duration": 90,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1788952081147"
     }
   ],
   "importantDates": [
