@@ -10090,6 +10090,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1789047220692"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "Reprendre TD1 stat",
+      "teacher": "",
+      "date": "2026-09-11",
+      "day": "fri",
+      "startTime": "10:45",
+      "duration": 90,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1789047274335"
     }
   ],
   "importantDates": [
