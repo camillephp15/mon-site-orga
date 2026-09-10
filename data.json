@@ -10076,6 +10076,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1788989292332"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "Refaure début TD Algèbre lin",
+      "teacher": "",
+      "date": "2026-09-11",
+      "day": "fri",
+      "startTime": "08:15",
+      "duration": 90,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1789047220692"
     }
   ],
   "importantDates": [
