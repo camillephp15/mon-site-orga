@@ -10157,7 +10157,7 @@
         "title": "Algèbre linéaire",
         "exosTodo": "",
         "exosHard": "ex 13",
-        "methods": "traces de matrices  : somme de ces elts dans la diagonale. Application linéaire. \nsomme/somme directe",
+        "methods": "traces de matrices  : somme de ces elts dans la diagonale. Application linéaire. \n\nsomme/somme directe\n\néquation cartésienne\n",
         "notes": ""
       },
       {
