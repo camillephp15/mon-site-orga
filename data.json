@@ -10187,6 +10187,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1789333925629"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "Série : revoir exos",
+      "teacher": "",
+      "date": "2026-09-15",
+      "day": "tue",
+      "startTime": "11:30",
+      "duration": 90,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1789333979048"
     }
   ],
   "importantDates": [
