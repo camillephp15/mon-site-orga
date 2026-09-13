@@ -10201,6 +10201,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1789333979048"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "séries : préparer exos",
+      "teacher": "",
+      "date": "2026-09-15",
+      "day": "tue",
+      "startTime": "14:00",
+      "duration": 60,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1789334008807"
     }
   ],
   "importantDates": [
