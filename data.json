@@ -10229,6 +10229,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1789334036648"
+    },
+    {
+      "calendarId": "cal_1787764123477",
+      "title": "finir linktree",
+      "teacher": "",
+      "date": "2026-09-15",
+      "day": "tue",
+      "startTime": "21:45",
+      "duration": 60,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1789334064014"
     }
   ],
   "importantDates": [
