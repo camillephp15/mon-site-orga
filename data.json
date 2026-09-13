@@ -10145,6 +10145,20 @@
       "duration": 300,
       "type": "tp",
       "completed": false
+    },
+    {
+      "calendarId": "cal_1787764281104",
+      "title": "course",
+      "teacher": "",
+      "date": "2026-09-14",
+      "day": "mon",
+      "startTime": "07:30",
+      "duration": 60,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1789333874404"
     }
   ],
   "importantDates": [
