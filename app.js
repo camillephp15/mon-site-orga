@@ -465,13 +465,11 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
         if (idAttr) {
           dropdownEl.id = idAttr + '-dd';
           sel.id = idAttr;
-          sel.style.cssText = 'position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;overflow:hidden;';
-          sel.setAttribute('aria-hidden', 'true');
-          sel.setAttribute('tabindex', '-1');
-          sel.parentNode.insertBefore(dropdownEl, sel);
-        } else {
-          sel.parentNode.replaceChild(dropdownEl, sel);
         }
+        sel.style.cssText = 'position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;overflow:hidden;';
+        sel.setAttribute('aria-hidden', 'true');
+        sel.setAttribute('tabindex', '-1');
+        sel.parentNode.insertBefore(dropdownEl, sel);
       });
     }
   };
@@ -1439,12 +1437,28 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
     getLongtermTodos() { return this.data.longtermTodos || []; }
     addLongtermTodo(todo) {
       if (!todo.id) todo.id = 'lt_' + Date.now();
+      if (todo.completed === undefined) todo.completed = (todo.status === 'done');
       this.data.longtermTodos.push(todo);
       this.save();
     }
+    toggleLongtermTodo(id) {
+      const item = (this.data.longtermTodos || []).find(t => t.id === id);
+      if (item) {
+        const isDone = item.status === 'done' || item.completed === true;
+        item.completed = !isDone;
+        item.status = !isDone ? 'done' : 'todo';
+        this.save();
+        return item;
+      }
+    }
     updateLongtermTodo(id, updates) {
-      const idx = this.data.longtermTodos.findIndex(t => t.id === id);
+      const idx = (this.data.longtermTodos || []).findIndex(t => t.id === id);
       if (idx !== -1) {
+        if (updates.status !== undefined && updates.completed === undefined) {
+          updates.completed = (updates.status === 'done');
+        } else if (updates.completed !== undefined && updates.status === undefined) {
+          updates.status = updates.completed ? 'done' : 'todo';
+        }
         this.data.longtermTodos[idx] = { ...this.data.longtermTodos[idx], ...updates };
         this.save();
       }
@@ -3410,6 +3424,7 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       dotClass: 'bg-orangePop-500',
       iconClass: 'text-orangePop-500',
       categories: [
+        { key: 'exosHard', label: 'Exos durs / typiques à revoir', icon: 'flame' },
         { key: 'methods', label: 'Méthodes et formules', icon: 'sparkles' },
         { key: 'notes', label: 'Infos / Notes', icon: 'file-text' }
       ]
@@ -3420,6 +3435,7 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       dotClass: 'bg-purple-600',
       iconClass: 'text-purple-600',
       categories: [
+        { key: 'exosHard', label: 'Exos durs / typiques à revoir', icon: 'flame' },
         { key: 'methods', label: 'Méthodes et formules', icon: 'sparkles' },
         { key: 'notes', label: 'Infos / Notes', icon: 'file-text' }
       ]
@@ -3710,7 +3726,7 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
       const categories = store.getLongtermCategories();
       const todos = store.getLongtermTodos();
       const totalCount = todos.length;
-      const doneCount = todos.filter(t => t.status === 'done').length;
+      const doneCount = todos.filter(t => t.status === 'done' || t.completed === true).length;
       const progressPercent = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
 
       container.innerHTML = `
@@ -3747,7 +3763,7 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
               </div>
             ` : categories.map(cat => {
               const catTodos = todos.filter(t => t.categoryId === cat.id);
-              const catDone = catTodos.filter(t => t.status === 'done').length;
+              const catDone = catTodos.filter(t => t.status === 'done' || t.completed === true).length;
               return `
                 <div class="bg-white dark:bg-ink-darkcard rounded-3xl border border-creme-300 dark:border-ink-border shadow-sm p-6 space-y-4">
                   <div class="flex items-center justify-between border-b border-creme-200 dark:border-ink-border pb-3">
@@ -3775,12 +3791,27 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
                       <p class="text-xs text-zinc-400 italic py-2 col-span-full">Aucune tâche dans cette catégorie.</p>
                     ` : catTodos.map(todo => {
                       const daysRemaining = this._computeDaysRemaining(todo.deadline);
+                      const isDone = todo.status === 'done' || todo.completed === true;
+                      const statusClass = isDone
+                        ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                        : (todo.status === 'in_progress'
+                            ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30'
+                            : 'bg-creme-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-creme-300 dark:border-zinc-700');
+
                       return `
-                        <div class="p-3.5 rounded-2xl bg-creme-100/80 dark:bg-ink-darkbg/80 border border-creme-300/80 dark:border-zinc-800 flex flex-col justify-between space-y-2.5 shadow-xs hover:border-solaire-400 dark:hover:border-zinc-700 transition-all group">
+                        <div class="p-3.5 rounded-2xl bg-creme-100/80 dark:bg-ink-darkbg/80 border border-creme-300/80 dark:border-zinc-800 flex flex-col justify-between space-y-2.5 shadow-xs hover:border-solaire-400 dark:hover:border-zinc-700 transition-all group ${isDone ? 'opacity-70 dark:opacity-60 bg-creme-200/50 dark:bg-ink-darkbg/40' : ''}">
                           <div class="space-y-1.5 min-w-0">
                             <div class="flex items-center justify-between gap-1.5">
-                              <span class="text-[9.5px] font-black px-2 py-0.5 rounded-md ${todo.priority === 'urgent' ? 'bg-rose-500 text-white' : 'bg-creme-200 text-ink dark:bg-zinc-800 dark:text-zinc-300'}">${todo.priority === 'urgent' ? '🔥 Urgent' : 'Normal'}</span>
-                              <div class="flex items-center gap-0.5">
+                              <div class="flex items-center gap-2 min-w-0">
+                                <!-- Bouton rond à cocher (Check Circle) -->
+                                <button type="button" data-toggle-lt="${todo.id}" title="${isDone ? 'Marquer comme non terminée' : 'Marquer comme terminée'}" class="w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 cursor-pointer ${isDone ? 'bg-solaire-500 border-solaire-500 text-white shadow-xs' : 'border-zinc-400 dark:border-zinc-500 hover:border-solaire-500 hover:scale-110 bg-white dark:bg-ink-darkcard'}">
+                                  ${isDone ? '<i data-lucide="check" class="w-2.5 h-2.5 stroke-[3]"></i>' : ''}
+                                </button>
+
+                                <span class="text-[9.5px] font-black px-2 py-0.5 rounded-md ${todo.priority === 'urgent' ? 'bg-rose-500 text-white' : 'bg-creme-200 text-ink dark:bg-zinc-800 dark:text-zinc-300'}">${todo.priority === 'urgent' ? '🔥 Urgent' : 'Normal'}</span>
+                              </div>
+
+                              <div class="flex items-center gap-0.5 flex-shrink-0">
                                 <button data-edit-lt="${todo.id}" title="Modifier la tâche" class="text-zinc-400 hover:text-solaire-600 hover:bg-creme-200 dark:hover:bg-zinc-800 p-1 rounded-lg transition-colors cursor-pointer">
                                   <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                                 </button>
@@ -3790,22 +3821,22 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
                               </div>
                             </div>
 
-                            <h4 data-edit-lt="${todo.id}" class="text-xs font-black text-ink dark:text-white leading-snug line-clamp-2 cursor-pointer hover:text-solaire-600 transition-colors ${todo.status === 'done' ? 'line-through text-zinc-400' : ''}" title="Cliquer pour modifier">${todo.title}</h4>
+                            <h4 data-edit-lt="${todo.id}" class="text-xs leading-snug line-clamp-2 cursor-pointer hover:text-solaire-600 transition-colors ${isDone ? 'line-through text-zinc-400 dark:text-zinc-500 font-bold' : 'text-ink dark:text-white font-black'}" title="Cliquer pour modifier">${todo.title}</h4>
 
-                            ${todo.notes ? `<p class="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-1 font-medium" title="${todo.notes}">${todo.notes}</p>` : ''}
+                            ${todo.notes ? `<p class="text-[11px] text-zinc-500 dark:text-zinc-400 line-clamp-1 font-medium ${isDone ? 'line-through opacity-70' : ''}" title="${todo.notes}">${todo.notes}</p>` : ''}
                           </div>
 
-                          <div class="pt-2 border-t border-creme-200 dark:border-zinc-800/80 flex items-center justify-between gap-1.5 text-xs">
-                            <div class="flex items-center gap-1 text-[10px] text-zinc-500 font-bold min-w-0">
-                              <i data-lucide="clock" class="w-3 h-3 flex-shrink-0"></i>
-                              <span class="truncate">${todo.deadline ? todo.deadline.slice(5) : 'Sans date'}</span>
+                          <div class="pt-2 border-t border-creme-200 dark:border-zinc-800/80 flex items-center justify-between gap-2 text-xs">
+                            <div class="flex items-center gap-1.5 text-[10px] text-zinc-500 font-bold min-w-0 flex-1">
+                              <i data-lucide="clock" class="w-3 h-3 flex-shrink-0 text-zinc-400"></i>
+                              <span class="truncate" title="${todo.deadline || 'Sans date'}">${todo.deadline ? todo.deadline.slice(5) : 'Sans date'}</span>
                               ${daysRemaining !== null ? `<span class="font-black text-[9px] px-1.5 py-0.5 rounded-md flex-shrink-0 ${daysRemaining < 0 ? 'bg-rose-500 text-white' : 'bg-creme-300 text-ink dark:bg-zinc-700 dark:text-white'}">${daysRemaining < 0 ? 'Dépassé' : `J-${daysRemaining}`}</span>` : ''}
                             </div>
 
-                            <select data-status-lt="${todo.id}" class="custom-select text-[10.5px] font-black px-2 py-0.5 rounded-lg flex-shrink-0">
-                              <option value="todo" ${todo.status === 'todo' ? 'selected' : ''}>À faire</option>
-                              <option value="in_progress" ${todo.status === 'in_progress' ? 'selected' : ''}>En cours</option>
-                              <option value="done" ${todo.status === 'done' ? 'selected' : ''}>Fait ✓</option>
+                            <select data-status-lt="${todo.id}" title="Changer le statut" class="text-[10px] font-black px-2 py-0.5 rounded-lg border transition-colors cursor-pointer focus:outline-none focus:ring-1 focus:ring-solaire-500 flex-shrink-0 max-w-[85px] ${statusClass}">
+                              <option value="todo" ${!isDone && todo.status !== 'in_progress' ? 'selected' : ''} class="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200">À faire</option>
+                              <option value="in_progress" ${!isDone && todo.status === 'in_progress' ? 'selected' : ''} class="bg-white dark:bg-zinc-900 text-amber-600 dark:text-amber-400">En cours</option>
+                              <option value="done" ${isDone ? 'selected' : ''} class="bg-white dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400">Fait ✓</option>
                             </select>
                           </div>
                         </div>
@@ -3854,6 +3885,16 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
         });
       });
 
+      // Clic sur le bouton rond pour cocher/décocher la tâche
+      container.querySelectorAll('[data-toggle-lt]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.toggleLt;
+          store.toggleLongtermTodo(id);
+          this.render(container);
+        });
+      });
+
       container.querySelectorAll('[data-edit-lt]').forEach(el => {
         el.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -3862,11 +3903,31 @@ function parseEventDetails(rawTitle, rawRoom, evTeacher) {
         });
       });
 
+      // Changement du statut via le sélecteur déroulant
       container.querySelectorAll('[data-status-lt]').forEach(select => {
         select.addEventListener('change', () => {
-          store.updateLongtermTodo(select.dataset.statusLt, { status: select.value });
+          const newStatus = select.value;
+          const isDone = newStatus === 'done';
+          store.updateLongtermTodo(select.dataset.statusLt, {
+            status: newStatus,
+            completed: isDone
+          });
           this.render(container);
         });
+      });
+
+      // Écouteur délégué sur le conteneur pour sécuriser la propagation de l'événement change
+      container.addEventListener('change', (e) => {
+        const target = e.target;
+        if (target && target.matches && target.matches('[data-status-lt]')) {
+          const newStatus = target.value;
+          const isDone = newStatus === 'done';
+          store.updateLongtermTodo(target.dataset.statusLt, {
+            status: newStatus,
+            completed: isDone
+          });
+          this.render(container);
+        }
       });
 
       container.querySelectorAll('[data-delete-lt]').forEach(btn => {
