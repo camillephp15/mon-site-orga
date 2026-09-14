@@ -784,7 +784,7 @@
       "room": "",
       "recurrence": "none",
       "groupId": null,
-      "completed": false,
+      "completed": true,
       "id": "ev_1789334064014"
     },
     {
@@ -10371,7 +10371,7 @@
       "completed": false
     },
     {
-      "calendarId": "cal_1788443555880",
+      "calendarId": "cal_1789397627231",
       "title": "bosser portfolio",
       "teacher": "",
       "date": "2026-09-15",
