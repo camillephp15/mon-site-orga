@@ -10334,6 +10334,20 @@
       "duration": 300,
       "type": "tp",
       "completed": false
+    },
+    {
+      "calendarId": "cal_1787764123477",
+      "title": "regarder portfolio",
+      "teacher": "",
+      "date": "2026-09-14",
+      "day": "mon",
+      "startTime": "09:15",
+      "duration": 45,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1789378299324"
     }
   ],
   "importantDates": [
