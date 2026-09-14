@@ -10496,9 +10496,9 @@
       "priority": "normal",
       "deadline": "2026-10-03",
       "notes": "",
-      "status": "done",
+      "status": "todo",
       "id": "lt_1788445353601",
-      "completed": true
+      "completed": false
     },
     {
       "title": "Finir week 6",
