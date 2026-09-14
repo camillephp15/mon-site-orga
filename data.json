@@ -10434,7 +10434,7 @@
         "id": "phy-ch3",
         "title": "Systèmes électroniques",
         "exosTodo": "• Filtres actifs d'ordre 2 (Sallen-Key, Rauch)\n• Diagramme de Bode (gain et phase)",
-        "methods": "• Fonction de transfert H(jw) = S / E.\n• Fréquence de coupure à -3dB : |H(w_c)| = H_max / sqrt(2)."
+        "methods": ""
       }
     ],
     "info": [
