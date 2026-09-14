@@ -10397,6 +10397,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1789398032540"
+    },
+    {
+      "calendarId": "cal_1788443635975",
+      "title": "Piano",
+      "teacher": "",
+      "date": "2026-09-17",
+      "day": "thu",
+      "startTime": "09:30",
+      "duration": 45,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1789398049824"
     }
   ],
   "importantDates": [
