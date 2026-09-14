@@ -10422,7 +10422,7 @@
         "id": "phy-ch1",
         "title": "Résistance des matériaux (RDM)",
         "exosTodo": "• Diagramme des moments fléchissants et efforts tranchants\n• Calcul de la flèche d'une poutre encastrée",
-        "methods": "• Équation de Navier-Bernoulli : sigma = M_f * y / I_Gz.\n• Flèche : E I_Gz v''(x) = - M_f(x)."
+        "methods": ""
       },
       {
         "id": "phy-ch2",
