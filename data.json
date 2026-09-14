@@ -10449,7 +10449,7 @@
         "id": "info-ch3",
         "title": "Conception base de données",
         "exosTodo": "• Modèle Entité-Association vers Modèle Relationnel\n• Formes normales (1NF, 2NF, 3NF, BCNF)",
-        "methods": "• Règle de passage 1:N : la clé primaire devient clé étrangère côté N."
+        "methods": ""
       },
       {
         "id": "info-ch2",
