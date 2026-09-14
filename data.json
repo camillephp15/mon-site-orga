@@ -10428,7 +10428,7 @@
         "id": "phy-ch2",
         "title": "Mécanique des fluides",
         "exosTodo": "• Écoulement de Poiseuille en conduite cylindrique\n• Théorème de Bernoulli avec pertes de charge",
-        "methods": "• Équation de Navier-Stokes pour fluide newtonien incompressible.\n• Nombre de Reynolds : Re = rho * v * D / mu."
+        "methods": ""
       },
       {
         "id": "phy-ch3",
