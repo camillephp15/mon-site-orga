@@ -10411,6 +10411,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1789398049824"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "bosser algèbre",
+      "teacher": "",
+      "date": "2026-09-16",
+      "day": "wed",
+      "startTime": "09:00",
+      "duration": 120,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1789398083625"
     }
   ],
   "importantDates": [
