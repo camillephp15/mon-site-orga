@@ -10362,6 +10362,20 @@
       "duration": 300,
       "type": "tp",
       "completed": false
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "bosser portfolio",
+      "teacher": "",
+      "date": "2026-09-15",
+      "day": "tue",
+      "startTime": "17:00",
+      "duration": 120,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1789397607572"
     }
   ],
   "importantDates": [
