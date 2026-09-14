@@ -784,7 +784,7 @@
       "room": "",
       "recurrence": "none",
       "groupId": null,
-      "completed": true,
+      "completed": false,
       "id": "ev_1789334064014"
     },
     {
