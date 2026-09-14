@@ -10451,7 +10451,8 @@
         "id": "info-ch1",
         "title": "Algorithmique et POO",
         "exosTodo": "• Héritage, polymorphisme et interfaces\n• Implémentation des patrons de conception (Singleton, Factory)",
-        "methods": "• Principes SOLID.\n• Encapsulation : attributs privés + getters/setters."
+        "methods": "• Principes SOLID.\n• Encapsulation : attributs privés + getters/setters.",
+        "notes": ""
       },
       {
         "id": "info-ch3",
