@@ -10455,7 +10455,7 @@
         "id": "info-ch2",
         "title": "Structures de données",
         "exosTodo": "• Arbres binaires de recherche (ABR) et arbres AVL\n• Tas binaires et files de priorité",
-        "methods": "• Recherche dans un ABR équilibré : O(log n).\n• Parcours : infixe (trié), préfixe, postfixe."
+        "methods": ""
       }
     ]
   },
