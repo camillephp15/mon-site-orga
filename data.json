@@ -10348,6 +10348,20 @@
       "duration": 300,
       "type": "tp",
       "completed": false
+    },
+    {
+      "calendarId": "cal_1787764123477",
+      "title": "zoom BD",
+      "teacher": "",
+      "date": "2026-10-01",
+      "day": "thu",
+      "startTime": "14:30",
+      "duration": 120,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1789390946256"
     }
   ],
   "importantDates": [
