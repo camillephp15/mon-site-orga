@@ -10439,6 +10439,20 @@
       "duration": 300,
       "type": "tp",
       "completed": false
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "Bosser Colles",
+      "teacher": "",
+      "date": "2026-09-16",
+      "day": "wed",
+      "startTime": "14:00",
+      "duration": 120,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1789465514611"
     }
   ],
   "importantDates": [
