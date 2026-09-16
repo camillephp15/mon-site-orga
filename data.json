@@ -10454,6 +10454,20 @@
       "groupId": null,
       "completed": true,
       "id": "ev_1789566200736"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "series : refaire exos mercredi",
+      "teacher": "",
+      "date": "2026-09-17",
+      "day": "thu",
+      "startTime": "10:15",
+      "duration": 90,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1789566274760"
     }
   ],
   "importantDates": [
