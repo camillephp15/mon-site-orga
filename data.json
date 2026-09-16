@@ -6749,19 +6749,6 @@
       "completed": false
     },
     {
-      "id": "ics_s93jk0i_1789465377237",
-      "calendarId": "cal_1788437811199",
-      "title": "Réservation",
-      "teacher": "Conférence",
-      "room": "ZOOM",
-      "date": "2026-09-17",
-      "day": "thu",
-      "startTime": "14:00",
-      "duration": 30,
-      "type": "course",
-      "completed": false
-    },
-    {
       "id": "ics_z7cu7r1_1789465377237",
       "calendarId": "cal_1788437811199",
       "title": "Skills Stage A2",
