@@ -10440,6 +10440,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1789465514611"
+    },
+    {
+      "calendarId": "cal_1787764123477",
+      "title": "series",
+      "teacher": "",
+      "date": "2026-09-16",
+      "day": "wed",
+      "startTime": "13:00",
+      "duration": 120,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1789566200736"
     }
   ],
   "importantDates": [
