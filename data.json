@@ -182,7 +182,7 @@
       "room": "",
       "recurrence": "weekly",
       "groupId": "rec_1788443718422",
-      "completed": false,
+      "completed": true,
       "id": "ev_1788443718429"
     },
     {
