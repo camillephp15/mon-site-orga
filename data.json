@@ -10619,7 +10619,99 @@
       "completed": true
     }
   ],
-  "flashcards": [],
+  "flashcards": [
+    {
+      "subject": "Maths",
+      "deckName": "Cours Séries",
+      "cards": [
+        {
+          "id": "c_ziwd2x3",
+          "front": "1. Définition de la série de terme général $(u_{n})$",
+          "back": "La série de terme général $(u_{n})$ désigne la suite $(S_{n})_{n\\in\\mathbb{N}}$ définie par $\\forall n\\in\\mathbb{N}$ $S_{n}=\\sum_{k=0}^{n}u_{k}.$",
+          "status": "learning"
+        },
+        {
+          "id": "c_dyl0q09",
+          "front": "2. Définition de la série géométrique de raison $q\\in\\mathbb{R}$ et de premier terme $u_{0}\\in\\mathbb{R}^{*}$",
+          "back": "On appelle série géométrique de raison $q$ et de premier terme $u_{0}$ la série $\\sum_{k=0}^{+\\infty}u_{0}q^{k}.$",
+          "status": "learning"
+        },
+        {
+          "id": "c_rdg7k5e",
+          "front": "3. Condition nécessaire et suffisante de convergence d'une série géométrique et valeur",
+          "back": "La série géométrique converge $\\iff q\\in]-1;1[$. Dans ce cas, $\\sum_{k=0}^{+\\infty}u_{0}q^{k}=\\frac{u_{0}}{1-q}.$",
+          "status": "learning"
+        },
+        {
+          "id": "c_ysjnp66",
+          "front": "4. Définition de la série de Riemann de paramètre $\\alpha\\in\\mathbb{R}$",
+          "back": "On appelle série de Riemann de paramètre $\\alpha$ la série $\\sum_{k=1}^{+\\infty}\\frac{1}{k^{\\alpha}}.$",
+          "status": "learning"
+        },
+        {
+          "id": "c_pl2j6zo",
+          "front": "5. Définition de la série harmonique",
+          "back": "On appelle série harmonique la série de Riemann de paramètre 1 : $\\sum_{k=1}^{+\\infty}\\frac{1}{k}.$",
+          "status": "learning"
+        },
+        {
+          "id": "c_ss6xzn0",
+          "front": "6. CNS de convergence d'une série de Riemann",
+          "back": "La série de Riemann de paramètre $\\alpha$ converge $\\iff \\alpha>1.$",
+          "status": "learning"
+        },
+        {
+          "id": "c_0fhtt8q",
+          "front": "7. Définition de la série exponentielle en $x\\in\\mathbb{R}$",
+          "back": "La série exponentielle en $x$ est $\\sum_{k=0}^{+\\infty}\\frac{x^{k}}{k!}.$",
+          "status": "learning"
+        },
+        {
+          "id": "c_hk5ghse",
+          "front": "8. Critère de comparaison pour des séries à termes positifs",
+          "back": "Soient $(u_{n}),(v_{n})\\subset\\mathbb{R}$ tq $0\\le u_{n}\\le v_{n}$. Alors $\\sum v_{k}$ converge $\\Rightarrow \\sum u_{k}$ converge.",
+          "status": "learning"
+        },
+        {
+          "id": "c_nvmyz7i",
+          "front": "9. Définition de la convergence absolue",
+          "back": "On dit que la série $\\sum u_{k}$ converge absolument si la série $\\sum |u_{k}|$ converge.",
+          "status": "learning"
+        },
+        {
+          "id": "c_lczd9nl",
+          "front": "10. Critère d'équivalence pour des séries à termes positifs",
+          "back": "Soient $u_n, v_n \\ge 0$ tq $u_n \\sim v_n$. Alors $\\sum u_k$ converge $\\iff \\sum v_k$ converge.",
+          "status": "learning"
+        },
+        {
+          "id": "c_rh96jul",
+          "front": "11. Critère du petit o pour des séries à termes positifs",
+          "back": "Soient $u_n = o(v_n)$ et $v_n \\ge 0$. Alors $\\sum v_k$ converge $\\Rightarrow \\sum u_k$ converge.",
+          "status": "learning"
+        },
+        {
+          "id": "c_jkepaoa",
+          "front": "12. Critère de D'Alembert",
+          "back": "Si $u_n>0$ et $\\lim \\frac{u_{n+1}}{u_{n}}=l$: si $l<1$ convergence, si $l>1$ divergence, si $l=1$ cas douteux.",
+          "status": "learning"
+        },
+        {
+          "id": "c_02rxd8e",
+          "front": "13. Critère de Cauchy",
+          "back": "Si $u_n\\ge0$ et $\\lim (u_{n})^{\\frac{1}{n}}=l$: si $l<1$ convergence, si $l>1$ divergence, si $l=1$ cas douteux.",
+          "status": "learning"
+        },
+        {
+          "id": "c_8e5h9f8",
+          "front": "14. Critère d'Abel",
+          "back": "Si $(a_n)$ est décroissante, $\\lim a_n = 0$, et les sommes partielles de $b_n$ sont bornées ($\\exists C, |B_n|\\le C$), alors $\\sum a_k b_k$ converge.",
+          "status": "learning"
+        }
+      ],
+      "id": "deck_1789647241173"
+    }
+  ],
   "gradesData": {
     "blocks": [
       {
