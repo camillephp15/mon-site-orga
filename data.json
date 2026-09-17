@@ -10795,6 +10795,67 @@
         }
       ],
       "id": "deck_1789647279169"
+    },
+    {
+      "subject": "Maths",
+      "deckName": "Cours Statistiques",
+      "cards": [
+        {
+          "id": "c_ybnjgoj",
+          "front": "1. Les 5 types de variables en statistiques",
+          "back": "Qualitative nominale (sans ordre), qualitative binaire (2 modalités), qualitative ordinale (ordonnée), quantitative discrète (comptage/fini), quantitative continue (mesure dans $\\mathbb{R}$).",
+          "status": "learning"
+        },
+        {
+          "id": "c_8qwqzd5",
+          "front": "2. Formules des effectifs et des fréquences",
+          "back": "$e_k = \\sum_{i=1}^n 1_{\\{x_i\\}}(m_k)$ et $f_k = \\frac{e_k}{n} = \\frac{1}{n} \\sum_{i=1}^n 1_{\\{x_i\\}}(m_k)$.",
+          "status": "learning"
+        },
+        {
+          "id": "c_esp6lcb",
+          "front": "3. Condition pour effectifs/fréquences cumulés",
+          "back": "Variable qualitative ordinale ou variable quantitative. Formule : $\\tilde{e}_k = \\sum_{i=1}^n 1_{\\{x_i < m_k\\}}.$",
+          "status": "learning"
+        },
+        {
+          "id": "c_29l8vjx",
+          "front": "4. Fonction de répartition empirique",
+          "back": "$\\hat{F}_x(m) = \\frac{1}{n} \\sum_{i=1}^n 1_{\\{x_i \\le m\\}}.$",
+          "status": "learning"
+        },
+        {
+          "id": "c_011lubt",
+          "front": "5. Quartiles et quantiles théoriques (méthode ceil)",
+          "back": "$1^{er}$ quartile $= x_{(\\lceil n/4 \\rceil)}$, Médiane $= x_{(\\lceil n/2 \\rceil)}$, $3^e$ quartile $= x_{(\\lceil 3n/4 \\rceil)}$. Quantile de niveau $\\alpha$ : $\\hat{q}_\\alpha = x_{(\\lceil \\alpha n \\rceil)}$.",
+          "status": "learning"
+        },
+        {
+          "id": "c_vam191y",
+          "front": "6. Quantile par interpolation linéaire",
+          "back": "$\\hat{q}_\\alpha^{\\text{lin}} = x_{(k+1)} + \\lambda (x_{(k+2)} - x_{(k+1)})$ avec $\\frac{k}{n-1} < \\alpha < \\frac{k+1}{n-1}$.",
+          "status": "learning"
+        },
+        {
+          "id": "c_jhavg23",
+          "front": "7. Moyenne, variance et écart-type empiriques",
+          "back": "$\\overline{x} = \\frac{1}{n}\\sum x_i$, $\\text{Var}(x) = \\hat{\\sigma}^2 = \\frac{1}{n}\\sum(x_i-\\overline{x})^2$, $\\hat{\\sigma} = \\sqrt{\\text{Var}(x)}.$",
+          "status": "learning"
+        },
+        {
+          "id": "c_b4nbmbi",
+          "front": "8. Moments empiriques (centrés et non centrés)",
+          "back": "Moment d'ordre $p$ : $m_p = \\frac{1}{n}\\sum x_i^p$. Moment centré d'ordre $p$ : $m_p = \\frac{1}{n}\\sum(x_i-\\overline{x})^p.$",
+          "status": "learning"
+        },
+        {
+          "id": "c_gnr8iz0",
+          "front": "9. Histogramme des fréquences et en densité",
+          "back": "Fréquence de classe : $f_k = e_k/n$. Histogramme : $S_{\\text{freq}}(v) = \\sum f_k 1_{\\mathcal{I}_k}(v)$. Densité : $S_{\\text{dens}}(v) = \\sum \\frac{f_k}{|\\mathcal{I}_k|} 1_{\\mathcal{I}_k}(v) = \\frac{1}{h}\\sum f_k 1_{\\mathcal{I}_k}(v).$",
+          "status": "learning"
+        }
+      ],
+      "id": "deck_1789647303925"
     }
   ],
   "gradesData": {
