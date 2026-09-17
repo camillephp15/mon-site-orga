@@ -10710,6 +10710,91 @@
         }
       ],
       "id": "deck_1789647241173"
+    },
+    {
+      "subject": "Maths",
+      "deckName": "Cours Algèbre",
+      "cards": [
+        {
+          "id": "c_chvoelg",
+          "front": "1. Familles génératrices, libres et liées",
+          "back": "$\\mathcal{F}$ est génératrice si $\\forall x\\in E, \\exists \\lambda_i, x=\\sum \\lambda_i x_i$. Libre si $\\sum \\lambda_i x_i=0_E \\Rightarrow \\lambda_i=0$. Liée si des $\\lambda_i$ non tous nuls vérifient $\\sum \\lambda_i x_i=0_E$.",
+          "status": "learning"
+        },
+        {
+          "id": "c_nzplwzf",
+          "front": "2. Bases et dimensions en dimension finie",
+          "back": "Une base est une famille libre et génératrice. Toutes les bases ont le même cardinal (dimension). En dimension $n$, toute famille libre de $n$ vecteurs (ou génératrice de $n$ vecteurs) est une base.",
+          "status": "learning"
+        },
+        {
+          "id": "c_c1nn3gu",
+          "front": "3. Sous-espaces vectoriels et descriptions",
+          "back": "$F$ est un s.e.v si $0_E \\in F$ et $\\forall u,v \\in F, \\forall \\lambda \\in \\mathbb{R}, u+\\lambda v \\in F$. Décrit par générateurs ($Vect$) ou par un système d'équations linéaires homogènes. En dim finie, $F \\subset G$ et $\\dim F = \\dim G \\Rightarrow F=G$.",
+          "status": "learning"
+        },
+        {
+          "id": "c_ow5k3xh",
+          "front": "4. Somme directe",
+          "back": "La somme $F+G$ est directe ($F \\oplus G$) si la décomposition est unique, ssi $F \\cap G = \\{0_E\\}$.",
+          "status": "learning"
+        },
+        {
+          "id": "c_e7t361f",
+          "front": "5. Formule de Grassmann et supplémentaires",
+          "back": "$\\dim(F+G)=\\dim F + \\dim G - \\dim(F \\cap G)$. Supplémentaires : $E = F \\oplus G \\iff F \\cap G = \\{0_E\\}$ et $\\dim F + \\dim G = \\dim E$.",
+          "status": "learning"
+        },
+        {
+          "id": "c_kv08vzu",
+          "front": "6. Application linéaire, noyau et image",
+          "back": "$f(x+\\lambda y)=f(x)+\\lambda f(y)$. $\\ker f = \\{x \\in E \\mid f(x)=0_F\\}$ et $\\text{Im} f = \\{f(x) \\mid x \\in E\\}$.",
+          "status": "learning"
+        },
+        {
+          "id": "c_ekqy7h4",
+          "front": "7. Théorème du rang",
+          "back": "$\\dim E = \\dim(\\ker f) + \\text{rg}(f)$. Pour un endomorphisme en dim finie : injectif $\\iff$ surjectif $\\iff$ bijectif.",
+          "status": "learning"
+        },
+        {
+          "id": "c_ffyrzhe",
+          "front": "8. Matrice d'une application linéaire",
+          "back": "$A = [f]_{\\mathcal{B},\\mathcal{B}'}$ telle que $AX = [f(x)]_{\\mathcal{B}'}$.",
+          "status": "learning"
+        },
+        {
+          "id": "c_xnwrks7",
+          "front": "9. Matrices inversibles et déterminant",
+          "back": "$A$ est inversible ssi il existe $B$ tq $AB=BA=I_n$, ce qui équivaut à $\\det(A) \\neq 0$.",
+          "status": "learning"
+        },
+        {
+          "id": "c_2ab4np4",
+          "front": "10. Définition et linéarité de la trace",
+          "back": "$\\text{tr}(A) = \\sum_{i=1}^n a_{ii}$. Linéarité : $\\text{tr}(A+\\lambda B) = \\text{tr}(A) + \\lambda \\text{tr}(B)$.",
+          "status": "learning"
+        },
+        {
+          "id": "c_s8otuku",
+          "front": "11. Projecteurs",
+          "back": "Endomorphisme $p$ tq $p^2=p$. On a $E = \\text{Im} p \\oplus \\ker p$.",
+          "status": "learning"
+        },
+        {
+          "id": "c_oq111mz",
+          "front": "12. Symétries",
+          "back": "Endomorphisme $s$ tq $s^2=\\text{id}_E$. Lien avec projecteurs : $s = 2p - \\text{id}_E$.",
+          "status": "learning"
+        },
+        {
+          "id": "c_1069fs6",
+          "front": "13. Matrices des projecteurs et symétries",
+          "back": "Dans une base adaptée à $F \\oplus G$, la matrice d'un projecteur est $\\begin{pmatrix} I & 0 \\\\ 0 & 0 \\end{pmatrix}$ et celle d'une symétrie est $\\begin{pmatrix} I & 0 \\\\ 0 & -I \\end{pmatrix}$.",
+          "status": "learning"
+        }
+      ],
+      "id": "deck_1789647279169"
     }
   ],
   "gradesData": {
