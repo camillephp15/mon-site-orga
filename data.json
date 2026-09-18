@@ -10468,6 +10468,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1789566289908"
+    },
+    {
+      "calendarId": "cal_1789397627231",
+      "title": "reprendre portfolio",
+      "teacher": "",
+      "date": "2026-09-19",
+      "day": "sat",
+      "startTime": "09:30",
+      "duration": 90,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1789720882181"
     }
   ],
   "importantDates": [
