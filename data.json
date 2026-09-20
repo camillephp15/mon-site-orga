@@ -10642,6 +10642,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1789924640221"
+    },
+    {
+      "calendarId": "cal_1788446200874",
+      "title": "Bosser CS50 week 4/5",
+      "teacher": "",
+      "date": "2026-09-21",
+      "day": "mon",
+      "startTime": "11:00",
+      "duration": 60,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1789924660569"
     }
   ],
   "importantDates": [
