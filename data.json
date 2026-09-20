@@ -10656,6 +10656,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1789924660569"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "Bosser BD",
+      "teacher": "",
+      "date": "2026-09-22",
+      "day": "tue",
+      "startTime": "17:30",
+      "duration": 90,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1789924789139"
     }
   ],
   "importantDates": [
