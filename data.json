@@ -10496,6 +10496,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1789915444830"
+    },
+    {
+      "calendarId": "cal_1788446200874",
+      "title": "Bosser CS50",
+      "teacher": "",
+      "date": "2026-09-20",
+      "day": "sun",
+      "startTime": "20:00",
+      "duration": 30,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1789915529081"
     }
   ],
   "importantDates": [
