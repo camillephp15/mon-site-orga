@@ -11361,6 +11361,169 @@
         }
       ],
       "id": "deck_1789647303925"
+    },
+    {
+      "subject": "Maths",
+      "deckName": "Bases de données 1",
+      "cards": [
+        {
+          "id": "c_df4koyw",
+          "front": "Qu'est-ce qu'une base de données (BDD) ?",
+          "back": "Conteneur d'un très grand nombre de données structurées, mémorisées sur support permanent, interrogeable et partagée par plusieurs applications.",
+          "status": "learning"
+        },
+        {
+          "id": "c_wlhnb76",
+          "front": "Qu'est-ce qu'un SGBD (Système de Gestion de Bases de Données) ?",
+          "back": "Un logiciel (ex: MySQL, PostgreSQL, Oracle) permettant de stocker, lire, écrire, modifier et sécuriser les données d'une BDD.",
+          "status": "learning"
+        },
+        {
+          "id": "c_079d24o",
+          "front": "Quelles sont les trois couches de modélisation d'une base de données ?",
+          "back": "Le Modèle Conceptuel (MCD), le Modèle Logique (MLD) et le Modèle Physique (MPD).",
+          "status": "learning"
+        },
+        {
+          "id": "c_61hm1h4",
+          "front": "Qu'est-ce que le Modèle Conceptuel (MCD / Entité-Association) ?",
+          "back": "Une représentation non-formelle et graphique des données, indépendante de tout système technique.",
+          "status": "learning"
+        },
+        {
+          "id": "c_fdcctww",
+          "front": "Qu'est-ce que le Modèle Logique (MLD / Modèle Relationnel) ?",
+          "back": "Une description formelle de la solution sous forme de tables et de relations.",
+          "status": "learning"
+        },
+        {
+          "id": "c_evh1jad",
+          "front": "Qu'est-ce que le Modèle Physique (MPD) ?",
+          "back": "L'implémentation réelle et l'optimisation de la BDD dans un SGBD (ex: en SQL).",
+          "status": "learning"
+        },
+        {
+          "id": "c_2vxqlij",
+          "front": "Qu'est-ce qu'une entité dans un MCD ?",
+          "back": "Un objet du monde réel (concret ou abstrait) clairement identifiable avec une existence propre, représenté par un rectangle.",
+          "status": "learning"
+        },
+        {
+          "id": "c_ig7ycrb",
+          "front": "Qu'est-ce qu'un attribut (ou propriété) ?",
+          "back": "Une donnée élémentaire décrivant une entité ou une association, dotée d'un type (entier, chaîne, etc.) et non dérivable (non calculable).",
+          "status": "learning"
+        },
+        {
+          "id": "c_51bozly",
+          "front": "Qu'est-ce qu'un identifiant (ou clé) dans un MCD ?",
+          "back": "Un attribut (ou groupe d'attributs) unique permettant de distinguer chaque occurrence d'une entité, obligatoirement non nul et souligné.",
+          "status": "learning"
+        },
+        {
+          "id": "c_yz15ql7",
+          "front": "Qu'est-ce qu'une association dans un MCD ?",
+          "back": "Un lien sémantique (souvent un verbe) entre deux ou plusieurs entités, représenté par un losange ou une ellipse.",
+          "status": "learning"
+        },
+        {
+          "id": "c_01ag3jc",
+          "front": "Qu'est-ce qu'une cardinalité ?",
+          "back": "Une paire (min, max) rattachée à chaque patte d'une association, exprimant la participation minimale et maximale d'une entité à cette relation.",
+          "status": "learning"
+        },
+        {
+          "id": "c_5h9fm4i",
+          "front": "Que signifie la cardinalité (0,1) ?",
+          "back": "L'entité participe au moins 0 fois et au plus 1 fois à l'association (optionnel, au plus un).",
+          "status": "learning"
+        },
+        {
+          "id": "c_7q22sue",
+          "front": "Que signifie la cardinalité (1,1) ?",
+          "back": "L'entité participe exactement 1 fois à l'association (obligatoire et unique).",
+          "status": "learning"
+        },
+        {
+          "id": "c_mxxyfap",
+          "front": "Que signifie la cardinalité (0,n) ?",
+          "back": "L'entité peut ne pas participer ou participer plusieurs fois à l'association.",
+          "status": "learning"
+        },
+        {
+          "id": "c_7ad64uy",
+          "front": "Que signifie la cardinalité (1,n) ?",
+          "back": "L'entité participe au moins 1 fois, ou plusieurs fois à l'association.",
+          "status": "learning"
+        },
+        {
+          "id": "c_efldswr",
+          "front": "Comment définit-on le type d'une association ?",
+          "back": "À partir des cardinalités maximales des deux branches de l'association ([1:1], [1:N] ou [N:N]).",
+          "status": "learning"
+        },
+        {
+          "id": "c_1yw3p0i",
+          "front": "Qu'est-ce qu'une relation (ou table) dans le modèle relationnel ?",
+          "back": "Un ensemble de tuples (lignes) caractérisé par un nom.",
+          "status": "learning"
+        },
+        {
+          "id": "c_5ddiclt",
+          "front": "Qu'est-ce qu'un attribut dans le modèle relationnel ?",
+          "back": "Une colonne représentant une caractéristique simple et monovaluée qui prend ses valeurs dans un domaine.",
+          "status": "learning"
+        },
+        {
+          "id": "c_z6e6qcw",
+          "front": "Qu'est-ce qu'une clé primaire (PK) ?",
+          "back": "Un attribut ou groupe d'attributs identifiant de manière unique un tuple dans une relation (soumise à la contrainte d'entité : non nulle et unique).",
+          "status": "learning"
+        },
+        {
+          "id": "c_9jmlvtn",
+          "front": "Qu'est-ce qu'une clé étrangère (FK) ?",
+          "back": "Un attribut ou groupe d'attributs qui fait référence à la clé primaire d'une autre table (soumise à la contrainte d'intégrité référentielle).",
+          "status": "learning"
+        },
+        {
+          "id": "c_qyox0es",
+          "front": "Quelle est la règle de traduction des associations [N:N] (maxima à N des deux côtés) vers le MLD ?",
+          "back": "On crée toujours une relation (table) spécifique de liaison dont la clé primaire est composée des clés des deux entités participantes.",
+          "status": "learning"
+        },
+        {
+          "id": "c_iprytd1",
+          "front": "Comment traduit-on une association [1:N] dont la cardinalité minimale est 1 du côté \"1\" ?",
+          "back": "On reporte l'identifiant de l'entité côté (1,n) directement dans la table de l'entité côté (1,1) sous forme de clé étrangère.",
+          "status": "learning"
+        },
+        {
+          "id": "c_5wi70nf",
+          "front": "Comment traduit-on une association [1:N] dont la cardinalité minimale est 0 du côté \"1\" ?",
+          "back": "On crée une relation (table) spécifique de liaison.",
+          "status": "learning"
+        },
+        {
+          "id": "c_fzi4ok5",
+          "front": "Comment traduit-on une association [1:1] dont les deux cardinalités minimales sont 1 ?",
+          "back": "On fusionne les deux entités en une seule et unique relation contenant tous les attributs.",
+          "status": "learning"
+        },
+        {
+          "id": "c_avlltrt",
+          "front": "Comment traduit-on une association [1:1] avec une cardinalité minimale à 0 et l'autre à 1 ?",
+          "back": "On reporte la clé de l'entité à participation optionnelle (0,1) dans la table de l'entité à participation totale (1,1).",
+          "status": "learning"
+        },
+        {
+          "id": "c_7lpcygw",
+          "front": "Comment traduit-on une association [1:1] dont les deux cardinalités minimales sont 0 ?",
+          "back": "On crée une relation spécifique contenant les clés primaires des deux entités.",
+          "status": "learning"
+        }
+      ],
+      "id": "deck_1790110100196"
     }
   ],
   "gradesData": {
