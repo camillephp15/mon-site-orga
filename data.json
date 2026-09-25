@@ -10866,6 +10866,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1790371491005"
+    },
+    {
+      "calendarId": "cal_1787764123477",
+      "title": "RDV Cordée MonaLisa",
+      "teacher": "",
+      "date": "2026-09-29",
+      "day": "tue",
+      "startTime": "17:00",
+      "duration": 120,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1790371817693"
     }
   ],
   "importantDates": [
