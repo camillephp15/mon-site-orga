@@ -10796,6 +10796,20 @@
       "groupId": null,
       "completed": true,
       "id": "ev_1790371280095"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "Algèbre",
+      "teacher": "",
+      "date": "2026-09-27",
+      "day": "sun",
+      "startTime": "13:30",
+      "duration": 180,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1790371379591"
     }
   ],
   "importantDates": [
