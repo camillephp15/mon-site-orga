@@ -10740,6 +10740,20 @@
       "duration": 330,
       "type": "tp",
       "completed": false
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "BD",
+      "teacher": "",
+      "date": "2026-09-25",
+      "day": "fri",
+      "startTime": "12:30",
+      "duration": 90,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1790371200615"
     }
   ],
   "importantDates": [
