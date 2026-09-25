@@ -10768,6 +10768,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1790371226185"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "POO",
+      "teacher": "",
+      "date": "2026-09-25",
+      "day": "fri",
+      "startTime": "16:15",
+      "duration": 90,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1790371250757"
     }
   ],
   "importantDates": [
