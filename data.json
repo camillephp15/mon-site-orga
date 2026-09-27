@@ -10894,6 +10894,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1790529303192"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "Resistance des matériaux",
+      "teacher": "",
+      "date": "2026-09-28",
+      "day": "mon",
+      "startTime": "09:45",
+      "duration": 90,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1790529324727"
     }
   ],
   "importantDates": [
