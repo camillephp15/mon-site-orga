@@ -10911,20 +10911,6 @@
     },
     {
       "calendarId": "cal_1788443555880",
-      "title": "Colles",
-      "teacher": "",
-      "date": "2026-09-28",
-      "day": "mon",
-      "startTime": "11:15",
-      "duration": 45,
-      "room": "",
-      "recurrence": "none",
-      "groupId": null,
-      "completed": false,
-      "id": "ev_1790529359839"
-    },
-    {
-      "calendarId": "cal_1788443555880",
       "title": "Prog",
       "teacher": "",
       "date": "2026-09-28",
