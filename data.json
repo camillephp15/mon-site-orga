@@ -11052,6 +11052,20 @@
       "duration": 330,
       "type": "tp",
       "completed": false
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "prog",
+      "teacher": "",
+      "date": "2026-09-29",
+      "day": "tue",
+      "startTime": "22:30",
+      "duration": 60,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1790716748374"
     }
   ],
   "importantDates": [
