@@ -11066,6 +11066,20 @@
       "duration": 330,
       "type": "tp",
       "completed": false
+    },
+    {
+      "calendarId": "cal_1787764123477",
+      "title": "Algèbre",
+      "teacher": "",
+      "date": "2026-10-01",
+      "day": "thu",
+      "startTime": "12:00",
+      "duration": 60,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1790879130506"
     }
   ],
   "importantDates": [
