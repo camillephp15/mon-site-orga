@@ -11094,6 +11094,20 @@
       "groupId": null,
       "completed": true,
       "id": "ev_1790879144799"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "Prog",
+      "teacher": "",
+      "date": "2026-10-01",
+      "day": "thu",
+      "startTime": "20:30",
+      "duration": 90,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1790879166989"
     }
   ],
   "importantDates": [
