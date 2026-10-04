@@ -11413,6 +11413,16 @@
       "status": "done",
       "id": "lt_1788794596730",
       "completed": true
+    },
+    {
+      "title": "Envoyer mail ESILV",
+      "categoryId": "cat_1788794605558",
+      "priority": "normal",
+      "deadline": "2026-11-03",
+      "notes": "",
+      "status": "todo",
+      "id": "lt_1791141768072",
+      "completed": false
     }
   ],
   "flashcards": [
