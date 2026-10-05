@@ -11279,6 +11279,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1791185781803"
+    },
+    {
+      "calendarId": "cal_1789397627231",
+      "title": "portfolio",
+      "teacher": "",
+      "date": "2026-10-05",
+      "day": "mon",
+      "startTime": "11:30",
+      "duration": 60,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1791185792778"
     }
   ],
   "importantDates": [
