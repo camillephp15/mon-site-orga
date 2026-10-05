@@ -7886,19 +7886,6 @@
       "completed": false
     },
     {
-      "id": "ics_0icbd9n_1791038989169",
-      "calendarId": "cal_1788437811199",
-      "title": "Colles Mathématiques",
-      "teacher": "MOULARD Victor",
-      "room": "MTPL-207 (30)",
-      "date": "2026-10-07",
-      "day": "wed",
-      "startTime": "08:15",
-      "duration": 90,
-      "type": "colle",
-      "completed": false
-    },
-    {
       "id": "ics_jjezb81_1791038989169",
       "calendarId": "cal_1788437811199",
       "title": "Colles Mathématiques",
