@@ -11251,6 +11251,20 @@
       "duration": 330,
       "type": "tp",
       "completed": false
+    },
+    {
+      "calendarId": "cal_1789397627231",
+      "title": "portfolio",
+      "teacher": "",
+      "date": "2026-10-04",
+      "day": "sun",
+      "startTime": "17:00",
+      "duration": 240,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1791185764586"
     }
   ],
   "importantDates": [
