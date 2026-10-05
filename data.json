@@ -11265,6 +11265,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1791185764586"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "colles",
+      "teacher": "",
+      "date": "2026-10-05",
+      "day": "mon",
+      "startTime": "09:30",
+      "duration": 120,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1791185781803"
     }
   ],
   "importantDates": [
