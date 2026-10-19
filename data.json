@@ -11720,7 +11720,7 @@
       "date": "2026-10-19",
       "day": "mon",
       "startTime": "09:30",
-      "duration": 30,
+      "duration": 120,
       "room": "",
       "recurrence": "none",
       "groupId": null,
