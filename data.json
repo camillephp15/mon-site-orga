@@ -11847,6 +11847,13 @@
         "title": "Structures de données",
         "exosTodo": "• Arbres binaires de recherche (ABR) et arbres AVL\n• Tas binaires et files de priorité",
         "methods": ""
+      },
+      {
+        "id": "info_ch_1792418824329",
+        "title": "Over The Wire",
+        "exosHard": "",
+        "methods": "",
+        "notes": ""
       }
     ]
   },
