@@ -11852,7 +11852,7 @@
         "id": "info_ch_1792418824329",
         "title": "Over The Wire",
         "exosHard": "url : ssh bandit1@bandit.labs.overthewire.org -p 2220\n0 : bandit0\n1 :  6y2kwnwK6grgvwvpvLaa2T1cpFEKOhNR\n2 : PK8fYLZg2hnHSz83plBL1iEPKdD3QToB",
-        "methods": "",
+        "methods": "t",
         "notes": ""
       }
     ]
