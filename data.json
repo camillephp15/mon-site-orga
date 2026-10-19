@@ -11698,6 +11698,20 @@
       "duration": 330,
       "type": "tp",
       "completed": false
+    },
+    {
+      "calendarId": "cal_1787764123477",
+      "title": "SQL murder",
+      "teacher": "",
+      "date": "2026-10-19",
+      "day": "mon",
+      "startTime": "14:00",
+      "duration": 180,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1792405415471"
     }
   ],
   "importantDates": [
