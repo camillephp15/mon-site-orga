@@ -11712,6 +11712,20 @@
       "groupId": null,
       "completed": true,
       "id": "ev_1792405415471"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "séries et BD",
+      "teacher": "",
+      "date": "2026-10-19",
+      "day": "mon",
+      "startTime": "09:30",
+      "duration": 30,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1792414763704"
     }
   ],
   "importantDates": [
