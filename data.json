@@ -11726,6 +11726,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1792414763704"
+    },
+    {
+      "calendarId": "cal_1787764123477",
+      "title": "Finir Base de données",
+      "teacher": "",
+      "date": "2026-10-19",
+      "day": "mon",
+      "startTime": "15:15",
+      "duration": 90,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1792414806926"
     }
   ],
   "importantDates": [
