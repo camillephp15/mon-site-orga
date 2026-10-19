@@ -11706,7 +11706,7 @@
       "date": "2026-10-19",
       "day": "mon",
       "startTime": "14:00",
-      "duration": 180,
+      "duration": 60,
       "room": "",
       "recurrence": "none",
       "groupId": null,
