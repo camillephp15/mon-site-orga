@@ -13027,7 +13027,15 @@
             "id": "sub-i2",
             "name": "Structures de données",
             "coef": 1,
-            "evaluations": []
+            "evaluations": [
+              {
+                "id": "ev_1793279681042",
+                "name": "DS1",
+                "grade": 12,
+                "coef": 2,
+                "bonus": 0
+              }
+            ]
           },
           {
             "id": "sub-i3",
