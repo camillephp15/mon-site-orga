@@ -12977,7 +12977,15 @@
             "id": "sub-m3",
             "name": "Série",
             "coef": 3,
-            "evaluations": []
+            "evaluations": [
+              {
+                "id": "ev_1793279608753",
+                "name": "DS1",
+                "grade": 3,
+                "coef": 1,
+                "bonus": 0
+              }
+            ]
           }
         ]
       },
