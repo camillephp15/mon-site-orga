@@ -12963,7 +12963,15 @@
             "id": "sub-m2",
             "name": "Algèbre linéaire",
             "coef": 4,
-            "evaluations": []
+            "evaluations": [
+              {
+                "id": "ev_1793279597385",
+                "name": "DS1",
+                "grade": 14.5,
+                "coef": 1,
+                "bonus": 0
+              }
+            ]
           },
           {
             "id": "sub-m3",
