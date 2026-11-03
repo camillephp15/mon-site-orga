@@ -13062,7 +13062,15 @@
             "id": "sub-p1",
             "name": "Résistance des matériaux",
             "coef": 3,
-            "evaluations": []
+            "evaluations": [
+              {
+                "id": "ev_1793717003076",
+                "name": "DS",
+                "grade": 10.25,
+                "coef": 2,
+                "bonus": 0
+              }
+            ]
           },
           {
             "id": "sub-p2",
