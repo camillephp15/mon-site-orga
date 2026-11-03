@@ -13094,7 +13094,15 @@
             "id": "sub-i1",
             "name": "Algorithmique et POO",
             "coef": 3,
-            "evaluations": []
+            "evaluations": [
+              {
+                "id": "ev_1793717018176",
+                "name": "DS1",
+                "grade": 5,
+                "coef": 2,
+                "bonus": 0
+              }
+            ]
           },
           {
             "id": "sub-i2",
