@@ -13134,7 +13134,15 @@
             "id": "sub-pr1",
             "name": "Projet PIX",
             "coef": 2,
-            "evaluations": []
+            "evaluations": [
+              {
+                "id": "ev_1793717038968",
+                "name": "vidéo",
+                "grade": 18.5,
+                "coef": 2,
+                "bonus": 0
+              }
+            ]
           },
           {
             "id": "sub-pr2",
