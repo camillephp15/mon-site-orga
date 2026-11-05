@@ -13138,7 +13138,15 @@
             "id": "sub-p3",
             "name": "Systèmes électroniques",
             "coef": 2,
-            "evaluations": []
+            "evaluations": [
+              {
+                "id": "ev_1793876235443",
+                "name": "NOTE FINALE",
+                "grade": 12,
+                "coef": 2,
+                "bonus": 0
+              }
+            ]
           }
         ]
       },
