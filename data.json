@@ -13110,7 +13110,15 @@
             "id": "sub-p2",
             "name": "Mécanique des fluides",
             "coef": 2,
-            "evaluations": []
+            "evaluations": [
+              {
+                "id": "ev_1793875943513",
+                "name": "DS",
+                "grade": 6.5,
+                "coef": 2,
+                "bonus": 0
+              }
+            ]
           },
           {
             "id": "sub-p3",
