@@ -13048,7 +13048,15 @@
             "id": "sub-m1",
             "name": "Intro aux statistiques",
             "coef": 2,
-            "evaluations": []
+            "evaluations": [
+              {
+                "id": "ev_1793875923972",
+                "name": "DS",
+                "grade": 16.75,
+                "coef": 1,
+                "bonus": 0
+              }
+            ]
           },
           {
             "id": "sub-m2",
