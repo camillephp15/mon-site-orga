@@ -13156,7 +13156,15 @@
             "id": "sub-i3",
             "name": "Conception base de données",
             "coef": 2,
-            "evaluations": []
+            "evaluations": [
+              {
+                "id": "ev_1793875969157",
+                "name": "DS",
+                "grade": 12,
+                "coef": 2,
+                "bonus": 0
+              }
+            ]
           }
         ]
       },
