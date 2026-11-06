@@ -13221,6 +13221,13 @@
                 "grade": 10,
                 "coef": 4,
                 "bonus": 0
+              },
+              {
+                "id": "ev_1793951571410",
+                "name": "TD NOTE",
+                "grade": 12,
+                "coef": 2.4,
+                "bonus": 0
               }
             ]
           },
