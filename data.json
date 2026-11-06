@@ -13200,6 +13200,13 @@
                 "grade": 5,
                 "coef": 2,
                 "bonus": 0
+              },
+              {
+                "id": "ev_1793951784598",
+                "name": "PROJET",
+                "grade": null,
+                "coef": 2,
+                "bonus": 0
               }
             ]
           },
