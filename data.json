@@ -13242,6 +13242,13 @@
                 "grade": 12,
                 "coef": 3,
                 "bonus": 0
+              },
+              {
+                "id": "ev_1793951674077",
+                "name": "EXAM FINAL",
+                "grade": null,
+                "coef": 4,
+                "bonus": 0
               }
             ]
           }
