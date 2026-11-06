@@ -13225,7 +13225,7 @@
               {
                 "id": "ev_1793951571410",
                 "name": "TD NOTE",
-                "grade": 0,
+                "grade": null,
                 "coef": 2.4,
                 "bonus": 0
               }
