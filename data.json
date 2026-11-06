@@ -13145,6 +13145,13 @@
                 "grade": 10.5,
                 "coef": 1,
                 "bonus": 0
+              },
+              {
+                "id": "ev_1793952330908",
+                "name": "TP",
+                "grade": null,
+                "coef": 2,
+                "bonus": 0
               }
             ]
           },
