@@ -13214,6 +13214,13 @@
                 "grade": null,
                 "coef": 4,
                 "bonus": 0
+              },
+              {
+                "id": "ev_1793952158446",
+                "name": "DS2",
+                "grade": null,
+                "coef": 2,
+                "bonus": 0
               }
             ]
           },
