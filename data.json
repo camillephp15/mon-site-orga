@@ -13207,7 +13207,15 @@
             "id": "sub-i2",
             "name": "Structures de données",
             "coef": 1,
-            "evaluations": []
+            "evaluations": [
+              {
+                "id": "ev_1793951503185",
+                "name": "Controle continu",
+                "grade": 16,
+                "coef": 1,
+                "bonus": 0
+              }
+            ]
           },
           {
             "id": "sub-i3",
