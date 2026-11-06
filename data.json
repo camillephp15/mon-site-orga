@@ -13211,7 +13211,7 @@
               {
                 "id": "ev_1793951503185",
                 "name": "Controle continu",
-                "grade": 16,
+                "grade": null,
                 "coef": 1,
                 "bonus": 0
               },
