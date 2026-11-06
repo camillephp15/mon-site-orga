@@ -13207,6 +13207,13 @@
                 "grade": null,
                 "coef": 2,
                 "bonus": 0
+              },
+              {
+                "id": "ev_1793951805050",
+                "name": "PARTIEL",
+                "grade": null,
+                "coef": 4,
+                "bonus": 0
               }
             ]
           },
