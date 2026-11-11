@@ -9671,19 +9671,6 @@
       "completed": false
     },
     {
-      "id": "ics_dgrmn1e_1794134128588",
-      "calendarId": "cal_1788437811199",
-      "title": "Sport Montpellier  LACASIA Christelle",
-      "teacher": "",
-      "room": "HORS CAMPUS",
-      "date": "2026-11-26",
-      "day": "thu",
-      "startTime": "14:00",
-      "duration": 90,
-      "type": "tp",
-      "completed": false
-    },
-    {
       "id": "ics_xww2zd7_1794134128588",
       "calendarId": "cal_1788437811199",
       "title": "Méca. Fluides",
