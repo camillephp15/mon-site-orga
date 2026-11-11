@@ -12318,14 +12318,14 @@
     },
     {
       "id": "ics_lgr4oze_1794134128592",
-      "calendarId": "cal_1788437811199",
+      "calendarId": "cal_1794437472901",
       "title": "JPO",
       "teacher": "Campus Montpellier",
       "room": "2 allée des meulières - 34170 CASTELNAU LE LEZ",
       "date": "2026-12-12",
       "day": "sat",
       "startTime": "08:30",
-      "duration": 330,
+      "duration": 30,
       "type": "tp",
       "completed": false
     },
