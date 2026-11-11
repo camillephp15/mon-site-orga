@@ -12387,6 +12387,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1794437196330"
+    },
+    {
+      "calendarId": "cal_1794437136234",
+      "title": "La Cordée : Soft Skills",
+      "teacher": "",
+      "date": "2026-11-26",
+      "day": "thu",
+      "startTime": "16:00",
+      "duration": 30,
+      "room": "Lycée",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1794437215996"
     }
   ],
   "importantDates": [
