@@ -48,6 +48,13 @@
       "color": "#8b5cf6",
       "feedUrl": "",
       "lastSync": null
+    },
+    {
+      "id": "cal_1794437472901",
+      "name": "Promotion",
+      "color": "#0284c7",
+      "feedUrl": "",
+      "lastSync": null
     }
   ],
   "events": [
