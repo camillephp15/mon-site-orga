@@ -1,13 +1,6 @@
 {
   "calendars": [
     {
-      "id": "cal_1787764123477",
-      "name": "Travail perso",
-      "color": "#ff3366",
-      "feedUrl": "",
-      "lastSync": null
-    },
-    {
       "id": "cal_1787764281104",
       "name": "Sport",
       "color": "#0284c7",
@@ -52,17 +45,6 @@
   ],
   "events": [
     {
-      "calendarId": "cal_1787764123477",
-      "title": "Travailler CS50",
-      "date": "2026-08-27",
-      "day": "thu",
-      "startTime": "09:00",
-      "duration": 60,
-      "room": "",
-      "completed": false,
-      "id": "ev_1787764199145"
-    },
-    {
       "calendarId": "cal_1787764281104",
       "title": "Escalade",
       "date": "2026-08-27",
@@ -72,20 +54,6 @@
       "room": "",
       "completed": false,
       "id": "ev_1787764301873"
-    },
-    {
-      "calendarId": "cal_1787764123477",
-      "title": "Bosser site",
-      "teacher": "",
-      "date": "2026-09-01",
-      "day": "tue",
-      "startTime": "16:00",
-      "duration": 60,
-      "room": "",
-      "recurrence": "none",
-      "groupId": null,
-      "completed": true,
-      "id": "ev_1788191203642"
     },
     {
       "calendarId": "cal_1788443555880",
@@ -536,20 +504,6 @@
       "id": "ev_1788768271606"
     },
     {
-      "calendarId": "cal_1787764123477",
-      "title": "bus 13h33-13h50",
-      "teacher": "",
-      "date": "2026-09-08",
-      "day": "tue",
-      "startTime": "13:45",
-      "duration": 30,
-      "room": "",
-      "recurrence": "none",
-      "groupId": null,
-      "completed": false,
-      "id": "ev_1788768622040"
-    },
-    {
       "calendarId": "cal_1788443555880",
       "title": "Refaire exos algèbre",
       "teacher": "",
@@ -576,20 +530,6 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1788769000059"
-    },
-    {
-      "calendarId": "cal_1787764123477",
-      "title": "finir carte des compétences (sur B1)",
-      "teacher": "",
-      "date": "2026-09-07",
-      "day": "mon",
-      "startTime": "17:15",
-      "duration": 30,
-      "room": "",
-      "recurrence": "none",
-      "groupId": null,
-      "completed": false,
-      "id": "ev_1788779413339"
     },
     {
       "calendarId": "cal_1788446200874",
@@ -800,20 +740,6 @@
       "groupId": null,
       "completed": true,
       "id": "ev_1789378299324"
-    },
-    {
-      "calendarId": "cal_1787764123477",
-      "title": "zoom BD",
-      "teacher": "",
-      "date": "2026-10-01",
-      "day": "thu",
-      "startTime": "14:30",
-      "duration": 120,
-      "room": "",
-      "recurrence": "none",
-      "groupId": null,
-      "completed": false,
-      "id": "ev_1789390946256"
     },
     {
       "calendarId": "cal_1788443555880",
@@ -1208,20 +1134,6 @@
       "id": "ev_1790371491005"
     },
     {
-      "calendarId": "cal_1787764123477",
-      "title": "RDV Cordée MonaLisa",
-      "teacher": "",
-      "date": "2026-09-29",
-      "day": "tue",
-      "startTime": "17:00",
-      "duration": 30,
-      "room": "",
-      "recurrence": "none",
-      "groupId": null,
-      "completed": true,
-      "id": "ev_1790371817693"
-    },
-    {
       "calendarId": "cal_1787764281104",
       "title": "Course",
       "teacher": "",
@@ -1430,20 +1342,6 @@
       "groupId": null,
       "completed": true,
       "id": "ev_1792414763704"
-    },
-    {
-      "calendarId": "cal_1787764123477",
-      "title": "Finir Base de données",
-      "teacher": "",
-      "date": "2026-10-19",
-      "day": "mon",
-      "startTime": "15:15",
-      "duration": 90,
-      "room": "",
-      "recurrence": "none",
-      "groupId": null,
-      "completed": true,
-      "id": "ev_1792414806926"
     },
     {
       "id": "ics_hebkee3_1794134128554",
@@ -12481,20 +12379,6 @@
       "duration": 540,
       "type": "tp",
       "completed": false
-    },
-    {
-      "calendarId": "cal_1787764123477",
-      "title": "La Cordée : Soft Skills",
-      "teacher": "",
-      "date": "2026-11-26",
-      "day": "thu",
-      "startTime": "14:00",
-      "duration": 120,
-      "room": "lycée",
-      "recurrence": "none",
-      "groupId": null,
-      "completed": false,
-      "id": "ev_1794437062708"
     }
   ],
   "importantDates": [
