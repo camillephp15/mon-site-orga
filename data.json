@@ -12415,6 +12415,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1794437285450"
+    },
+    {
+      "calendarId": "cal_1794437136234",
+      "title": "La Cordée : Visite Kyndril",
+      "teacher": "",
+      "date": "2026-12-14",
+      "day": "mon",
+      "startTime": "11:00",
+      "duration": 30,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1794437302996"
     }
   ],
   "importantDates": [
