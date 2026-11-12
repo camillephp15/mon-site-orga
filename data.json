@@ -12535,6 +12535,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1794481334169"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "Révision Prog",
+      "teacher": "",
+      "date": "2026-11-13",
+      "day": "fri",
+      "startTime": "20:30",
+      "duration": 120,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1794481376962"
     }
   ],
   "importantDates": [
