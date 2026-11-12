@@ -12437,6 +12437,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1794437560259"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "Révision Séries",
+      "teacher": "",
+      "date": "2026-11-12",
+      "day": "thu",
+      "startTime": "10:30",
+      "duration": 120,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1794481177238"
     }
   ],
   "importantDates": [
