@@ -12549,6 +12549,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1794481376962"
+    },
+    {
+      "calendarId": "cal_1788443555880",
+      "title": "Révision Algèbre",
+      "teacher": "",
+      "date": "2026-11-14",
+      "day": "sat",
+      "startTime": "13:00",
+      "duration": 120,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1794481417446"
     }
   ],
   "importantDates": [
