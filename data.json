@@ -12493,6 +12493,20 @@
       "groupId": null,
       "completed": false,
       "id": "ev_1794481271561"
+    },
+    {
+      "calendarId": "cal_1788443635975",
+      "title": "Installation musique",
+      "teacher": "",
+      "date": "2026-11-14",
+      "day": "sat",
+      "startTime": "15:30",
+      "duration": 90,
+      "room": "",
+      "recurrence": "none",
+      "groupId": null,
+      "completed": false,
+      "id": "ev_1794481298979"
     }
   ],
   "importantDates": [
