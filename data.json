@@ -12671,14 +12671,14 @@
     },
     {
       "id": "ics_1d8mo00_1795077477688",
-      "calendarId": "cal_1788437811199",
+      "calendarId": "cal_1794437472901",
       "title": "L'étudiant",
       "teacher": "Salon de l'Enseignement Supérieur - Montpellier",
       "room": "PARC DES EXPOSITIONS HALL B2 ROUTE DE LA FOIRE  - 34470 PEROLS",
       "date": "2027-01-15",
       "day": "fri",
       "startTime": "08:30",
-      "duration": 540,
+      "duration": 30,
       "type": "tp",
       "completed": false
     }
