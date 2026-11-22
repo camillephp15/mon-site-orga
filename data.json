@@ -1358,19 +1358,6 @@
       "id": "ev_1792414763704"
     },
     {
-      "id": "ics_lgr4oze_1794134128592",
-      "calendarId": "cal_1794437472901",
-      "title": "JPO",
-      "teacher": "Campus Montpellier",
-      "room": "2 allée des meulières - 34170 CASTELNAU LE LEZ",
-      "date": "2026-12-12",
-      "day": "sat",
-      "startTime": "08:30",
-      "duration": 240,
-      "type": "tp",
-      "completed": false
-    },
-    {
       "id": "ics_whtk8ot_1794134128592",
       "calendarId": "cal_1794437472901",
       "title": "LYCEE ISMAEL DAUPHIN",
