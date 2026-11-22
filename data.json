@@ -1426,20 +1426,6 @@
       "id": "ev_1794437302996"
     },
     {
-      "calendarId": "cal_1794437472901",
-      "title": "JPO",
-      "teacher": "",
-      "date": "2026-12-12",
-      "day": "sat",
-      "startTime": "12:30",
-      "duration": 90,
-      "room": "",
-      "recurrence": "none",
-      "groupId": null,
-      "completed": false,
-      "id": "ev_1794437560259"
-    },
-    {
       "calendarId": "cal_1788443555880",
       "title": "Révision Séries",
       "teacher": "",
