@@ -12683,38 +12683,7 @@
       "completed": false
     }
   ],
-  "importantDates": [
-    {
-      "title": "EXAM : Séries, Algèbre, POO, BD",
-      "date": "2026-10-03",
-      "color": "#f97316",
-      "id": "imp_1787763961363"
-    },
-    {
-      "title": "EXAM : RDM, Méca des fluides, Statistiques",
-      "date": "2026-10-17",
-      "color": "#f97316",
-      "id": "imp_1787764006392"
-    },
-    {
-      "title": "Concert",
-      "date": "2026-11-14",
-      "color": "#8b5cf6",
-      "id": "imp_1788443601739"
-    },
-    {
-      "title": "TOEFEL",
-      "date": "2026-12-19",
-      "color": "#f97316",
-      "id": "imp_1789647544543"
-    },
-    {
-      "title": "COLLES",
-      "date": "2026-10-07",
-      "color": "#f97316",
-      "id": "imp_1789647565262"
-    }
-  ],
+  "importantDates": [],
   "dailyTodos": [],
   "subjectsData": {
     "maths": [
