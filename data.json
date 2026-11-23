@@ -12683,7 +12683,14 @@
       "completed": false
     }
   ],
-  "importantDates": [],
+  "importantDates": [
+    {
+      "title": "Rendu coopération en équipe",
+      "date": "2026-11-23",
+      "color": "#ff3366",
+      "id": "imp_1795418894652"
+    }
+  ],
   "dailyTodos": [],
   "subjectsData": {
     "maths": [
