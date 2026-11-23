@@ -12760,7 +12760,8 @@
         "id": "phy-ch2",
         "title": "Mécanique des fluides",
         "exosTodo": "• Écoulement de Poiseuille en conduite cylindrique\n• Théorème de Bernoulli avec pertes de charge",
-        "methods": ""
+        "methods": "",
+        "exosHard": "31"
       },
       {
         "id": "phy-ch3",
